@@ -10,11 +10,11 @@ import com.vynqtalk.server.repository.UserRepo;
 @Service
 public class UserService {
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-    private UserRepo userRepo;
 
     @Autowired
+    private UserRepo userRepo;
 
-    public boolean authenticate(User user){
+    public boolean authenticate(User user) {
         User dbUser = userRepo.findByEmail(user.getEmail());
         return passwordEncoder.matches(user.getPassword(), dbUser.getPassword());
     }
