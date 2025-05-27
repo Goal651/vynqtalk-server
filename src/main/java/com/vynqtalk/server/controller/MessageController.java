@@ -1,6 +1,7 @@
 package com.vynqtalk.server.controller;
 
 import com.vynqtalk.server.model.Message;
+import com.vynqtalk.server.model.MessagesResponse;
 import com.vynqtalk.server.service.MessageService;
 
 import java.util.List;
@@ -18,10 +19,10 @@ public class MessageController {
 
     // Get all messages in a conversation or group
     @GetMapping("/conv/{senderId}/{receiverId}")
-    public ResponseEntity<List<Message>> getMessagesByConversation(@PathVariable Long senderId,
+    public ResponseEntity<MessagesResponse> getMessagesByConversation(@PathVariable Long senderId,
             @PathVariable Long receiverId) {
         List<Message> messages = messageService.getMessages(senderId, receiverId);
-        return ResponseEntity.ok(messages);
+        return ResponseEntity.ok(new MessagesResponse(messages,"Messages retrieved successfully",200));
     }
 
     // Get messages by conversation ID

@@ -37,7 +37,7 @@ public class MessageService {
             Message message = existing.get();
             message.setContent(updatedMessage.getContent());
             message.setEdited(true);
-            message.setTimestamp(Instant.now()); // Update timestamp to current time
+            message.setTimestamp(Instant.now()); 
             return messageRepository.save(message);
         } else {
             throw new RuntimeException("Message not found with ID: " + messageId);

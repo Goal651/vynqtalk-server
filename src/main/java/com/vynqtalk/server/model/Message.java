@@ -16,10 +16,6 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.Data;
 
-enum MessageType {
-    text, image, audio, file
-}
-
 @Data
 @Entity
 @Table(name = "messages")
@@ -33,8 +29,8 @@ public class Message {
     private String content;
 
     // @Enumerated(EnumType.STRING)
-    // @Column(nullable = false)
-    // private MessageType type;
+    @Column(nullable = false)
+    private String type;
 
     @Column(nullable = false)
     private String senderId;
@@ -49,10 +45,4 @@ public class Message {
     @Column(nullable = false)
     private boolean isEdited;
 
-    // @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-    // @JoinColumn(name = "message_id")
-    // private List<Reaction> reactions;
-
-    // @Embedded
-    // private ReplyTo replyTo;
 }
