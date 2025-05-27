@@ -16,11 +16,11 @@ public class JwtService {
     private  final SecretKey SECRET_KEY = Keys.hmacShaKeyFor(SECRET.getBytes());
     private  final long EXPIRATION_TIME = 86400000; // 1 day in milliseconds
 
-    public  String generateToken(String email) {
+    public  String generateToken(Long id) {
         long nowMillis = System.currentTimeMillis();
         long expMillis = nowMillis + EXPIRATION_TIME;
         return Jwts.builder()
-                .claim("sub", email)
+                .claim("sub", id)
                 .claim("iat", new Date(nowMillis))
                 .claim("exp", new Date(expMillis))
                 .signWith(SECRET_KEY)

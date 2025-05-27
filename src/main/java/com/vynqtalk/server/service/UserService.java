@@ -1,26 +1,26 @@
 package com.vynqtalk.server.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.vynqtalk.server.model.AuthResult;
 import com.vynqtalk.server.model.User;
-import com.vynqtalk.server.repository.UserRepo;
+import com.vynqtalk.server.repository.UserRepository;
 
 @Service
 public class UserService {
-    private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     @Autowired
-    private UserRepo userRepo;
+    private UserRepository userRepo;
 
-    public boolean authenticate(User user) {
+    public AuthResult authenticate(User user) {
         User dbUser = userRepo.findByEmail(user.getEmail());
-        return passwordEncoder.matches(user.getPassword(), dbUser.getPassword());
+        return (dbUser != null && user.getPassword()== dbUser.getPassword())
+                ? new AuthResult(true, dbUser)
+                : new AuthResult(false, null);
     }
 
     public void saveUser(User user) {
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
         userRepo.save(user);
     }
 }

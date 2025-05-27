@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.vynqtalk.server.model.ApiResponse;
+import com.vynqtalk.server.model.AuthResult;
 import com.vynqtalk.server.model.User;
 import com.vynqtalk.server.service.JwtService;
 import com.vynqtalk.server.service.UserService;
@@ -22,11 +23,18 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<ApiResponse<String>> login(@RequestBody User user) {
-        // Authenticate the user
-        if (!userService.authenticate(user)) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ApiResponse<>(null, "Invalid credentials", HttpStatus.UNAUTHORIZED.value()));
+        if (user.getEmail() == null || user.getPassword() == null) {
+            return ResponseEntity.badRequest().body(new ApiResponse<>(null, "Email and password are required", HttpStatus.BAD_REQUEST.value()));
         }
-        String token = jwtService.generateToken(user.getEmail());
+        AuthResult authResult = userService.authenticate(user);
+        if (!authResult.isAuth()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ApiResponse<>(null, "Invalid email or password", HttpStatus.UNAUTHORIZED.value()));
+        }
+        User authenticatedUser = authResult.getUser();
+        if (authenticatedUser == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ApiResponse<>(null, "Invalid email or password", HttpStatus.UNAUTHORIZED.value()));
+        }
+        String token = jwtService.generateToken(user.getId());
         return ResponseEntity.ok(new ApiResponse<>(token, "Login successful", HttpStatus.OK.value()));
     }
 
