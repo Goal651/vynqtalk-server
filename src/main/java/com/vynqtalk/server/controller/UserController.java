@@ -1,14 +1,16 @@
 package com.vynqtalk.server.controller;
 
 import com.vynqtalk.server.model.User;
+import com.vynqtalk.server.model.UsersResponse;
 import com.vynqtalk.server.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/users")
+@RequestMapping("/api/v1/users")
 public class UserController {
 
     @Autowired
@@ -29,8 +31,8 @@ public class UserController {
 
     // Update user profile
     @PutMapping("/{id}")
-    public User updateUser(@PathVariable Long id, @RequestBody User user) {
-        return userService.updateUser(id, user);
+    public ResponseEntity<User> updateUser(@PathVariable Long id, @RequestBody User user) {
+        return ResponseEntity.ok(userService.updateUser(id, user));
     }
 
     // Delete user account
@@ -41,7 +43,7 @@ public class UserController {
 
     // List all users
     @GetMapping
-    public List<User> getAllUsers() {
-        return userService.getAllUsers();
+    public ResponseEntity<UsersResponse> getAllUsers() {
+        return ResponseEntity.ok(new UsersResponse(userService.getAllUsers(),"successfully loaded",200));
     }
 }

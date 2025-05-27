@@ -32,28 +32,27 @@ public class Message {
     @Column(nullable = false, columnDefinition = "TEXT")
     private String content;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private MessageType type;
+    // @Enumerated(EnumType.STRING)
+    // @Column(nullable = false)
+    // private MessageType type;
 
     @Column(nullable = false)
     private String senderId;
 
     @Column(nullable = false)
-    private String senderName;
+    private String receiverId;
 
-    private String senderAvatar;
 
-    @Column(nullable = false)
-    private Instant timestamp;
+    // @Column(nullable = false)
+    // private Instant timestamp;
 
     @Column(nullable = false)
     private boolean isEdited;
 
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(name = "message_id")
-    private List<Reaction> reactions;
+    // @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    // @JoinColumn(name = "message_id")
+    // private List<Reaction> reactions;
 
-    @Embedded
-    private ReplyTo replyTo;
+    // @Embedded
+    // private ReplyTo replyTo;
 }
