@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.vynqtalk.server.model.ApiResponse;
 import com.vynqtalk.server.model.AuthResult;
+import com.vynqtalk.server.model.LoginData;
 import com.vynqtalk.server.model.SignupData;
 import com.vynqtalk.server.model.SignupResponse;
 import com.vynqtalk.server.model.User;
@@ -26,7 +27,7 @@ public class AuthController {
     private JwtService jwtService;
 
     @PostMapping("/login")
-    public ResponseEntity<ApiResponse<String>> login(@RequestBody User user) {
+    public ResponseEntity<ApiResponse<LoginData>> login(@RequestBody User user) {
         if (user.getEmail() == null || user.getPassword() == null) {
             return ResponseEntity.badRequest()
                     .body(new ApiResponse<>(null, "Email and password are required", HttpStatus.BAD_REQUEST.value()));
@@ -41,8 +42,12 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(new ApiResponse<>(null, "Invalid email or password", HttpStatus.UNAUTHORIZED.value()));
         }
-        String token = jwtService.generateToken(user.getId());
-        return ResponseEntity.ok(new ApiResponse<>(token, "Login successful", HttpStatus.OK.value()));
+
+        String token = jwtService.generateToken(authenticatedUser.getEmail());
+
+        return ResponseEntity.ok(new ApiResponse<LoginData>(new LoginData(authenticatedUser, token), "Login successful",
+                HttpStatus.OK.value(),
+                authenticatedUser));
     }
 
     @PostMapping("/signup")
@@ -53,12 +58,12 @@ public class AuthController {
         }
         user.setIsAdmin(false); // Default to non-admin user
         // Check if user already exists
-        if (userService.getUserById(user.getId()) != null) {
+        if (userService.getUserByEmail(user.getEmail()) != null) {
             return ResponseEntity.status(HttpStatus.CONFLICT)
                     .body(new SignupResponse<>(null, "User already exists"));
         }
         userService.saveUser(user);
-        String token = jwtService.generateToken(user.getId());
+        String token = jwtService.generateToken(user.getEmail());
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(new SignupResponse<SignupData>(new SignupData(token, user), "Signup successful"));
     }

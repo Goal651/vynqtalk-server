@@ -3,9 +3,9 @@ package com.vynqtalk.server.model;
 import lombok.Data;
 
 @Data
-public class ChatMessage {
+public class ChatMessage  {
     private String sender;
     private String content;
-    private String type; // e.g., "CHAT", "JOIN", "LEAVE"
+    private String type; 
 }
 

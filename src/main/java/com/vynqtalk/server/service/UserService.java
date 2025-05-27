@@ -18,7 +18,7 @@ public class UserService {
 
     public AuthResult authenticate(User user) {
         User dbUser = userRepo.findByEmail(user.getEmail());
-        return (dbUser != null && user.getPassword() == dbUser.getPassword())
+        return (dbUser != null && dbUser.getPassword().equals(user.getPassword()))
                 ? new AuthResult(true, dbUser)
                 : new AuthResult(false, null);
     }
@@ -31,6 +31,10 @@ public class UserService {
     public User getUserById(Long id) {
         Optional<User> user = userRepo.findById(id);
         return user.orElse(null);
+    }
+
+    public User getUserByEmail(String email) {
+        return userRepo.findByEmail(email);
     }
 
     // Update user profile

@@ -1,8 +1,10 @@
 package com.vynqtalk.server.handler;
 
+import org.springframework.stereotype.Component;
 import org.springframework.web.socket.*;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 
+@Component
 public class SocketHandler extends TextWebSocketHandler {
 
     @Override

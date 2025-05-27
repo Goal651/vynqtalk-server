@@ -6,7 +6,7 @@ import lombok.Data;
 @Data
 @AllArgsConstructor
 public class SignupData {
-    private String access_token;
+    private String accessToken;
     private User user;
 
 }
