@@ -20,7 +20,7 @@ public class JwtService {
         long nowMillis = System.currentTimeMillis();
         long expMillis = nowMillis + EXPIRATION_TIME;
         return Jwts.builder()
-                .claim("sub", id)
+                .claim("sub", String.valueOf(id))
                 .claim("iat", new Date(nowMillis))
                 .claim("exp", new Date(expMillis))
                 .signWith(SECRET_KEY)

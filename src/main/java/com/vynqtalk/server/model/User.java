@@ -14,10 +14,10 @@ import lombok.Data;
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;
+    private Long id; 
 
     @Column(nullable = false)
-    private String names;
+    private String name;
 
     @Column(nullable = false)
     private String email;
