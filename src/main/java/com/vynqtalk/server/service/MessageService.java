@@ -5,6 +5,7 @@ import com.vynqtalk.server.repository.MessageRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
@@ -21,8 +22,9 @@ public class MessageService {
     public Message getMessagesByConversationId(Long conversationId) {
         return messageRepository.findById(conversationId).get();
     }
+
     public List<Message> getMessages(Long senderId, Long receiverId) {
-        return messageRepository.findMessagesBetweenUsers(senderId, receiverId);
+        return messageRepository.findChatBetweenUsers(String.valueOf(senderId), String.valueOf(receiverId));
     }
 
     public void deleteMessage(Long messageId) {
@@ -35,6 +37,7 @@ public class MessageService {
             Message message = existing.get();
             message.setContent(updatedMessage.getContent());
             message.setEdited(true);
+            message.setTimestamp(Instant.now()); // Update timestamp to current time
             return messageRepository.save(message);
         } else {
             throw new RuntimeException("Message not found with ID: " + messageId);

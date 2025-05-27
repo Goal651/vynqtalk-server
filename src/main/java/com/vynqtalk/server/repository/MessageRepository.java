@@ -4,14 +4,14 @@ import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import com.vynqtalk.server.model.Message;
 
 public interface MessageRepository extends JpaRepository<Message, Long> {
     @Query("SELECT m FROM Message m WHERE " +
-            "(m.senderId = :user1 AND m.receiverId = :user2) OR " +
-            "(m.senderId = :user2 AND m.receiverId = :user1) " +
-            "ORDER BY m.timestamp ASC")
-    List<Message> findMessagesBetweenUsers(Long user1, Long user2);
+            "(m.senderId = :userA AND m.receiverId = :userB) OR " +
+            "(m.senderId = :userB AND m.receiverId = :userA) ")
+    List<Message> findChatBetweenUsers(@Param("userA") String userA, @Param("userB") String userB);
 
 }

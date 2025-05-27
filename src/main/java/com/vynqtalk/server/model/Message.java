@@ -43,8 +43,8 @@ public class Message {
     private String receiverId;
 
 
-    // @Column(nullable = false)
-    // private Instant timestamp;
+    @Column(nullable = false)
+    private Instant timestamp;
 
     @Column(nullable = false)
     private boolean isEdited;

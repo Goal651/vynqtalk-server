@@ -4,7 +4,6 @@ import com.vynqtalk.server.model.ChatMessage;
 import com.vynqtalk.server.model.Message;
 import com.vynqtalk.server.service.MessageService;
 
-import java.util.Date;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.MessageMapping;
