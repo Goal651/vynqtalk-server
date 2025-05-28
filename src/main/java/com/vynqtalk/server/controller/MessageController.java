@@ -42,6 +42,7 @@ public class MessageController {
     // Delete a message
     @DeleteMapping("/{messageId}")
     public ResponseEntity<Void> deleteMessage(@PathVariable Long messageId) {
+        System.out.println("messageId"+messageId);
         messageService.deleteMessage(messageId);
         return ResponseEntity.noContent().build();
     }
