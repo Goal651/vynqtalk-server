@@ -8,12 +8,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.vynqtalk.server.model.ApiResponse;
-import com.vynqtalk.server.model.AuthResult;
 import com.vynqtalk.server.model.LoginData;
 import com.vynqtalk.server.model.SignupData;
-import com.vynqtalk.server.model.SignupResponse;
 import com.vynqtalk.server.model.User;
+import com.vynqtalk.server.model.response.ApiResponse;
+import com.vynqtalk.server.model.response.AuthResult;
+import com.vynqtalk.server.model.response.SignupResponse;
 import com.vynqtalk.server.service.JwtService;
 import com.vynqtalk.server.service.UserService;
 

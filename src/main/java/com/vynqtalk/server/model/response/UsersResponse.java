@@ -1,7 +1,8 @@
-package com.vynqtalk.server.model;
+package com.vynqtalk.server.model.response;
 
 import java.util.List;
 
+import com.vynqtalk.server.model.User;
 
 import lombok.Data;
 

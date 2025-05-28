@@ -1,7 +1,7 @@
 package com.vynqtalk.server.controller;
 
 import com.vynqtalk.server.model.Message;
-import com.vynqtalk.server.model.MessagesResponse;
+import com.vynqtalk.server.model.response.MessagesResponse;
 import com.vynqtalk.server.service.MessageService;
 
 import java.util.List;
@@ -28,7 +28,7 @@ public class MessageController {
     // Get messages by conversation ID
     @GetMapping("/{conversationId}")
     public ResponseEntity<Message> getMessages(@PathVariable Long conversationId) {
-        Message messages = messageService.getMessagesByConversationId(conversationId);
+        Message messages = messageService.getMessageById(conversationId).get();
         return ResponseEntity.ok(messages);
     }
 

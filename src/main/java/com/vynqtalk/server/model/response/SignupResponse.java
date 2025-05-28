@@ -1,4 +1,6 @@
-package com.vynqtalk.server.model;
+package com.vynqtalk.server.model.response;
+
+import com.vynqtalk.server.model.SignupData;
 
 import lombok.Data;
 

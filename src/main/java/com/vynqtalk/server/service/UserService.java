@@ -3,8 +3,8 @@ package com.vynqtalk.server.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.vynqtalk.server.model.AuthResult;
 import com.vynqtalk.server.model.User;
+import com.vynqtalk.server.model.response.AuthResult;
 import com.vynqtalk.server.repository.UserRepository;
 
 import java.util.List;

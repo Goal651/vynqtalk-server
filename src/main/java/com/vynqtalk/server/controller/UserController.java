@@ -1,7 +1,7 @@
 package com.vynqtalk.server.controller;
 
 import com.vynqtalk.server.model.User;
-import com.vynqtalk.server.model.UsersResponse;
+import com.vynqtalk.server.model.response.UsersResponse;
 import com.vynqtalk.server.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;

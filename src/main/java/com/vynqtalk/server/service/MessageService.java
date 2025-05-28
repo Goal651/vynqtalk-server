@@ -19,8 +19,8 @@ public class MessageService {
         return messageRepository.save(message);
     }
 
-    public Message getMessagesByConversationId(Long conversationId) {
-        return messageRepository.findById(conversationId).get();
+    public Optional<Message> getMessageById(Long id) {
+        return messageRepository.findById(id);
     }
 
     public List<Message> getMessages(Long senderId, Long receiverId) {
@@ -37,7 +37,18 @@ public class MessageService {
             Message message = existing.get();
             message.setContent(updatedMessage.getContent());
             message.setEdited(true);
-            message.setTimestamp(Instant.now()); 
+            message.setTimestamp(Instant.now());
+            return messageRepository.save(message);
+        } else {
+            throw new RuntimeException("Message not found with ID: " + messageId);
+        }
+    }
+
+    public Message reactToMessage(Long messageId, List<String> reactions) {
+        Optional<Message> existing = messageRepository.findById(messageId);
+        if (existing.isPresent()) {
+            Message message = existing.get();
+            message.setReactions(reactions);
             return messageRepository.save(message);
         } else {
             throw new RuntimeException("Message not found with ID: " + messageId);
