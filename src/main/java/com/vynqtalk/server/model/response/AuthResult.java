@@ -12,6 +12,7 @@ public class AuthResult {
     public AuthResult(boolean auth, User user) {
         this.auth = auth;
         this.user = user;
+        user.setPassword(null);
     }
 
     public AuthResult() {

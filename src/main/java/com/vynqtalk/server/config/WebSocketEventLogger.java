@@ -1,0 +1,49 @@
+package com.vynqtalk.server.config;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.messaging.Message;
+import org.springframework.messaging.MessageChannel;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.messaging.simp.stomp.StompCommand;
+import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
+import org.springframework.messaging.support.ChannelInterceptor;
+import org.springframework.stereotype.Component;
+
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+
+@Component
+public class WebSocketEventLogger implements ChannelInterceptor {
+    private static final Logger logger = LoggerFactory.getLogger(WebSocketEventLogger.class);
+
+    private final Set<String> connectedUsers = ConcurrentHashMap.newKeySet();
+
+    @Autowired
+    @Lazy // Lazy to avoid circular dependency issues
+    private SimpMessagingTemplate messagingTemplate;
+
+    private void broadcastUsers() {
+        messagingTemplate.convertAndSend("/topic/onlineUsers", connectedUsers);
+    }
+
+    @Override
+    public Message<?> preSend(Message<?> message, MessageChannel channel) {
+        StompHeaderAccessor accessor = StompHeaderAccessor.wrap(message);
+        StompCommand command = accessor.getCommand();
+        String sessionId = accessor.getSessionId();
+
+        if (command == StompCommand.CONNECT) {
+            connectedUsers.add(sessionId);
+            logger.info("STOMP client connected: sessionId={}", sessionId);
+            broadcastUsers();
+        } else if (command == StompCommand.DISCONNECT) {
+            connectedUsers.remove(sessionId);
+            logger.info("STOMP client disconnected: sessionId={}", sessionId);
+            broadcastUsers();
+        }
+        return message;
+    }
+}

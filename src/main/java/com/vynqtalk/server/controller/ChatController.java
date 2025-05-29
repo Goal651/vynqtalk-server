@@ -9,7 +9,6 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
-import org.hibernate.mapping.Array;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
@@ -32,7 +31,7 @@ public class ChatController {
         savedMessage.setEdited(false);
         savedMessage.setType("text");
         savedMessage.setTimestamp(Instant.now());
-        savedMessage.setReactions(message.getReactions());
+        savedMessage.setReactions(List.of());
         messageService.saveMessage(savedMessage);
         return message;
     }

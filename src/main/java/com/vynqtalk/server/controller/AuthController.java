@@ -37,6 +37,7 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(new ApiResponse<>(null, "Invalid email or password", HttpStatus.UNAUTHORIZED.value()));
         }
+        System.out.println("Loaded users " + authResult.toString());
         User authenticatedUser = authResult.getUser();
         if (authenticatedUser == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
