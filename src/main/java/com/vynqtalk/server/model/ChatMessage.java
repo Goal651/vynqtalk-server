@@ -5,8 +5,8 @@ import lombok.Data;
 
 @Data
 public class ChatMessage  {
-    private String sender;
-    private String receiver;
+    private Long senderId;
+    private Long receiverId;
     private String content;
     private String type; 
 }

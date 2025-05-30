@@ -28,10 +28,10 @@ public class Message {
     private String type;
 
     @Column(nullable = false)
-    private String senderId;
+    private Long senderId;
 
     @Column(nullable = false)
-    private String receiverId;
+    private Long receiverId;
 
     @Column(nullable = false)
     private Instant timestamp;

@@ -24,9 +24,10 @@ public class ChatController {
     @MessageMapping("/chat.sendMessage") // front-end will send to /app/chat.sendMessage
     @SendTo("/topic/public") // sent back to all clients subscribed to /topic/public
     public ChatMessage receiveMessage(@Payload ChatMessage message) {
+        System.out.println("Received message: " + message);
         Message savedMessage = new Message();
-        savedMessage.setSenderId(message.getSender());
-        savedMessage.setReceiverId(message.getReceiver());
+        savedMessage.setSenderId(message.getSenderId());
+        savedMessage.setReceiverId(message.getReceiverId());
         savedMessage.setContent(message.getContent());
         savedMessage.setEdited(false);
         savedMessage.setType("text");
