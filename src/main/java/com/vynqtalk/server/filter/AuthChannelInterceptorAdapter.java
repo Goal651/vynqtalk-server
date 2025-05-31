@@ -29,7 +29,6 @@ public class AuthChannelInterceptorAdapter implements HandshakeInterceptor {
             }
 
         }
-        response.setStatusCode(org.springframework.http.HttpStatus.UNAUTHORIZED);
         return true;
     }
 

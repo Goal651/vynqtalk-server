@@ -54,4 +54,16 @@ public class MessageService {
             throw new RuntimeException("Message not found with ID: " + messageId);
         }
     }
+
+    public Message replyMessage(Long messageId, Message reply) {
+        Optional<Message> existing = messageRepository.findById(messageId);
+        if (existing.isPresent()) {
+            Message message = existing.get();
+            reply.setReplyToMessageId(message);
+            reply.setTimestamp(Instant.now());
+            return messageRepository.save(reply);
+        } else {
+            throw new RuntimeException("Message not found with ID: " + messageId);
+        }
+    }
 }
