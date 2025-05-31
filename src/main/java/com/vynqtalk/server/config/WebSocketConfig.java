@@ -17,6 +17,9 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     @Autowired
     private WebSocketEventLogger webSocketEventLogger;
 
+    @Autowired
+    private AuthChannelInterceptorAdapter authInterceptor;
+
     @SuppressWarnings("null")
     @Override
     public void configureMessageBroker(MessageBrokerRegistry config) {
@@ -29,7 +32,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry.addEndpoint("/ws")
                 .setAllowedOrigins("http://localhost:8080")
-                .addInterceptors(new AuthChannelInterceptorAdapter())
+                .addInterceptors(authInterceptor)
                 .withSockJS();
     }
 
