@@ -22,8 +22,8 @@ public class ChatController {
     @Autowired
     private MessageService messageService;
 
-    @MessageMapping("/chat.sendMessage") // front-end will send to /app/chat.sendMessage
-    @SendTo("/topic/public") // sent back to all clients subscribed to /topic/public
+    @MessageMapping("/chat.sendMessage")
+    @SendTo("/topic/public")
     public Message receiveMessage(@Payload ChatMessage message) {
         System.out.println("Received message: " + message);
         Message savedMessage = new Message();
@@ -53,15 +53,15 @@ public class ChatController {
         return messageService.saveMessage(savedMessage);
     }
 
-    @MessageMapping("/chat.chat.reactToMessage")
+    @MessageMapping("/chat.sendMessageReaction")
     @SendTo("/topic/public")
     public String reactToMessage(@Payload ReactMessage message) {
-        Optional<Message> exist = messageService.getMessageById(message.getId());
+        System.out.println("Received message: " + message);
+        Optional<Message> exist = messageService.getMessageById(message.getMessageId());
         if (exist.isPresent()) {
             Message savedMessage = exist.get();
-            List<String> reactions = savedMessage.getReactions();
-            reactions.add(message.getReaction());
-            savedMessage.setReactions(reactions);
+            savedMessage.setReactions(message.getReactions());
+            messageService.saveMessage(savedMessage); // <-- persist the update
         }
         return "Successfully updated";
     }
