@@ -20,7 +20,6 @@ public class AuthChannelInterceptorAdapter implements HandshakeInterceptor {
     @Autowired
     private JwtService jwtService;
 
-    @SuppressWarnings("null")
 
     @Override
     public boolean beforeHandshake(ServerHttpRequest request, ServerHttpResponse response,
@@ -43,17 +42,17 @@ public class AuthChannelInterceptorAdapter implements HandshakeInterceptor {
             return false;
         }
 
-        String userId = jwtService.getUsernameFromToken(token);
-        System.out.println("User ID extracted from token: " + userId);
+        String userEmail = jwtService.getUsernameFromToken(token);
+        System.out.println("User ID extracted from token: " + userEmail);
 
-        if (userId == null) {
+        if (userEmail == null) {
             System.out.println("Invalid token, user ID is null");
             response.setStatusCode(org.springframework.http.HttpStatus.UNAUTHORIZED);
             return false;
         }
 
-        System.out.println("User ID is valid: " + userId);
-        attributes.put("userId", userId);
+        System.out.println("User ID is valid: " + userEmail);
+        attributes.put("userEmail", userEmail);
         return true;
     }
 
