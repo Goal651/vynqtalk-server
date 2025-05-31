@@ -1,6 +1,7 @@
 package com.vynqtalk.server.controller;
 
 import com.vynqtalk.server.model.ChatMessage;
+import com.vynqtalk.server.model.ChatMessageReply;
 import com.vynqtalk.server.model.Message;
 import com.vynqtalk.server.model.ReactMessage;
 import com.vynqtalk.server.service.MessageService;
@@ -23,7 +24,7 @@ public class ChatController {
 
     @MessageMapping("/chat.sendMessage") // front-end will send to /app/chat.sendMessage
     @SendTo("/topic/public") // sent back to all clients subscribed to /topic/public
-    public ChatMessage receiveMessage(@Payload ChatMessage message) {
+    public Message receiveMessage(@Payload ChatMessage message) {
         System.out.println("Received message: " + message);
         Message savedMessage = new Message();
         savedMessage.setSenderId(message.getSenderId());
@@ -33,17 +34,32 @@ public class ChatController {
         savedMessage.setType("text");
         savedMessage.setTimestamp(Instant.now());
         savedMessage.setReactions(List.of());
-        messageService.saveMessage(savedMessage);
-        return message;
+        return messageService.saveMessage(savedMessage);
+    }
+
+    @MessageMapping("/chat.sendMessageReply") // front-end will send to /app/chat.sendMessage
+    @SendTo("/topic/public") // sent back to all clients subscribed to /topic/public
+    public Message receiveMessage(@Payload ChatMessageReply message) {
+        System.out.println("Received message: " + message);
+        Message savedMessage = new Message();
+        savedMessage.setSenderId(message.getSenderId());
+        savedMessage.setReceiverId(message.getReceiverId());
+        savedMessage.setContent(message.getContent());
+        savedMessage.setReplyToMessageId(message.getReplyToMessage());
+        savedMessage.setEdited(false);
+        savedMessage.setType("text");
+        savedMessage.setTimestamp(Instant.now());
+        savedMessage.setReactions(List.of());
+        return messageService.saveMessage(savedMessage);
     }
 
     @MessageMapping("/chat.chat.reactToMessage")
     @SendTo("/topic/public")
-    public String reactToMessage(@Payload ReactMessage message){
-        Optional<Message> exist=messageService.getMessageById(message.getId());
-        if(exist.isPresent()){
-            Message savedMessage=exist.get();
-            List<String> reactions=savedMessage.getReactions();
+    public String reactToMessage(@Payload ReactMessage message) {
+        Optional<Message> exist = messageService.getMessageById(message.getId());
+        if (exist.isPresent()) {
+            Message savedMessage = exist.get();
+            List<String> reactions = savedMessage.getReactions();
             reactions.add(message.getReaction());
             savedMessage.setReactions(reactions);
         }
