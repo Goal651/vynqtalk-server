@@ -1,9 +1,9 @@
 package com.vynqtalk.server.controller;
 
-import com.vynqtalk.server.model.ChatMessage;
-import com.vynqtalk.server.model.ChatMessageReply;
 import com.vynqtalk.server.model.Message;
-import com.vynqtalk.server.model.ReactMessage;
+import com.vynqtalk.server.model.sockets.ChatMessage;
+import com.vynqtalk.server.model.sockets.ChatMessageReply;
+import com.vynqtalk.server.model.sockets.ReactMessage;
 import com.vynqtalk.server.service.MessageService;
 
 import java.time.Instant;

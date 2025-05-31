@@ -1,9 +1,14 @@
 package com.vynqtalk.server.model;
 
+import java.util.List;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
 import lombok.Data;
 
 @Entity
@@ -19,5 +24,9 @@ public class Group {
     private String createdBy;
     private String createdAt;
     private Boolean isPrivate;
-    private String[] members;
+
+    @ManyToMany
+    @JoinTable(name = "group_members", joinColumns = @JoinColumn(name = "group_id"), inverseJoinColumns = @JoinColumn(name = "user_id"))
+
+    private List<User> members;
 }

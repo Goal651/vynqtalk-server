@@ -1,5 +1,7 @@
-package com.vynqtalk.server.model;
+package com.vynqtalk.server.model.sockets;
 
+
+import com.vynqtalk.server.model.Message;
 
 import lombok.Data;
 
