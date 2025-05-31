@@ -22,13 +22,14 @@ public class WebSocketEventLogger implements ChannelInterceptor {
     private final Set<String> connectedUsers = ConcurrentHashMap.newKeySet();
 
     @Autowired
-    @Lazy // Lazy to avoid circular dependency issues
+    @Lazy 
     private SimpMessagingTemplate messagingTemplate;
 
     private void broadcastUsers() {
         messagingTemplate.convertAndSend("/topic/onlineUsers", connectedUsers);
     }
 
+    @SuppressWarnings("null")
     @Override
     public Message<?> preSend(Message<?> message, MessageChannel channel) {
         StompHeaderAccessor accessor = StompHeaderAccessor.wrap(message);

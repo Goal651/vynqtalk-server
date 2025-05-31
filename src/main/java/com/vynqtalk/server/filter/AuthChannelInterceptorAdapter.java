@@ -11,7 +11,7 @@ import org.springframework.web.socket.WebSocketHandler;
 import org.springframework.web.socket.server.HandshakeInterceptor;
 
 public class AuthChannelInterceptorAdapter implements HandshakeInterceptor {
-
+    @SuppressWarnings("null")
     @Override
     public boolean beforeHandshake(ServerHttpRequest request, ServerHttpResponse response,
             WebSocketHandler wsHandler, Map<String, Object> attributes) throws Exception {
@@ -32,10 +32,10 @@ public class AuthChannelInterceptorAdapter implements HandshakeInterceptor {
         return true;
     }
 
+    @SuppressWarnings("null")
     @Override
     public void afterHandshake(ServerHttpRequest request, ServerHttpResponse response,
             WebSocketHandler wsHandler, Exception exception) {
-
 
     }
 }
