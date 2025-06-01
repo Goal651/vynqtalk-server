@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.vynqtalk.server.model.Group;
+import com.vynqtalk.server.model.response.ApiResponse;
 import com.vynqtalk.server.service.GroupService;
 
 @RestController
@@ -27,44 +28,49 @@ public class GroupController {
 
     // Get all groups
     @GetMapping
-    public ResponseEntity<List<Group>> getAllGroups() {
+    public ResponseEntity<ApiResponse<List<Group>>> getAllGroups() {
         List<Group> groups = groupService.findAll();
-        return ResponseEntity.ok(groups);
+        return ResponseEntity.ok(new ApiResponse<>(groups, "Groups retrieved successfully", 200));
     }
 
     // Get group by ID
     @GetMapping("/{id}")
-    public ResponseEntity<Group> getGroupById(@PathVariable Long id) {
+    public ResponseEntity<ApiResponse<Group>> getGroupById(@PathVariable Long id) {
         Group group = groupService.findById(id);
-        return group != null ? ResponseEntity.ok(group) : ResponseEntity.notFound().build();
+        if (group == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new ApiResponse<>(null, "Group not found", HttpStatus.NOT_FOUND.value()));
+        }
+        return ResponseEntity.ok(new ApiResponse<>(group, "Group retrieved successfully", 200));
     }
 
     // Create a new group
     @PostMapping
-    public ResponseEntity<Group> createGroup(@RequestBody Group group) {
+    public ResponseEntity<ApiResponse<Group>> createGroup(@RequestBody Group group) {
         group.setCreatedAt(Instant.now());
         group.setCreatedBy("system");
         Group savedGroup = groupService.save(group);
-        return ResponseEntity.status(HttpStatus.CREATED).body(savedGroup);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(new ApiResponse<>(savedGroup, "Group created successfully", HttpStatus.CREATED.value()));
     }
 
     // Update an existing group
     @PutMapping("/{id}")
-    public ResponseEntity<Group> updateGroup(@PathVariable Long id, @RequestBody Group updatedGroup) {
+    public ResponseEntity<ApiResponse<Group>> updateGroup(@PathVariable Long id, @RequestBody Group updatedGroup) {
         Group existingGroup = groupService.findById(id);
         if (existingGroup == null) {
             return ResponseEntity.notFound().build();
         }
         updatedGroup.setId(id);
         Group savedGroup = groupService.save(updatedGroup);
-        return ResponseEntity.ok(savedGroup);
+        return ResponseEntity.ok(new ApiResponse<>(savedGroup, "Group updated successfully", 200));
     }
 
     // Delete group by ID
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteGroup(@PathVariable Long id) {
+    public ResponseEntity<ApiResponse<Void>> deleteGroup(@PathVariable Long id) {
         groupService.delete(id);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok(new ApiResponse<>(null, "Group deleted successfully", 200));
     }
 
 }
