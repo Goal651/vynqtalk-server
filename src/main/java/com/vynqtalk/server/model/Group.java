@@ -1,7 +1,9 @@
 package com.vynqtalk.server.model;
 
+import java.time.Instant;
 import java.util.List;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -20,15 +22,22 @@ public class Group {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
+    @Column(nullable = false)
     private String name;
-    private String avatar;
+
+    @Column(nullable = false)
     private String description;
+    
+    @Column(nullable = false)
     private String createdBy;
-    private String createdAt;
+    
+    @Column(nullable = false)
+    private Instant createdAt;
+
+    @Column(nullable = false)
     private Boolean isPrivate;
 
     @ManyToMany
     @JoinTable(name = "group_members", joinColumns = @JoinColumn(name = "group_id"), inverseJoinColumns = @JoinColumn(name = "user_id"))
-
     private List<User> members;
 }

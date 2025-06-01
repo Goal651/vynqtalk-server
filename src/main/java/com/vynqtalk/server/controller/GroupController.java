@@ -1,5 +1,6 @@
 package com.vynqtalk.server.controller;
 
+import java.time.Instant;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +10,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -40,9 +42,22 @@ public class GroupController {
     // Create a new group
     @PostMapping
     public ResponseEntity<Group> createGroup(@RequestBody Group group) {
+        group.setCreatedAt(Instant.now());
+        group.setCreatedBy("system");
         Group savedGroup = groupService.save(group);
         return ResponseEntity.status(HttpStatus.CREATED).body(savedGroup);
     }
+// Update an existing group
+@PutMapping("/{id}")
+public ResponseEntity<Group> updateGroup(@PathVariable Long id, @RequestBody Group updatedGroup) {
+    Group existingGroup = groupService.findById(id);
+    if (existingGroup == null) {
+        return ResponseEntity.notFound().build();
+    }
+    updatedGroup.setId(id);
+    Group savedGroup = groupService.save(updatedGroup);
+    return ResponseEntity.ok(savedGroup);
+}
 
     // Delete group by ID
     @DeleteMapping("/{id}")
