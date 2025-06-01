@@ -2,13 +2,11 @@ package com.vynqtalk.server.model.response;
 
 import com.vynqtalk.server.model.User;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.*;
 
 @Data
 @AllArgsConstructor
-public class SignupData {
-    private String accessToken;
+public class AuthData {
     private User user;
-
+    private String accessToken;
 }

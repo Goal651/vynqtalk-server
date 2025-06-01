@@ -11,9 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.vynqtalk.server.model.User;
 import com.vynqtalk.server.model.response.ApiResponse;
 import com.vynqtalk.server.model.response.AuthResult;
-import com.vynqtalk.server.model.response.LoginData;
-import com.vynqtalk.server.model.response.SignupData;
-import com.vynqtalk.server.model.response.SignupResponse;
+import com.vynqtalk.server.model.response.AuthData;
 import com.vynqtalk.server.service.JwtService;
 import com.vynqtalk.server.service.UserService;
 
@@ -27,7 +25,7 @@ public class AuthController {
     private JwtService jwtService;
 
     @PostMapping("/login")
-    public ResponseEntity<ApiResponse<LoginData>> login(@RequestBody User user) {
+    public ResponseEntity<ApiResponse<AuthData>> login(@RequestBody User user) {
         if (user.getEmail() == null || user.getPassword() == null) {
             return ResponseEntity.badRequest()
                     .body(new ApiResponse<>(null, "Email and password are required", HttpStatus.BAD_REQUEST.value()));
@@ -37,7 +35,7 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(new ApiResponse<>(null, "Invalid email or password", HttpStatus.UNAUTHORIZED.value()));
         }
-        System.out.println("Loaded users " + authResult.toString());
+
         User authenticatedUser = authResult.getUser();
         if (authenticatedUser == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
@@ -45,28 +43,27 @@ public class AuthController {
         }
 
         String token = jwtService.generateToken(authenticatedUser.getEmail());
-
-        return ResponseEntity.ok(new ApiResponse<LoginData>(new LoginData(authenticatedUser, token), "Login successful",
-                HttpStatus.OK.value(),
-                authenticatedUser));
+        AuthData loginData = new AuthData(authenticatedUser, token);
+        return ResponseEntity.ok(new ApiResponse<>(loginData, "Login successful", HttpStatus.OK.value()));
     }
 
     @PostMapping("/signup")
-    public ResponseEntity<SignupResponse<SignupData>> signup(@RequestBody User user) {
+    public ResponseEntity<ApiResponse<AuthData>> signup(@RequestBody User user) {
         if (user.getEmail() == null || user.getPassword() == null || user.getName() == null) {
             return ResponseEntity.badRequest().body(
-                    new SignupResponse<>(null, "Email, password, and name are required"));
+                   new     ApiResponse<>(null, "Email, password, and name are required", HttpStatus.BAD_REQUEST.value()));
         }
         user.setIsAdmin(false); // Default to non-admin user
         // Check if user already exists
         if (userService.getUserByEmail(user.getEmail()) != null) {
             return ResponseEntity.status(HttpStatus.CONFLICT)
-                    .body(new SignupResponse<>(null, "User already exists"));
+                    .body(new ApiResponse<>(null, "User already exists", HttpStatus.CONFLICT.value()));
         }
         userService.saveUser(user);
         String token = jwtService.generateToken(user.getEmail());
+        AuthData authData = new AuthData(user, token);
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(new SignupResponse<SignupData>(new SignupData(token, user), "Signup successful"));
+                .body(new ApiResponse<>(authData, "Signup successful", HttpStatus.CREATED.value()));
     }
 
     @PostMapping("/logout")

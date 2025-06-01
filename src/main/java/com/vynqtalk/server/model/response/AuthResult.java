@@ -5,7 +5,7 @@ import com.vynqtalk.server.model.User;
 import lombok.Data;
 
 @Data
-public class AuthResult {
+public class AuthResult  {
     private boolean auth;
     private User user;
 

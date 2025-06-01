@@ -47,17 +47,18 @@ public class GroupController {
         Group savedGroup = groupService.save(group);
         return ResponseEntity.status(HttpStatus.CREATED).body(savedGroup);
     }
-// Update an existing group
-@PutMapping("/{id}")
-public ResponseEntity<Group> updateGroup(@PathVariable Long id, @RequestBody Group updatedGroup) {
-    Group existingGroup = groupService.findById(id);
-    if (existingGroup == null) {
-        return ResponseEntity.notFound().build();
+
+    // Update an existing group
+    @PutMapping("/{id}")
+    public ResponseEntity<Group> updateGroup(@PathVariable Long id, @RequestBody Group updatedGroup) {
+        Group existingGroup = groupService.findById(id);
+        if (existingGroup == null) {
+            return ResponseEntity.notFound().build();
+        }
+        updatedGroup.setId(id);
+        Group savedGroup = groupService.save(updatedGroup);
+        return ResponseEntity.ok(savedGroup);
     }
-    updatedGroup.setId(id);
-    Group savedGroup = groupService.save(updatedGroup);
-    return ResponseEntity.ok(savedGroup);
-}
 
     // Delete group by ID
     @DeleteMapping("/{id}")

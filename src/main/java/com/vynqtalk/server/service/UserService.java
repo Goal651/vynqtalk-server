@@ -23,8 +23,8 @@ public class UserService {
                 : new AuthResult(false, null);
     }
 
-    public void saveUser(User user) {
-        userRepo.save(user);
+    public User saveUser(User user) {
+       return userRepo.save(user);
     }
 
     // Get user by ID
