@@ -29,9 +29,9 @@ public class WebSocketEventLogger implements ChannelInterceptor {
         messagingTemplate.convertAndSend("/topic/onlineUsers", connectedUsers);
     }
 
-    @SuppressWarnings("null")
+   
     @Override
-    public Message<?> preSend(Message<?> message, MessageChannel channel) {
+    public Message<?> preSend(@NonNull Message<?> message, MessageChannel channel) {
         StompHeaderAccessor accessor = StompHeaderAccessor.wrap(message);
         StompCommand command = accessor.getCommand();
         String sessionId = accessor.getSessionId();
