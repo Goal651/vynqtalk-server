@@ -35,7 +35,6 @@ public class AuthChannelInterceptorAdapter implements HandshakeInterceptor {
         }
 
         String token = httpServletRequest.getParameter("token");
-        System.out.println("Token received: " + token);
 
         if (token == null || token.isEmpty()) {
             System.out.println("Token is missing or empty");
@@ -44,7 +43,7 @@ public class AuthChannelInterceptorAdapter implements HandshakeInterceptor {
         }
 
         String userEmail = jwtService.getUsernameFromToken(token);
-        System.out.println("User ID extracted from token: " + userEmail);
+        System.out.println("User email extracted from token: " + userEmail);
 
         if (userEmail == null) {
             System.out.println("Invalid token, user ID is null");

@@ -13,14 +13,14 @@ import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.messaging.support.ChannelInterceptor;
 import org.springframework.stereotype.Component;
 
-import java.util.Set;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Component
 public class WebSocketEventLogger implements ChannelInterceptor {
     private static final Logger logger = LoggerFactory.getLogger(WebSocketEventLogger.class);
 
-    private final Set<String> connectedUsers = ConcurrentHashMap.newKeySet();
+    private final Map<String, String> connectedUsers = new ConcurrentHashMap<>();
 
     @Autowired
     @Lazy
@@ -37,7 +37,8 @@ public class WebSocketEventLogger implements ChannelInterceptor {
         String sessionId = accessor.getSessionId();
 
         if (command == StompCommand.CONNECT) {
-            connectedUsers.add(sessionId);
+            String userEmail = accessor.getFirstNativeHeader("userEmail");
+            connectedUsers.put(sessionId, userEmail);
             logger.info("STOMP client connected: sessionId={}", sessionId);
             broadcastUsers();
         } else if (command == StompCommand.DISCONNECT) {

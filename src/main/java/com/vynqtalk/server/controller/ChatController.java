@@ -18,10 +18,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.handler.annotation.SendTo;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 
 @Controller
 public class ChatController {
+    @Autowired
+    private SimpMessagingTemplate messagingTemplate;
 
     @Autowired
     private MessageService messageService;
@@ -30,7 +33,6 @@ public class ChatController {
     private GroupMessageService groupMessageService;
 
     @MessageMapping("/chat.sendMessage")
-    @SendTo("/topic/public")
     public Message receiveMessage(@Payload ChatMessage message) {
         System.out.println("Received message: " + message);
         Message savedMessage = new Message();
@@ -41,11 +43,15 @@ public class ChatController {
         savedMessage.setType("text");
         savedMessage.setTimestamp(Instant.now());
         savedMessage.setReactions(List.of());
-        return messageService.saveMessage(savedMessage);
+        Message saved = messageService.saveMessage(savedMessage);
+        messagingTemplate.convertAndSendToUser(
+                message.getReceiver().getEmail(),
+                "/queue/private",
+                saved);
+        return saved;
     }
 
     @MessageMapping("/chat.sendMessageReply") // front-end will send to /app/chat.sendMessage
-    @SendTo("/topic/public") // sent back to all clients subscribed to /topic/public
     public Message replyMessage(@Payload ChatMessageReply message) {
         System.out.println("Received message: " + message);
         Message savedMessage = new Message();
@@ -61,7 +67,6 @@ public class ChatController {
     }
 
     @MessageMapping("/chat.sendMessageReaction")
-    @SendTo("/topic/public")
     public String reactToMessage(@Payload ReactMessage message) {
         System.out.println("Received message: " + message);
         Optional<Message> exist = messageService.getMessageById(message.getMessageId());
@@ -76,7 +81,6 @@ public class ChatController {
     // Group socket controller
 
     @MessageMapping("/chat.sendGroupMessage")
-    @SendTo("/topic/public")
     public GroupMessage receiveGroupMessage(@Payload ChatGroupMessage message) {
         System.out.println("Received message: " + message);
         GroupMessage savedMessage = new GroupMessage();
@@ -87,11 +91,14 @@ public class ChatController {
         savedMessage.setType("text");
         savedMessage.setTimestamp(Instant.now());
         savedMessage.setReactions(List.of());
-        return groupMessageService.saveGroupMessage(savedMessage);
+        GroupMessage saved = groupMessageService.saveGroupMessage(savedMessage);
+        messagingTemplate.convertAndSend(
+                "/topic/group/" + message.getGroup().getId(),
+                saved);
+        return saved;
     }
 
     @MessageMapping("/chat.sendGroupMessageReply") // front-end will send to /app/chat.sendMessage
-    @SendTo("/topic/public") // sent back to all clients subscribed to /topic/public
     public GroupMessage replyGroupMessage(@Payload ChatGroupMessageReply message) {
         System.out.println("Received message: " + message);
         GroupMessage savedMessage = new GroupMessage();
@@ -107,7 +114,6 @@ public class ChatController {
     }
 
     @MessageMapping("/chat.sendGroupMessageReaction")
-    @SendTo("/topic/public")
     public String reactToGroupMessage(@Payload ReactMessage message) {
         System.out.println("Received message: " + message);
         Optional<GroupMessage> exist = groupMessageService.getGroupMessageById(message.getMessageId());
