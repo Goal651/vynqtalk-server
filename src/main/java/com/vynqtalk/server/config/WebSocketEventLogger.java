@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.lang.NonNull;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -22,16 +23,15 @@ public class WebSocketEventLogger implements ChannelInterceptor {
     private final Set<String> connectedUsers = ConcurrentHashMap.newKeySet();
 
     @Autowired
-    @Lazy 
+    @Lazy
     private SimpMessagingTemplate messagingTemplate;
 
     private void broadcastUsers() {
         messagingTemplate.convertAndSend("/topic/onlineUsers", connectedUsers);
     }
 
-   
     @Override
-    public Message<?> preSend(@NonNull Message<?> message, MessageChannel channel) {
+    public Message<?> preSend(@NonNull Message<?> message, @NonNull MessageChannel channel) {
         StompHeaderAccessor accessor = StompHeaderAccessor.wrap(message);
         StompCommand command = accessor.getCommand();
         String sessionId = accessor.getSessionId();
