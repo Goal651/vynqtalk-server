@@ -1,5 +1,6 @@
 package com.vynqtalk.server.controller;
 
+import com.vynqtalk.server.config.WebSocketEventLogger;
 import com.vynqtalk.server.model.GroupMessage;
 import com.vynqtalk.server.model.Message;
 import com.vynqtalk.server.model.sockets.ChatGroupMessage;
@@ -17,7 +18,6 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
-import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 
@@ -25,6 +25,10 @@ import org.springframework.stereotype.Controller;
 public class ChatController {
     @Autowired
     private SimpMessagingTemplate messagingTemplate;
+
+      @Autowired
+    private WebSocketEventLogger webSocketEventLogger;
+    
 
     @Autowired
     private MessageService messageService;
@@ -44,8 +48,10 @@ public class ChatController {
         savedMessage.setTimestamp(Instant.now());
         savedMessage.setReactions(List.of());
         Message saved = messageService.saveMessage(savedMessage);
+        String receiverSessionId = webSocketEventLogger.getSessionIdByEmail(message.getReceiver().getEmail());
+        
         messagingTemplate.convertAndSendToUser(
-                message.getReceiver().getEmail(),
+                receiverSessionId,
                 "/queue/private",
                 saved);
         return saved;

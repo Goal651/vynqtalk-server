@@ -26,6 +26,10 @@ public class WebSocketEventLogger implements ChannelInterceptor {
     @Lazy
     private SimpMessagingTemplate messagingTemplate;
 
+    public String getSessionIdByEmail(String email) {
+        return connectedUsers.get(email);
+    }
+
     private void broadcastUsers() {
         messagingTemplate.convertAndSend("/topic/onlineUsers", connectedUsers);
     }
@@ -35,12 +39,15 @@ public class WebSocketEventLogger implements ChannelInterceptor {
         StompHeaderAccessor accessor = StompHeaderAccessor.wrap(message);
         StompCommand command = accessor.getCommand();
         String sessionId = accessor.getSessionId();
-
+        Map<String, Object> attributes = accessor.getSessionAttributes();
         if (command == StompCommand.CONNECT) {
-            String userEmail = accessor.getFirstNativeHeader("userEmail");
-            connectedUsers.put(sessionId, userEmail);
-            logger.info("STOMP client connected: sessionId={}", sessionId);
-            broadcastUsers();
+            if (attributes != null) {
+                String userEmail = (String) attributes.get("userEmail");
+
+                connectedUsers.put(userEmail, sessionId);
+                logger.info("STOMP client connected: sessionId={}", sessionId);
+                broadcastUsers();
+            }
         } else if (command == StompCommand.DISCONNECT) {
             connectedUsers.remove(sessionId);
             logger.info("STOMP client disconnected: sessionId={}", sessionId);
