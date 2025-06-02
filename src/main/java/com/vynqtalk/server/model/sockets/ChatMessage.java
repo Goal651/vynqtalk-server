@@ -1,12 +1,14 @@
 package com.vynqtalk.server.model.sockets;
 
 
+import com.vynqtalk.server.model.User;
+
 import lombok.Data;
 
 @Data
 public class ChatMessage  {
-    private Long senderId;
-    private Long receiverId;
+    private User sender;
+    private User receiver;
     private String content;
     private String type; 
 }

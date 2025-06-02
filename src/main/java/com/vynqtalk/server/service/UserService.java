@@ -18,7 +18,10 @@ public class UserService {
 
     public AuthResult authenticate(User user) {
         User dbUser = userRepo.findByEmail(user.getEmail());
-        return (dbUser != null && dbUser.getPassword().equals(user.getPassword()))
+        if(dbUser==null){
+            return new AuthResult(false, null);
+        }
+        return (dbUser.getPassword().equals(user.getPassword()))
                 ? new AuthResult(true, dbUser)
                 : new AuthResult(false, null);
     }

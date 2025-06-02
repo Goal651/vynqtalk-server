@@ -29,11 +29,13 @@ public class Message {
     @Column(nullable = false)
     private String type;
 
-    @Column(nullable = false)
-    private Long senderId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(nullable = false, name = "sender_id")
+    private User sender;
 
-    @Column(nullable = false)
-    private Long receiverId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(nullable = false, name = "receiver_id")
+    private User receiver;
 
     @Column(nullable = false)
     private Instant timestamp;
@@ -46,6 +48,6 @@ public class Message {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "reply_to_message_id")
-    private Message replyToMessageId;
+    private Message replyToMessage;
 
 }

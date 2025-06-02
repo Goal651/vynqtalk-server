@@ -31,14 +31,16 @@ public class AuthController {
                     .body(new ApiResponse<>(null, "Email and password are required", HttpStatus.BAD_REQUEST.value()));
         }
         AuthResult authResult = userService.authenticate(user);
+        System.out.println("Auth result " + authResult);
+
         if (!authResult.isAuth()) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+            return ResponseEntity.status(HttpStatus.ACCEPTED)
                     .body(new ApiResponse<>(null, "Invalid email or password", HttpStatus.UNAUTHORIZED.value()));
         }
 
         User authenticatedUser = authResult.getUser();
         if (authenticatedUser == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+            return ResponseEntity.status(HttpStatus.ACCEPTED)
                     .body(new ApiResponse<>(null, "Invalid email or password", HttpStatus.UNAUTHORIZED.value()));
         }
 
@@ -49,19 +51,21 @@ public class AuthController {
 
     @PostMapping("/signup")
     public ResponseEntity<ApiResponse<AuthData>> signup(@RequestBody User user) {
+        
         if (user.getEmail() == null || user.getPassword() == null || user.getName() == null) {
-            return ResponseEntity.badRequest().body(
-                   new     ApiResponse<>(null, "Email, password, and name are required", HttpStatus.BAD_REQUEST.value()));
+            return ResponseEntity.ok().body(
+                    new ApiResponse<>(null, "Email, password, and name are required", HttpStatus.BAD_REQUEST.value()));
         }
         user.setIsAdmin(false); // Default to non-admin user
         // Check if user already exists
         if (userService.getUserByEmail(user.getEmail()) != null) {
-            return ResponseEntity.status(HttpStatus.CONFLICT)
+            return ResponseEntity.status(HttpStatus.ACCEPTED)
                     .body(new ApiResponse<>(null, "User already exists", HttpStatus.CONFLICT.value()));
         }
         userService.saveUser(user);
         String token = jwtService.generateToken(user.getEmail());
         AuthData authData = new AuthData(user, token);
+        System.out.println("User create"+authData);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(new ApiResponse<>(authData, "Signup successful", HttpStatus.CREATED.value()));
     }

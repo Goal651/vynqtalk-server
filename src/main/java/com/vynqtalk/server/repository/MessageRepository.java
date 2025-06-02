@@ -10,8 +10,8 @@ import com.vynqtalk.server.model.Message;
 
 public interface MessageRepository extends JpaRepository<Message, Long> {
     @Query("SELECT m FROM Message m WHERE " +
-            "(m.senderId = :userA AND m.receiverId = :userB) OR " +
-            "(m.senderId = :userB AND m.receiverId = :userA) ")
+            "(m.sender.id = :userA AND m.receiver.id = :userB) OR " +
+            "(m.sender.id = :userB AND m.receiver.id = :userA) ")
     List<Message> findChatBetweenUsers(@Param("userA") String userA, @Param("userB") String userB);
 
 }

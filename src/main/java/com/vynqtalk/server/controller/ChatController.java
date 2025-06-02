@@ -27,8 +27,8 @@ public class ChatController {
     public Message receiveMessage(@Payload ChatMessage message) {
         System.out.println("Received message: " + message);
         Message savedMessage = new Message();
-        savedMessage.setSenderId(message.getSenderId());
-        savedMessage.setReceiverId(message.getReceiverId());
+        savedMessage.setSender(message.getSender());
+        savedMessage.setReceiver(message.getReceiver());
         savedMessage.setContent(message.getContent());
         savedMessage.setEdited(false);
         savedMessage.setType("text");
@@ -42,10 +42,10 @@ public class ChatController {
     public Message receiveMessage(@Payload ChatMessageReply message) {
         System.out.println("Received message: " + message);
         Message savedMessage = new Message();
-        savedMessage.setSenderId(message.getSenderId());
-        savedMessage.setReceiverId(message.getReceiverId());
+        savedMessage.setSender(message.getSender());
+        savedMessage.setReceiver(message.getReceiver());
         savedMessage.setContent(message.getContent());
-        savedMessage.setReplyToMessageId(message.getReplyToMessage());
+        savedMessage.setReplyToMessage(message.getReplyToMessage());
         savedMessage.setEdited(false);
         savedMessage.setType("text");
         savedMessage.setTimestamp(Instant.now());

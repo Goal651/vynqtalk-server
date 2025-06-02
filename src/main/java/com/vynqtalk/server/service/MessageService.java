@@ -59,7 +59,7 @@ public class MessageService {
         Optional<Message> existing = messageRepository.findById(messageId);
         if (existing.isPresent()) {
             Message message = existing.get();
-            reply.setReplyToMessageId(message);
+            reply.setReplyToMessage(message);
             reply.setTimestamp(Instant.now());
             return messageRepository.save(reply);
         } else {
