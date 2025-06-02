@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.vynqtalk.server.model.User;
+import com.vynqtalk.server.model.request.LoginRequest;
 import com.vynqtalk.server.model.response.AuthResult;
 import com.vynqtalk.server.repository.UserRepository;
 
@@ -16,18 +17,18 @@ public class UserService {
     @Autowired
     private UserRepository userRepo;
 
-    public AuthResult authenticate(User user) {
-        User dbUser = userRepo.findByEmail(user.getEmail());
-        if(dbUser==null){
+    public AuthResult authenticate(LoginRequest loginRequest) {
+        User dbUser = userRepo.findByEmail(loginRequest.getEmail());
+        if (dbUser == null) {
             return new AuthResult(false, null);
         }
-        return (dbUser.getPassword().equals(user.getPassword()))
+        return (dbUser.getPassword().equals(loginRequest.getPassword()))
                 ? new AuthResult(true, dbUser)
                 : new AuthResult(false, null);
     }
 
     public User saveUser(User user) {
-       return userRepo.save(user);
+        return userRepo.save(user);
     }
 
     // Get user by ID

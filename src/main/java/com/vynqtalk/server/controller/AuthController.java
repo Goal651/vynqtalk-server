@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.vynqtalk.server.model.User;
+import com.vynqtalk.server.model.request.LoginRequest;
 import com.vynqtalk.server.model.response.ApiResponse;
 import com.vynqtalk.server.model.response.AuthResult;
 import com.vynqtalk.server.model.response.AuthData;
@@ -25,13 +26,12 @@ public class AuthController {
     private JwtService jwtService;
 
     @PostMapping("/login")
-    public ResponseEntity<ApiResponse<AuthData>> login(@RequestBody User user) {
-        System.out.println("Login request received: " + user);
-        if (user.getEmail() == null || user.getPassword() == null) {
+    public ResponseEntity<ApiResponse<AuthData>> login(@RequestBody LoginRequest loginRequest) {
+        if (loginRequest.getEmail() == null || loginRequest.getPassword() == null) {
             return ResponseEntity.ok()
                     .body(new ApiResponse<>(null, "Email and password are required", HttpStatus.BAD_REQUEST.value()));
         }
-        AuthResult authResult = userService.authenticate(user);
+        AuthResult authResult = userService.authenticate(loginRequest);
         System.out.println("Auth result " + authResult);
 
         if (!authResult.isAuth()) {
