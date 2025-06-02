@@ -42,20 +42,10 @@ public class MessageController {
 
     // Update (edit) a message
     @PutMapping("/{messageId}")
-    public ResponseEntity<ApiResponse<Message>> updateMessage(@PathVariable Long messageId, @RequestBody Message updated) {
+    public ResponseEntity<ApiResponse<Message>> updateMessage(@PathVariable Long messageId,
+            @RequestBody Message updated) {
         Message result = messageService.updateMessage(messageId, updated);
         return ResponseEntity.ok(new ApiResponse<>(result, "Message updated successfully", 200));
     }
 
-    @PutMapping("/react/{messageId}")
-    public ResponseEntity<ApiResponse<Message>> reactMessage(@PathVariable Long messageId, @RequestBody List<String> reactions) {
-        Message result = messageService.reactToMessage(messageId, reactions);
-        return ResponseEntity.ok(new ApiResponse<>(result, "Message reactions updated successfully", 200));
-    }
-
-    @PutMapping("/reply/{messageId}")
-    public ResponseEntity<ApiResponse<Message>> replyToMessage(@PathVariable Long messageId, @RequestBody Message reply) {
-        Message result = messageService.replyMessage(messageId, reply);
-        return ResponseEntity.ok(new ApiResponse<>(result, "Message replied successfully", 200));
-    }
 }
