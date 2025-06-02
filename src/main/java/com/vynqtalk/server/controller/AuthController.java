@@ -26,8 +26,9 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<ApiResponse<AuthData>> login(@RequestBody User user) {
+        System.out.println("Login request received: " + user);
         if (user.getEmail() == null || user.getPassword() == null) {
-            return ResponseEntity.badRequest()
+            return ResponseEntity.ok()
                     .body(new ApiResponse<>(null, "Email and password are required", HttpStatus.BAD_REQUEST.value()));
         }
         AuthResult authResult = userService.authenticate(user);

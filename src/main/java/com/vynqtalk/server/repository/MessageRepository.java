@@ -12,6 +12,6 @@ public interface MessageRepository extends JpaRepository<Message, Long> {
     @Query("SELECT m FROM Message m WHERE " +
             "(m.sender.id = :userA AND m.receiver.id = :userB) OR " +
             "(m.sender.id = :userB AND m.receiver.id = :userA) ")
-    List<Message> findChatBetweenUsers(@Param("userA") String userA, @Param("userB") String userB);
+    List<Message> findChatBetweenUsers(@Param("userA") Long userA, @Param("userB") Long userB);
 
 }

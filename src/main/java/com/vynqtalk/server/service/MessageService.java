@@ -24,7 +24,7 @@ public class MessageService {
     }
 
     public List<Message> getMessages(Long senderId, Long receiverId) {
-        return messageRepository.findChatBetweenUsers(String.valueOf(senderId), String.valueOf(receiverId));
+        return messageRepository.findChatBetweenUsers(senderId, receiverId);
     }
 
     public void deleteMessage(Long messageId) {
