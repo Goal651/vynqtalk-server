@@ -18,13 +18,13 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     @Autowired
     private WebSocketEventLogger webSocketEventLogger;
 
+
     @Autowired
     private AuthChannelInterceptorAdapter authInterceptor;
 
     @Override
     public void configureMessageBroker(@NonNull MessageBrokerRegistry config) {
-        config.enableSimpleBroker("/topic","/queue");
-        config.setUserDestinationPrefix("/user");
+        config.enableSimpleBroker("/topic");
         config.setApplicationDestinationPrefixes("/app");
     }
 

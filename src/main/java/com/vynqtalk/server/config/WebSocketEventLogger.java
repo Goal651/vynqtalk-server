@@ -45,7 +45,7 @@ public class WebSocketEventLogger implements ChannelInterceptor {
                 String userEmail = (String) attributes.get("userEmail");
 
                 connectedUsers.put(userEmail, sessionId);
-                logger.info("STOMP client connected: sessionId={}", sessionId);
+                logger.info("STOMP client connected:" , "userEmail={}, sessionId={}", userEmail, sessionId);
                 broadcastUsers();
             }
         } else if (command == StompCommand.DISCONNECT) {

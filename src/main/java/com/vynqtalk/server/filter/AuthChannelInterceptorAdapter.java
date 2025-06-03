@@ -53,6 +53,7 @@ public class AuthChannelInterceptorAdapter implements HandshakeInterceptor {
 
         System.out.println("User ID is valid: " + userEmail);
         attributes.put("userEmail", userEmail);
+           attributes.put("stompUser", userEmail);
         return true;
     }
 

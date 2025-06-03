@@ -1,6 +1,5 @@
 package com.vynqtalk.server.controller;
 
-import com.vynqtalk.server.config.WebSocketEventLogger;
 import com.vynqtalk.server.model.GroupMessage;
 import com.vynqtalk.server.model.Message;
 import com.vynqtalk.server.model.sockets.ChatGroupMessage;
@@ -15,20 +14,21 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
+import org.hibernate.Hibernate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 
 @Controller
 public class ChatController {
     @Autowired
-    private SimpMessagingTemplate messagingTemplate;
 
-      @Autowired
-    private WebSocketEventLogger webSocketEventLogger;
-    
+    private static final Logger logger = LoggerFactory.getLogger(ChatController.class);
 
     @Autowired
     private MessageService messageService;
@@ -37,8 +37,9 @@ public class ChatController {
     private GroupMessageService groupMessageService;
 
     @MessageMapping("/chat.sendMessage")
+    @SendTo("/topic/messages")
     public Message receiveMessage(@Payload ChatMessage message) {
-        System.out.println("Received message: " + message);
+        logger.info("Received private message: {}", message);
         Message savedMessage = new Message();
         savedMessage.setSender(message.getSender());
         savedMessage.setReceiver(message.getReceiver());
@@ -47,17 +48,14 @@ public class ChatController {
         savedMessage.setType("text");
         savedMessage.setTimestamp(Instant.now());
         savedMessage.setReactions(List.of());
+
         Message saved = messageService.saveMessage(savedMessage);
-        String receiverSessionId = webSocketEventLogger.getSessionIdByEmail(message.getReceiver().getEmail());
-        
-        messagingTemplate.convertAndSendToUser(
-                receiverSessionId,
-                "/queue/private",
-                saved);
+        logger.debug("Saved message to database: {}", saved);
         return saved;
     }
 
-    @MessageMapping("/chat.sendMessageReply") // front-end will send to /app/chat.sendMessage
+    @MessageMapping("/chat.sendMessageReply")
+    @SendTo("/topic/messages")
     public Message replyMessage(@Payload ChatMessageReply message) {
         System.out.println("Received message: " + message);
         Message savedMessage = new Message();
@@ -73,20 +71,29 @@ public class ChatController {
     }
 
     @MessageMapping("/chat.sendMessageReaction")
-    public String reactToMessage(@Payload ReactMessage message) {
+    @SendTo("/topic/reactions")
+    @Transactional
+    public Message reactToMessage(@Payload ReactMessage message) {
         System.out.println("Received message: " + message);
         Optional<Message> exist = messageService.getMessageById(message.getMessageId());
-        if (exist.isPresent()) {
-            Message savedMessage = exist.get();
-            savedMessage.setReactions(message.getReactions());
-            messageService.saveMessage(savedMessage); // <-- persist the update
+        if (!exist.isPresent()) {
+            return null;
         }
-        return "Successfully updated";
+        Message savedMessage = exist.get();
+
+        Hibernate.initialize(savedMessage.getSender());
+        Hibernate.initialize(savedMessage.getReceiver());
+
+        savedMessage.setReactions(message.getReactions());
+        messageService.saveMessage(savedMessage);
+
+        return savedMessage;
     }
 
     // Group socket controller
 
     @MessageMapping("/chat.sendGroupMessage")
+    @SendTo("/topic/groupMessages")
     public GroupMessage receiveGroupMessage(@Payload ChatGroupMessage message) {
         System.out.println("Received message: " + message);
         GroupMessage savedMessage = new GroupMessage();
@@ -98,13 +105,10 @@ public class ChatController {
         savedMessage.setTimestamp(Instant.now());
         savedMessage.setReactions(List.of());
         GroupMessage saved = groupMessageService.saveGroupMessage(savedMessage);
-        messagingTemplate.convertAndSend(
-                "/topic/group/" + message.getGroup().getId(),
-                saved);
         return saved;
     }
 
-    @MessageMapping("/chat.sendGroupMessageReply") // front-end will send to /app/chat.sendMessage
+    @MessageMapping("/chat.sendGroupMessageReply")
     public GroupMessage replyGroupMessage(@Payload ChatGroupMessageReply message) {
         System.out.println("Received message: " + message);
         GroupMessage savedMessage = new GroupMessage();
