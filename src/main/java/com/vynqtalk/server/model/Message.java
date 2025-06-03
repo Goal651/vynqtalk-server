@@ -4,7 +4,6 @@ import java.time.Instant;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -35,12 +34,12 @@ public class Message {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(nullable = false, name = "sender_id")
-    @JsonManagedReference
+    @JsonIgnoreProperties("messages")
     private User sender;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(nullable = false, name = "receiver_id")
-    @JsonManagedReference
+    @JsonIgnoreProperties("messages")
     private User receiver;
 
     @Column(nullable = false)
@@ -54,7 +53,9 @@ public class Message {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "reply_to_message_id")
-    @JsonIgnoreProperties("replyToMessage")
+    @JsonIgnoreProperties({"replyToMessage", "sender", "receiver"})
     private Message replyToMessage;
+
+    
 
 }

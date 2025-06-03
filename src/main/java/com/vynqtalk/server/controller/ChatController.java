@@ -56,8 +56,8 @@ public class ChatController {
 
     @MessageMapping("/chat.sendMessageReply")
     @SendTo("/topic/messages")
+    @Transactional
     public Message replyMessage(@Payload ChatMessageReply message) {
-        System.out.println("Received message: " + message);
         Message savedMessage = new Message();
         savedMessage.setSender(message.getSender());
         savedMessage.setReceiver(message.getReceiver());
@@ -67,7 +67,15 @@ public class ChatController {
         savedMessage.setType("text");
         savedMessage.setTimestamp(Instant.now());
         savedMessage.setReactions(List.of());
-        return messageService.saveMessage(savedMessage);
+        Message saved = messageService.saveMessage(savedMessage);
+        // Initialize lazy-loaded entities
+        Hibernate.initialize(saved.getSender());
+        Hibernate.initialize(saved.getReceiver());
+        if (saved.getReplyToMessage() != null) {
+            Hibernate.initialize(saved.getReplyToMessage());
+            Hibernate.initialize(saved.getReplyToMessage().getSender());
+        }
+        return saved;
     }
 
     @MessageMapping("/chat.sendMessageReaction")
@@ -81,9 +89,13 @@ public class ChatController {
         }
         Message savedMessage = exist.get();
 
+        // Initialize lazy-loaded entities
         Hibernate.initialize(savedMessage.getSender());
         Hibernate.initialize(savedMessage.getReceiver());
-
+        if (savedMessage.getReplyToMessage() != null) {
+            Hibernate.initialize(savedMessage.getReplyToMessage());
+            Hibernate.initialize(savedMessage.getReplyToMessage().getSender());
+        }
         savedMessage.setReactions(message.getReactions());
         messageService.saveMessage(savedMessage);
 

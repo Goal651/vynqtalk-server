@@ -1,5 +1,6 @@
 package com.vynqtalk.server.model;
 
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonProperty.Access;
@@ -32,4 +33,6 @@ public class User {
     private String password;
 
     private Boolean isAdmin;
+
+   
 }
