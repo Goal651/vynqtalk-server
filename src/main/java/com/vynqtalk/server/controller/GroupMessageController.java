@@ -20,6 +20,10 @@ public class GroupMessageController {
     // Get all messages in a conversation or group
     @GetMapping("/conv/{groupId}")
     public ResponseEntity<ApiResponse<List<GroupMessage>>> getMessagesByConversation(@PathVariable Long groupId) {
+        if (groupId == null) {
+            return ResponseEntity.badRequest()
+                    .body(new ApiResponse<>(null, "Group ID cannot be null", 400));
+        }
         List<GroupMessage> messages = groupMessageService.getAllGroupMessages(groupId);
         return ResponseEntity.ok(new ApiResponse<>(messages, "Messages retrieved successfully", 200));
     }

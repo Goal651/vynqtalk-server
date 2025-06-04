@@ -154,7 +154,7 @@ public class ChatController {
 
     // Group socket controller
 
-    @MessageMapping("/chat.sendGroupMessage")
+    @MessageMapping("/group.sendMessage")
     @SendTo("/topic/groupMessages")
     public GroupMessage receiveGroupMessage(@Payload ChatGroupMessage message) {
         System.out.println("Received message: " + message);
@@ -170,7 +170,7 @@ public class ChatController {
         return saved;
     }
 
-    @MessageMapping("/chat.sendGroupMessageReply")
+    @MessageMapping("/group.sendMessageReply")
     public GroupMessage replyGroupMessage(@Payload ChatGroupMessageReply message) {
         System.out.println("Received message: " + message);
         GroupMessage savedMessage = new GroupMessage();
@@ -185,7 +185,7 @@ public class ChatController {
         return groupMessageService.saveGroupMessage(savedMessage);
     }
 
-    @MessageMapping("/chat.sendGroupMessageReaction")
+    @MessageMapping("/group.sendMessageReaction")
     public String reactToGroupMessage(@Payload ReactMessage message) {
         System.out.println("Received message: " + message);
         Optional<GroupMessage> exist = groupMessageService.getGroupMessageById(message.getMessageId());
