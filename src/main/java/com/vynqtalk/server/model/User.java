@@ -32,6 +32,7 @@ public class User {
     @Column(nullable = false)
     private String password;
 
+    @Column(name = "is_admin", nullable = true)
     private Boolean isAdmin;
 
    

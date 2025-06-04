@@ -1,5 +1,6 @@
 package com.vynqtalk.server.controller;
 
+import java.security.Principal;
 import java.time.Instant;
 import java.util.List;
 
@@ -16,8 +17,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.vynqtalk.server.model.Group;
+import com.vynqtalk.server.model.User;
 import com.vynqtalk.server.model.response.ApiResponse;
 import com.vynqtalk.server.service.GroupService;
+import com.vynqtalk.server.service.UserService;
 
 @RestController
 @RequestMapping("/api/v1/groups")
@@ -26,10 +29,24 @@ public class GroupController {
     @Autowired
     private GroupService groupService;
 
+    @Autowired
+    private UserService userService;
+
     // Get all groups
     @GetMapping
-    public ResponseEntity<ApiResponse<List<Group>>> getAllGroups() {
+    public ResponseEntity<ApiResponse<List<Group>>> getAllGroups(Principal principal) {
         List<Group> groups = groupService.findAll();
+        if (principal != null) {
+            User currentUser = userService.getUserByEmail(principal.getName());
+            // Filter groups where the user is a member
+            groups = groups.stream()
+                    .filter(g -> g.getMembers().stream().anyMatch(m -> m.getId().equals(currentUser.getId())))
+                    .toList();
+        }
+
+        if (groups.isEmpty()) {
+            return ResponseEntity.ok(new ApiResponse<>(groups, "No groups found", 200));
+        }
         return ResponseEntity.ok(new ApiResponse<>(groups, "Groups retrieved successfully", 200));
     }
 
@@ -46,9 +63,15 @@ public class GroupController {
 
     // Create a new group
     @PostMapping
-    public ResponseEntity<ApiResponse<Group>> createGroup(@RequestBody Group group) {
+    public ResponseEntity<ApiResponse<Group>> createGroup(Principal principal, @RequestBody Group group) {
+        User createdBy = userService.getUserByEmail(principal.getName());
+        if (createdBy == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new ApiResponse<>(null, "User not found", HttpStatus.UNAUTHORIZED.value()));
+        }
+        group.setMembers(List.of(createdBy)); // Add creator as the first member
+        group.setCreatedBy(createdBy);
         group.setCreatedAt(Instant.now());
-        group.setCreatedBy("system");
         Group savedGroup = groupService.save(group);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(new ApiResponse<>(savedGroup, "Group created successfully", HttpStatus.CREATED.value()));
@@ -66,11 +89,30 @@ public class GroupController {
         return ResponseEntity.ok(new ApiResponse<>(savedGroup, "Group updated successfully", 200));
     }
 
+    //Add member
+    @PostMapping("/{id}/members")
+    public ResponseEntity<ApiResponse<Group>> addMember(@PathVariable Long id, @RequestBody User user) {
+        System.out.println("Adding member: " + user);
+        User existingUser = userService.getUserByEmail(user.getEmail());
+        if (existingUser == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new ApiResponse<>(null, "User not found", HttpStatus.NOT_FOUND.value()));
+        }
+
+        Group group = groupService.findById(id);
+        if (group == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new ApiResponse<>(null, "Group not found", HttpStatus.NOT_FOUND.value()));    
+        }
+        group.getMembers().add(user);
+        Group savedGroup = groupService.save(group);
+        return ResponseEntity.ok(new ApiResponse<>(savedGroup, "Member added successfully", 200));
+    }
+
     // Delete group by ID
     @DeleteMapping("/{id}")
     public ResponseEntity<ApiResponse<Void>> deleteGroup(@PathVariable Long id) {
         groupService.delete(id);
         return ResponseEntity.ok(new ApiResponse<>(null, "Group deleted successfully", 200));
     }
-
 }
