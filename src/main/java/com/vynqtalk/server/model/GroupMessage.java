@@ -3,8 +3,6 @@ package com.vynqtalk.server.model;
 import java.time.Instant;
 import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -20,7 +18,6 @@ import lombok.Data;
 @Data
 @Entity
 @Table(name = "group_messages")
-@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class GroupMessage {
 
     @Id
@@ -35,12 +32,10 @@ public class GroupMessage {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(nullable = false, name = "sender_id")
-    @JsonManagedReference
     private User sender;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(nullable = false, name = "receiver_id")
-    @JsonManagedReference
     private Group group;
 
     @Column(nullable = false)
@@ -54,7 +49,6 @@ public class GroupMessage {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "reply_to_message_id")
-    @JsonIgnoreProperties("replyToMessage")
     private GroupMessage replyToMessage;
 
 }

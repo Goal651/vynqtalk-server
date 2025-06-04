@@ -1,10 +1,11 @@
 package com.vynqtalk.server.controller;
 
+import com.vynqtalk.server.dto.GroupMessageDTO;
 import com.vynqtalk.server.dto.MessageDTO;
-import com.vynqtalk.server.dto.UserDTO;
+import com.vynqtalk.server.mapper.GroupMessageMapper;
+import com.vynqtalk.server.mapper.MessageMapper;
 import com.vynqtalk.server.model.GroupMessage;
 import com.vynqtalk.server.model.Message;
-import com.vynqtalk.server.model.User;
 import com.vynqtalk.server.model.sockets.ChatGroupMessage;
 import com.vynqtalk.server.model.sockets.ChatGroupMessageReply;
 import com.vynqtalk.server.model.sockets.ChatMessage;
@@ -17,7 +18,6 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
-import org.hibernate.Hibernate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,56 +39,15 @@ public class ChatController {
     @Autowired
     private GroupMessageService groupMessageService;
 
-    // Example: Add to your ChatController or a Mapper class
+    @Autowired
+    private MessageMapper messageMapper;
 
-    private UserDTO toUserDTO(User user) {
-        if (user == null)
-            return null;
-        UserDTO dto = new UserDTO();
-        dto.id = user.getId();
-        dto.name = user.getName();
-        dto.email = user.getEmail();
-        dto.isAdmin = user.getIsAdmin();
-        return dto;
-    }
-
-    private MessageDTO toMessageDTO(Message message) {
-        if (message == null)
-            return null;
-        MessageDTO dto = new MessageDTO();
-        dto.id = message.getId();
-        dto.content = message.getContent();
-        dto.type = message.getType();
-        dto.sender = toUserDTO(message.getSender());
-        dto.receiver = toUserDTO(message.getReceiver());
-        dto.timestamp = message.getTimestamp();
-        dto.edited = message.isEdited();
-        dto.reactions = message.getReactions();
-        // Only map one level of replyToMessage to avoid deep recursion
-        dto.replyToMessage = message.getReplyToMessage() != null ? toMessageDTOShallow(message.getReplyToMessage())
-                : null;
-        return dto;
-    }
-
-    private MessageDTO toMessageDTOShallow(Message message) {
-        if (message == null)
-            return null;
-        MessageDTO dto = new MessageDTO();
-        dto.id = message.getId();
-        dto.content = message.getContent();
-        dto.type = message.getType();
-        dto.sender = toUserDTO(message.getSender());
-        dto.receiver = toUserDTO(message.getReceiver());
-        dto.timestamp = message.getTimestamp();
-        dto.edited = message.isEdited();
-        dto.reactions = message.getReactions();
-        // Do not recurse further!
-        return dto;
-    }
+    @Autowired
+    private GroupMessageMapper groupMessageMapper;
 
     @MessageMapping("/chat.sendMessage")
     @SendTo("/topic/messages")
-    public Message receiveMessage(@Payload ChatMessage message) {
+    public MessageDTO receiveMessage(@Payload ChatMessage message) {
         logger.info("Received private message: {}", message);
         Message savedMessage = new Message();
         savedMessage.setSender(message.getSender());
@@ -101,7 +60,7 @@ public class ChatController {
 
         Message saved = messageService.saveMessage(savedMessage);
         logger.debug("Saved message to database: {}", saved);
-        return saved;
+        return messageMapper.toDTO(saved);
     }
 
     @MessageMapping("/chat.sendMessageReply")
@@ -117,46 +76,30 @@ public class ChatController {
         savedMessage.setType("text");
         savedMessage.setTimestamp(Instant.now());
         savedMessage.setReactions(List.of());
-        Message saved = messageService.saveMessage(savedMessage);
-        // Initialize lazy-loaded entities
-        Hibernate.initialize(saved.getSender());
-        Hibernate.initialize(saved.getReceiver());
-        if (saved.getReplyToMessage() != null) {
-            Hibernate.initialize(saved.getReplyToMessage());
-            Hibernate.initialize(saved.getReplyToMessage().getSender());
-        }
-        return this.toMessageDTO(savedMessage);
+        savedMessage = messageService.saveMessage(savedMessage);
+        return messageMapper.toDTO(savedMessage);
     }
 
     @MessageMapping("/chat.sendMessageReaction")
     @SendTo("/topic/reactions")
     @Transactional
-    public Message reactToMessage(@Payload ReactMessage message) {
+    public MessageDTO reactToMessage(@Payload ReactMessage message) {
         System.out.println("Received message: " + message);
         Optional<Message> exist = messageService.getMessageById(message.getMessageId());
         if (!exist.isPresent()) {
             return null;
         }
         Message savedMessage = exist.get();
-
-        // Initialize lazy-loaded entities
-        Hibernate.initialize(savedMessage.getSender());
-        Hibernate.initialize(savedMessage.getReceiver());
-        if (savedMessage.getReplyToMessage() != null) {
-            Hibernate.initialize(savedMessage.getReplyToMessage());
-            Hibernate.initialize(savedMessage.getReplyToMessage().getSender());
-        }
         savedMessage.setReactions(message.getReactions());
         messageService.saveMessage(savedMessage);
-
-        return savedMessage;
+        return messageMapper.toDTO(savedMessage);
     }
 
     // Group socket controller
 
     @MessageMapping("/group.sendMessage")
     @SendTo("/topic/groupMessages")
-    public GroupMessage receiveGroupMessage(@Payload ChatGroupMessage message) {
+    public GroupMessageDTO receiveGroupMessage(@Payload ChatGroupMessage message) {
         System.out.println("Received message: " + message);
         GroupMessage savedMessage = new GroupMessage();
         savedMessage.setSender(message.getSender());
@@ -167,11 +110,11 @@ public class ChatController {
         savedMessage.setTimestamp(Instant.now());
         savedMessage.setReactions(List.of());
         GroupMessage saved = groupMessageService.saveGroupMessage(savedMessage);
-        return saved;
+        return groupMessageMapper.toDTO(saved);
     }
 
     @MessageMapping("/group.sendMessageReply")
-    public GroupMessage replyGroupMessage(@Payload ChatGroupMessageReply message) {
+    public GroupMessageDTO replyGroupMessage(@Payload ChatGroupMessageReply message) {
         System.out.println("Received message: " + message);
         GroupMessage savedMessage = new GroupMessage();
         savedMessage.setSender(message.getSender());
@@ -182,7 +125,8 @@ public class ChatController {
         savedMessage.setType("text");
         savedMessage.setTimestamp(Instant.now());
         savedMessage.setReactions(List.of());
-        return groupMessageService.saveGroupMessage(savedMessage);
+        savedMessage = groupMessageService.saveGroupMessage(savedMessage);
+        return groupMessageMapper.toDTO(savedMessage);
     }
 
     @MessageMapping("/group.sendMessageReaction")

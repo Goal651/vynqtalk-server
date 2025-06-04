@@ -16,6 +16,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.vynqtalk.server.dto.GroupDTO;
+import com.vynqtalk.server.mapper.GroupMapper;
 import com.vynqtalk.server.model.Group;
 import com.vynqtalk.server.model.User;
 import com.vynqtalk.server.model.response.ApiResponse;
@@ -32,9 +34,12 @@ public class GroupController {
     @Autowired
     private UserService userService;
 
+    @Autowired
+    private GroupMapper groupMapper;
+
     // Get all groups
     @GetMapping
-    public ResponseEntity<ApiResponse<List<Group>>> getAllGroups(Principal principal) {
+    public ResponseEntity<ApiResponse<List<GroupDTO>>> getAllGroups(Principal principal) {
         List<Group> groups = groupService.findAll();
         if (principal != null) {
             User currentUser = userService.getUserByEmail(principal.getName());
@@ -45,25 +50,28 @@ public class GroupController {
         }
 
         if (groups.isEmpty()) {
-            return ResponseEntity.ok(new ApiResponse<>(groups, "No groups found", 200));
+            return ResponseEntity.ok(new ApiResponse<>(List.of(), "No groups found", 200));
         }
-        return ResponseEntity.ok(new ApiResponse<>(groups, "Groups retrieved successfully", 200));
+        List<GroupDTO> groupDTO = groups.stream()
+                .map(groupMapper::toDTO)
+                .toList();
+        return ResponseEntity.ok(new ApiResponse<>(groupDTO, "Groups retrieved successfully", 200));
     }
 
     // Get group by ID
     @GetMapping("/{id}")
-    public ResponseEntity<ApiResponse<Group>> getGroupById(@PathVariable Long id) {
+    public ResponseEntity<ApiResponse<GroupDTO>> getGroupById(@PathVariable Long id) {
         Group group = groupService.findById(id);
         if (group == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(new ApiResponse<>(null, "Group not found", HttpStatus.NOT_FOUND.value()));
         }
-        return ResponseEntity.ok(new ApiResponse<>(group, "Group retrieved successfully", 200));
+        return ResponseEntity.ok(new ApiResponse<>(groupMapper.toDTO(group), "Group retrieved successfully", 200));
     }
 
     // Create a new group
     @PostMapping
-    public ResponseEntity<ApiResponse<Group>> createGroup(Principal principal, @RequestBody Group group) {
+    public ResponseEntity<ApiResponse<GroupDTO>> createGroup(Principal principal, @RequestBody Group group) {
         User createdBy = userService.getUserByEmail(principal.getName());
         if (createdBy == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
@@ -74,24 +82,24 @@ public class GroupController {
         group.setCreatedAt(Instant.now());
         Group savedGroup = groupService.save(group);
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(new ApiResponse<>(savedGroup, "Group created successfully", HttpStatus.CREATED.value()));
+                .body(new ApiResponse<>(groupMapper.toDTO(savedGroup), "Group created successfully", HttpStatus.CREATED.value()));
     }
 
     // Update an existing group
     @PutMapping("/{id}")
-    public ResponseEntity<ApiResponse<Group>> updateGroup(@PathVariable Long id, @RequestBody Group updatedGroup) {
+    public ResponseEntity<ApiResponse<GroupDTO>> updateGroup(@PathVariable Long id, @RequestBody Group updatedGroup) {
         Group existingGroup = groupService.findById(id);
         if (existingGroup == null) {
             return ResponseEntity.notFound().build();
         }
         updatedGroup.setId(id);
         Group savedGroup = groupService.save(updatedGroup);
-        return ResponseEntity.ok(new ApiResponse<>(savedGroup, "Group updated successfully", 200));
+        return ResponseEntity.ok(new ApiResponse<>(groupMapper.toDTO(savedGroup), "Group updated successfully", 200));
     }
 
     //Add member
     @PostMapping("/{id}/members")
-    public ResponseEntity<ApiResponse<Group>> addMember(@PathVariable Long id, @RequestBody User user) {
+    public ResponseEntity<ApiResponse<GroupDTO>> addMember(@PathVariable Long id, @RequestBody User user) {
         System.out.println("Adding member: " + user);
         User existingUser = userService.getUserByEmail(user.getEmail());
         if (existingUser == null) {
@@ -106,7 +114,7 @@ public class GroupController {
         }
         group.getMembers().add(user);
         Group savedGroup = groupService.save(group);
-        return ResponseEntity.ok(new ApiResponse<>(savedGroup, "Member added successfully", 200));
+        return ResponseEntity.ok(new ApiResponse<>(groupMapper.toDTO(savedGroup), "Member added successfully", 200));
     }
 
     // Delete group by ID
