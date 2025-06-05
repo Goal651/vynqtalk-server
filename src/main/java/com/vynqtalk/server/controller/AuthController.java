@@ -9,12 +9,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.vynqtalk.server.model.User;
+import com.vynqtalk.server.model.UserSettings;
 import com.vynqtalk.server.model.request.LoginRequest;
 import com.vynqtalk.server.model.response.ApiResponse;
 import com.vynqtalk.server.model.response.AuthResult;
 import com.vynqtalk.server.model.response.AuthData;
 import com.vynqtalk.server.service.JwtService;
 import com.vynqtalk.server.service.UserService;
+import com.vynqtalk.server.service.UserSettingsService;
 
 @RestController
 @RequestMapping("/api/v1/auth")
@@ -24,6 +26,9 @@ public class AuthController {
 
     @Autowired
     private JwtService jwtService;
+
+    @Autowired
+    private UserSettingsService userSettingsService;
 
     @PostMapping("/login")
     public ResponseEntity<ApiResponse<AuthData>> login(@RequestBody LoginRequest loginRequest) {
@@ -64,6 +69,7 @@ public class AuthController {
                     .body(new ApiResponse<>(null, "User already exists", HttpStatus.CONFLICT.value()));
         }
         userService.saveUser(user);
+        userSettingsService.updateUserSettings(user, new UserSettings());
         String token = jwtService.generateToken(user.getEmail());
         AuthData authData = new AuthData(user, token);
         System.out.println("User create"+authData);
