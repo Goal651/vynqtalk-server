@@ -57,11 +57,11 @@ public class GroupService {
     }
 
     public Group removeMember(Group group, User user) {
+        // Create notification for removed member before removing them
+        createMemberRemovedNotification(group, user);
+        // Now remove the member
         group.getMembers().removeIf(m -> m.getId().equals(user.getId()));
-        Group savedGroup = groupRepository.save(group);
-        // Create notification for removed member
-        createMemberRemovedNotification(savedGroup, user);
-        return savedGroup;
+        return groupRepository.save(group);
     }
 
     private void createGroupCreationNotification(Group group) {
@@ -115,6 +115,8 @@ public class GroupService {
     }
 
     private void createMemberRemovedNotification(Group group, User removedMember) {
+        System.out.println("Creating member removed notification for group: "+group);
+        System.out.println("Removed member: "+removedMember);
         // Notify the removed member
         Notification memberNotification = new Notification();
         memberNotification.setTitle("Removed from Group");
