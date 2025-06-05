@@ -28,5 +28,5 @@ public class User {
     @Column(name = "is_admin", nullable = true)
     private Boolean isAdmin;
 
-   
+    
 }

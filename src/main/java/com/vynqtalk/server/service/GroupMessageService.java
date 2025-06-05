@@ -1,5 +1,6 @@
 package com.vynqtalk.server.service;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
@@ -7,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.vynqtalk.server.model.GroupMessage;
+import com.vynqtalk.server.model.Notification;
 import com.vynqtalk.server.repository.GroupMessageRepository;
 
 @Service
@@ -15,10 +17,15 @@ public class GroupMessageService {
     @Autowired
     private GroupMessageRepository groupMessageRepository;
 
+    @Autowired
+    private NotificationService notificationService;
+
     // Add methods to handle group message operations, such as saving messages,
     // retrieving messages, etc.
     public GroupMessage saveGroupMessage(GroupMessage groupMessage) {
-        return groupMessageRepository.save(groupMessage);
+        GroupMessage savedMessage = groupMessageRepository.save(groupMessage);
+        createGroupMessageNotification(savedMessage);
+        return savedMessage;
     }
 
     public Optional<GroupMessage> getGroupMessageById(Long id) {
@@ -30,7 +37,12 @@ public class GroupMessageService {
     }
 
     public void deleteGroupMessage(Long id) {
-        groupMessageRepository.deleteById(id);
+        Optional<GroupMessage> messageOpt = groupMessageRepository.findById(id);
+        if (messageOpt.isPresent()) {
+            GroupMessage message = messageOpt.get();
+            createGroupMessageDeletedNotification(message);
+            groupMessageRepository.deleteById(id);
+        }
     }
 
     public GroupMessage updateGroupMessage(Long id, GroupMessage updatedGroupMessage) {
@@ -40,9 +52,11 @@ public class GroupMessageService {
             groupMessage.setContent(updatedGroupMessage.getContent());
             groupMessage.setSender(updatedGroupMessage.getSender());
             groupMessage.setTimestamp(updatedGroupMessage.getTimestamp());
-            return groupMessageRepository.save(groupMessage);
+            GroupMessage savedMessage = groupMessageRepository.save(groupMessage);
+            createGroupMessageEditedNotification(savedMessage);
+            return savedMessage;
         }
-        return null; // or throw an exception
+        return null;
     }
 
     public GroupMessage reactToMessage(Long messageId, List<String> reactions) {
@@ -50,8 +64,66 @@ public class GroupMessageService {
         if (optionalMessage.isPresent()) {
             GroupMessage message = optionalMessage.get();
             message.setReactions(reactions);
-            return groupMessageRepository.save(message);
+            GroupMessage savedMessage = groupMessageRepository.save(message);
+            createGroupMessageReactionNotification(savedMessage);
+            return savedMessage;
         }
-        return null; // or throw an exception
+        return null;
+    }
+
+    private void createGroupMessageNotification(GroupMessage message) {
+        message.getGroup().getMembers().forEach(member -> {
+            if (!member.getId().equals(message.getSender().getId())) {
+                Notification notification = new Notification();
+                notification.setTitle("New Group Message");
+                notification.setMessage(message.getSender().getName() + " sent a message in " + message.getGroup().getName());
+                notification.setUser(member);
+                notification.setTimestamp(Instant.now());
+                notification.setIsRead(false);
+                notification.setType("NEW_GROUP_MESSAGE");
+                notificationService.createNotification(notification);
+            }
+        });
+    }
+
+    private void createGroupMessageDeletedNotification(GroupMessage message) {
+        message.getGroup().getMembers().forEach(member -> {
+            if (!member.getId().equals(message.getSender().getId())) {
+                Notification notification = new Notification();
+                notification.setTitle("Group Message Deleted");
+                notification.setMessage("A message from " + message.getSender().getName() + " was deleted in " + message.getGroup().getName());
+                notification.setUser(member);
+                notification.setTimestamp(Instant.now());
+                notification.setIsRead(false);
+                notification.setType("GROUP_MESSAGE_DELETED");
+                notificationService.createNotification(notification);
+            }
+        });
+    }
+
+    private void createGroupMessageEditedNotification(GroupMessage message) {
+        message.getGroup().getMembers().forEach(member -> {
+            if (!member.getId().equals(message.getSender().getId())) {
+                Notification notification = new Notification();
+                notification.setTitle("Group Message Edited");
+                notification.setMessage(message.getSender().getName() + " edited their message in " + message.getGroup().getName());
+                notification.setUser(member);
+                notification.setTimestamp(Instant.now());
+                notification.setIsRead(false);
+                notification.setType("GROUP_MESSAGE_EDITED");
+                notificationService.createNotification(notification);
+            }
+        });
+    }
+
+    private void createGroupMessageReactionNotification(GroupMessage message) {
+        Notification notification = new Notification();
+        notification.setTitle("Group Message Reaction");
+        notification.setMessage("Someone reacted to your message in " + message.getGroup().getName());
+        notification.setUser(message.getSender());
+        notification.setTimestamp(Instant.now());
+        notification.setIsRead(false);
+        notification.setType("GROUP_MESSAGE_REACTION");
+        notificationService.createNotification(notification);
     }
 }

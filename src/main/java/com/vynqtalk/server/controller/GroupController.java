@@ -107,7 +107,6 @@ public class GroupController {
     // Add member
     @PostMapping("/{id}/members")
     public ResponseEntity<ApiResponse<GroupDTO>> addMember(@PathVariable Long id, @RequestBody User user) {
-        System.out.println("Adding member: " + user);
         User existingUser = userService.getUserByEmail(user.getEmail());
         if (existingUser == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
@@ -119,12 +118,11 @@ public class GroupController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(new ApiResponse<>(null, "Group not found", HttpStatus.NOT_FOUND.value()));
         }
-        group.getMembers().add(user);
-        Group savedGroup = groupService.save(group);
-        return ResponseEntity.ok(new ApiResponse<>(groupMapper.toDTO(savedGroup), "Member added successfully", 200));
+        
+        Group updatedGroup = groupService.addMember(group, existingUser);
+        return ResponseEntity.ok(new ApiResponse<>(groupMapper.toDTO(updatedGroup), "Member added successfully", 200));
     }
 
-// Remove member
     @DeleteMapping("/{id}/members/{userId}")
     public ResponseEntity<ApiResponse<GroupDTO>> removeMember(@PathVariable Long id, @PathVariable Long userId) {
         Group group = groupService.findById(id);
@@ -137,9 +135,9 @@ public class GroupController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(new ApiResponse<>(null, "User not found", HttpStatus.NOT_FOUND.value()));
         }
-        group.getMembers().removeIf(m -> m.getId().equals(userId));
-        Group savedGroup = groupService.save(group);
-        return ResponseEntity.ok(new ApiResponse<>(groupMapper.toDTO(savedGroup), "Member removed successfully", 200));
+        
+        Group updatedGroup = groupService.removeMember(group, user);
+        return ResponseEntity.ok(new ApiResponse<>(groupMapper.toDTO(updatedGroup), "Member removed successfully", 200));
     }
 
     // Delete group by ID
