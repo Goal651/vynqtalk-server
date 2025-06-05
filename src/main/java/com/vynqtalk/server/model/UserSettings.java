@@ -27,23 +27,23 @@ public class UserSettings {
     private Boolean notificationEnabled = true;
 
     @Column(name = "email_notifications", nullable = false)
-    private Boolean emailNotifications = true;
+    private Boolean emailNotifications = true; 
 
     @Column(name = "push_notifications", nullable = false)
     private Boolean pushNotifications = true;
 
-    @Column(name = "dark_mode", nullable = false)
-    private String theme ;
-
+    @Column(name = "theme", nullable = false)
+    private String theme = "blue";
+ 
     @Column(name = "language", nullable = false)
     private String language = "en"; 
 
     @Column(name = "timezone", nullable = false)
     private String timezone = "UTC";
 
-    @Column(name = "online_status", nullable = false)
+    @Column( nullable = false)
     private Boolean showOnlineStatus = true;
 
-    @Column(name = "read_receipts", nullable = false)
+    @Column( nullable = false)
     private Boolean readReceipts = true;
 } 
