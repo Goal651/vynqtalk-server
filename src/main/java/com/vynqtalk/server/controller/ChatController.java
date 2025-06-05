@@ -29,7 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Controller
 public class ChatController {
-    @Autowired
+
 
     private static final Logger logger = LoggerFactory.getLogger(ChatController.class);
 

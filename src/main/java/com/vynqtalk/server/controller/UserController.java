@@ -60,6 +60,7 @@ public class UserController {
     @GetMapping
     public ResponseEntity<ApiResponse<List<UserDTO>>> getAllUsers() {
         List<User> users = userService.getAllUsers();
+        System.out.println("This is wigo test " + users);
         if (users.isEmpty()) {
             return ResponseEntity.ok().body(new ApiResponse<>(null, "No users found", 404));
         }

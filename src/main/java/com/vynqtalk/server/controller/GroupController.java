@@ -41,6 +41,7 @@ public class GroupController {
     @GetMapping
     public ResponseEntity<ApiResponse<List<GroupDTO>>> getAllGroups(Principal principal) {
         List<Group> groups = groupService.findAll();
+
         if (principal != null) {
             User currentUser = userService.getUserByEmail(principal.getName());
             // Filter groups where the user is a member
@@ -48,7 +49,7 @@ public class GroupController {
                     .filter(g -> g.getMembers().stream().anyMatch(m -> m.getId().equals(currentUser.getId())))
                     .toList();
         }
-
+        System.out.println("This is wigo test " + groups);
         if (groups.isEmpty()) {
             return ResponseEntity.ok(new ApiResponse<>(List.of(), "No groups found", 200));
         }
@@ -82,12 +83,18 @@ public class GroupController {
         group.setCreatedAt(Instant.now());
         Group savedGroup = groupService.save(group);
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(new ApiResponse<>(groupMapper.toDTO(savedGroup), "Group created successfully", HttpStatus.CREATED.value()));
+                .body(new ApiResponse<>(groupMapper.toDTO(savedGroup), "Group created successfully",
+                        HttpStatus.CREATED.value()));
     }
 
     // Update an existing group
     @PutMapping("/{id}")
     public ResponseEntity<ApiResponse<GroupDTO>> updateGroup(@PathVariable Long id, @RequestBody Group updatedGroup) {
+        System.out.println("Updating group with ID: " + id);
+        if (updatedGroup.getName() == null || updatedGroup.getDescription() == null) {
+            return ResponseEntity.badRequest()
+                    .body(new ApiResponse<>(null, "Group name and description cannot be null", HttpStatus.BAD_REQUEST.value()));
+        }
         Group existingGroup = groupService.findById(id);
         if (existingGroup == null) {
             return ResponseEntity.notFound().build();
@@ -97,7 +104,7 @@ public class GroupController {
         return ResponseEntity.ok(new ApiResponse<>(groupMapper.toDTO(savedGroup), "Group updated successfully", 200));
     }
 
-    //Add member
+    // Add member
     @PostMapping("/{id}/members")
     public ResponseEntity<ApiResponse<GroupDTO>> addMember(@PathVariable Long id, @RequestBody User user) {
         System.out.println("Adding member: " + user);
@@ -110,11 +117,29 @@ public class GroupController {
         Group group = groupService.findById(id);
         if (group == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(new ApiResponse<>(null, "Group not found", HttpStatus.NOT_FOUND.value()));    
+                    .body(new ApiResponse<>(null, "Group not found", HttpStatus.NOT_FOUND.value()));
         }
         group.getMembers().add(user);
         Group savedGroup = groupService.save(group);
         return ResponseEntity.ok(new ApiResponse<>(groupMapper.toDTO(savedGroup), "Member added successfully", 200));
+    }
+
+// Remove member
+    @DeleteMapping("/{id}/members/{userId}")
+    public ResponseEntity<ApiResponse<GroupDTO>> removeMember(@PathVariable Long id, @PathVariable Long userId) {
+        Group group = groupService.findById(id);
+        if (group == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new ApiResponse<>(null, "Group not found", HttpStatus.NOT_FOUND.value()));
+        }
+        User user = userService.getUserById(userId);
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new ApiResponse<>(null, "User not found", HttpStatus.NOT_FOUND.value()));
+        }
+        group.getMembers().removeIf(m -> m.getId().equals(userId));
+        Group savedGroup = groupService.save(group);
+        return ResponseEntity.ok(new ApiResponse<>(groupMapper.toDTO(savedGroup), "Member removed successfully", 200));
     }
 
     // Delete group by ID

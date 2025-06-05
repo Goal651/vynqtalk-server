@@ -1,5 +1,6 @@
 package com.vynqtalk.server.dto;
 
+import java.time.Instant;
 import java.util.List;
 
 public class GroupDTO {
@@ -7,5 +8,7 @@ public class GroupDTO {
     public String name;
     public String description;
     public Boolean isPrivate;
+    public UserDTO createdBy;
+    public Instant createdAt;
     public List<UserDTO> members;
 }
