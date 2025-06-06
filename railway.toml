@@ -3,7 +3,7 @@ builder = "DOCKERFILE"
 dockerfilePath = "Dockerfile"
 
 [deploy]
-startCommand = "java -jar app.jar"
+startCommand = "catalina.sh run"
 healthcheckPath = "/api/v1/user-settings/1"
 healthcheckTimeout = 300
 restartPolicyType = "ON_FAILURE"
@@ -13,4 +13,4 @@ restartPolicyMaxRetries = 10
 interval = "30s"
 timeout = "10s"
 retries = 3
-startPeriod = "40s" 
+startPeriod = "60s" 

@@ -12,12 +12,17 @@ COPY src ./src
 RUN mvn clean package -DskipTests
 
 # Runtime stage
-FROM eclipse-temurin:17-jre-alpine
+FROM tomcat:9.0-jre17-temurin
 WORKDIR /app
-COPY --from=build /app/target/*.jar app.jar
+
+# Remove default Tomcat webapps
+RUN rm -rf /usr/local/tomcat/webapps/*
+
+# Copy the WAR file to Tomcat's webapps directory
+COPY --from=build /app/target/*.war /usr/local/tomcat/webapps/ROOT.war
 
 # Set environment variables
 ENV JAVA_OPTS="-Xmx512m -Xms256m"
 
 EXPOSE 8080
-ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS -jar app.jar"] 
+CMD ["catalina.sh", "run"] 
