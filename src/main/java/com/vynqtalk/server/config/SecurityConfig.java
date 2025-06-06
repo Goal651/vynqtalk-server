@@ -63,8 +63,7 @@ public class SecurityConfig {
         configuration.addAllowedMethod(HttpMethod.PATCH);
         configuration.addAllowedMethod(HttpMethod.DELETE);
         configuration.addAllowedMethod(HttpMethod.OPTIONS); // Explicitly allow OPTIONS
-        configuration.addAllowedHeader("Authorization");
-        configuration.addAllowedHeader("Content-Type");
+        configuration.addAllowedHeader("*");
         configuration.setAllowCredentials(true); // Allow cookies or Authorization headers
         configuration.setMaxAge(3600L); // Cache preflight response for 1 hour
 
