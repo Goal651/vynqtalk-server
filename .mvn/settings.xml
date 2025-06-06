@@ -20,6 +20,13 @@
                 <maven.test.skip>true</maven.test.skip>
                 <maven.javadoc.skip>true</maven.javadoc.skip>
                 <maven.source.skip>true</maven.source.skip>
+                <maven.compiler.source>21</maven.compiler.source>
+                <maven.compiler.target>21</maven.compiler.target>
+                <maven.compiler.release>21</maven.compiler.release>
+                <maven.compiler.fork>true</maven.compiler.fork>
+                <maven.compiler.compilerVersion>21</maven.compiler.compilerVersion>
+                <maven.compiler.memoryInitial>1024m</maven.compiler.memoryInitial>
+                <maven.compiler.memoryMaximum>2048m</maven.compiler.memoryMaximum>
             </properties>
         </profile>
     </profiles>
