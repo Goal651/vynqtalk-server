@@ -56,17 +56,17 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.addAllowedOrigin("https://vynqtalk.vercel.app"); // Replace with your frontend origin
+        configuration.addAllowedOrigin("https://vynqtalk.vercel.app");
+        configuration.addAllowedOrigin("http://localhost:8000");
         configuration.addAllowedMethod(HttpMethod.GET);
         configuration.addAllowedMethod(HttpMethod.POST);
         configuration.addAllowedMethod(HttpMethod.PUT);
         configuration.addAllowedMethod(HttpMethod.PATCH);
         configuration.addAllowedMethod(HttpMethod.DELETE);
-        configuration.addAllowedMethod(HttpMethod.OPTIONS); // Explicitly allow OPTIONS
+        configuration.addAllowedMethod(HttpMethod.OPTIONS); 
         configuration.addAllowedHeader("*");
-        configuration.setAllowCredentials(true); // Allow cookies or Authorization headers
-        configuration.setMaxAge(3600L); // Cache preflight response for 1 hour
-
+        configuration.setAllowCredentials(true);
+        configuration.setMaxAge(3600L);
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration); // Apply to all endpoints
         return source;
