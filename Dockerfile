@@ -1,7 +1,7 @@
 FROM maven:3.9.6-eclipse-temurin-21 AS build
 
 # Build arguments for Maven
-ARG MAVEN_OPTS="-Xmx1024m -Xms512m -Dmaven.repo.local=/usr/share/maven/ref/repository"
+ARG MAVEN_OPTS="-Xmx768m -Xms256m -Dmaven.repo.local=/usr/share/maven/ref/repository"
 ARG MAVEN_CLI_OPTS="--batch-mode --errors --fail-at-end --show-version"
 
 WORKDIR /app
@@ -26,8 +26,8 @@ RUN mvn $MAVEN_CLI_OPTS clean package \
 FROM tomcat:10.1-jdk21-temurin
 
 # Set environment variables
-ENV JAVA_OPTS="-Xmx384m -Xms256m -XX:+UseG1GC -XX:MaxGCPauseMillis=200 -Djava.security.egd=file:/dev/./urandom"
-ENV CATALINA_OPTS="-Xms256m -Xmx384m -XX:+UseG1GC"
+ENV JAVA_OPTS="-Xmx256m -Xms128m -XX:+UseG1GC -XX:MaxGCPauseMillis=200 -Djava.security.egd=file:/dev/./urandom"
+ENV CATALINA_OPTS="-Xms128m -Xmx256m -XX:+UseG1GC"
 
 # Remove default Tomcat webapps
 RUN rm -rf /usr/local/tomcat/webapps/*
@@ -35,5 +35,19 @@ RUN rm -rf /usr/local/tomcat/webapps/*
 # Copy the WAR file to Tomcat's webapps directory
 COPY --from=build /app/target/*.war /usr/local/tomcat/webapps/ROOT.war
 
+# Create a script to wait for database
+RUN echo '#!/bin/sh\n\
+echo "Waiting for database connection..."\n\
+for i in $(seq 1 30); do\n\
+  if nc -z $DATABASE_HOST $DATABASE_PORT; then\n\
+    echo "Database is ready!"\n\
+    break\n\
+  fi\n\
+  echo "Waiting for database... attempt $i of 30"\n\
+  sleep 2\n\
+done\n\
+exec catalina.sh run' > /usr/local/tomcat/bin/start.sh && \
+chmod +x /usr/local/tomcat/bin/start.sh
+
 EXPOSE 8080
-CMD ["catalina.sh", "run"] 
+CMD ["/usr/local/tomcat/bin/start.sh"] 
