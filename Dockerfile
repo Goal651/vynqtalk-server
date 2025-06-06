@@ -32,34 +32,17 @@ RUN mvn $MAVEN_CLI_OPTS clean package \
     -Dmaven.compiler.release=21
 
 # Runtime stage
-FROM eclipse-temurin:21-jre-alpine
-
-# Add build arguments for runtime
-ARG TOMCAT_VERSION=10.1
-ARG TOMCAT_HOME=/usr/local/tomcat
-
-WORKDIR $TOMCAT_HOME
-
-# Install Tomcat
-RUN apk add --no-cache tomcat10 && \
-    rm -rf webapps/* && \
-    rm -rf work/* && \
-    rm -rf temp/* && \
-    mkdir -p webapps/ROOT
-
-# Copy the WAR file to Tomcat's webapps directory
-COPY --from=build /app/target/*.war webapps/ROOT.war
+FROM tomcat:10.1-jdk21-temurin
 
 # Set environment variables
 ENV JAVA_OPTS="-Xmx512m -Xms256m -XX:+UseG1GC -XX:MaxGCPauseMillis=200 -Djava.security.egd=file:/dev/./urandom"
 ENV CATALINA_OPTS="-Xms256m -Xmx512m -XX:+UseG1GC"
 
-# Create a non-root user
-RUN addgroup -S tomcat && \
-    adduser -S -G tomcat tomcat && \
-    chown -R tomcat:tomcat $TOMCAT_HOME
+# Remove default Tomcat webapps
+RUN rm -rf /usr/local/tomcat/webapps/*
 
-USER tomcat
+# Copy the WAR file to Tomcat's webapps directory
+COPY --from=build /app/target/*.war /usr/local/tomcat/webapps/ROOT.war
 
 EXPOSE 8080
 CMD ["catalina.sh", "run"] 
