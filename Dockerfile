@@ -20,8 +20,7 @@ RUN mvn $MAVEN_CLI_OPTS clean package \
     -DskipTests \
     -Dmaven.compiler.source=21 \
     -Dmaven.compiler.target=21 \
-    -Dmaven.compiler.release=21 \
-    -X
+    -Dmaven.compiler.release=21
 
 # Runtime stage
 FROM tomcat:10.1-jdk21-temurin
