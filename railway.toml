@@ -1,6 +1,7 @@
 [build]
 builder = "DOCKERFILE"
 dockerfilePath = "Dockerfile"
+buildTimeout = 1800  # 30 minutes build timeout
 
 [deploy]
 startCommand = "catalina.sh run"
