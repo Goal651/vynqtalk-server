@@ -1,19 +1,13 @@
 FROM maven:3.9.6-eclipse-temurin-21 AS build
 
 # Build arguments for Maven
-ARG MAVEN_OPTS="-Xmx2048m -Xms1024m -Dmaven.repo.local=/usr/share/maven/ref/repository -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=WARN -Dorg.slf4j.simpleLogger.showDateTime=true -Djava.awt.headless=true"
-ARG MAVEN_CLI_OPTS="--batch-mode --errors --fail-at-end --show-version -DinstallAtEnd=true -DdeployAtEnd=true"
+ARG MAVEN_OPTS="-Xmx2048m -Xms1024m -Dmaven.repo.local=/usr/share/maven/ref/repository"
+ARG MAVEN_CLI_OPTS="--batch-mode --errors --fail-at-end --show-version"
 
 WORKDIR /app
 
-# Copy only pom files first to cache dependencies
+# Copy pom files
 COPY pom.xml .
-COPY */pom.xml ./
-RUN mkdir -p target && \
-    for f in $(find . -name "pom.xml"); do \
-        mkdir -p $(dirname $f)/src/main/java; \
-        touch $(dirname $f)/src/main/java/.gitkeep; \
-    done
 
 # Download dependencies
 RUN mvn $MAVEN_CLI_OPTS dependency:go-offline
@@ -21,15 +15,13 @@ RUN mvn $MAVEN_CLI_OPTS dependency:go-offline
 # Copy source code
 COPY src ./src
 
-# Build the application with optimized settings
+# Build the application with debug output
 RUN mvn $MAVEN_CLI_OPTS clean package \
     -DskipTests \
-    -Dmaven.test.skip=true \
-    -Dmaven.javadoc.skip=true \
-    -Dmaven.source.skip=true \
     -Dmaven.compiler.source=21 \
     -Dmaven.compiler.target=21 \
-    -Dmaven.compiler.release=21
+    -Dmaven.compiler.release=21 \
+    -X
 
 # Runtime stage
 FROM tomcat:10.1-jdk21-temurin
