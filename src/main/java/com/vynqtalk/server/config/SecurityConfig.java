@@ -56,7 +56,7 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.addAllowedOrigin("http://localhost:8080"); // Replace with your frontend origin
+        configuration.addAllowedOrigin("https://vynqtalk.vercel.app"); // Replace with your frontend origin
         configuration.addAllowedMethod(HttpMethod.GET);
         configuration.addAllowedMethod(HttpMethod.POST);
         configuration.addAllowedMethod(HttpMethod.PUT);
