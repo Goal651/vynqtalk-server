@@ -78,9 +78,11 @@ public class GroupController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(new ApiResponse<>(null, "User not found", HttpStatus.UNAUTHORIZED.value()));
         }
-        group.setMembers(List.of(createdBy)); // Add creator as the first member
+        group.setMembers(List.of(createdBy)); 
         group.setCreatedBy(createdBy);
         group.setCreatedAt(Instant.now());
+        group.setIsPrivate(false);
+        group.setStatus("active");
         Group savedGroup = groupService.save(group);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(new ApiResponse<>(groupMapper.toDTO(savedGroup), "Group created successfully",

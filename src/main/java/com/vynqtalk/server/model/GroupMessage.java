@@ -30,11 +30,11 @@ public class GroupMessage {
     @Column(nullable = false)
     private String type;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(nullable = false, name = "sender_id")
     private User sender;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(nullable = false, name = "receiver_id")
     private Group group;
 
@@ -47,7 +47,7 @@ public class GroupMessage {
     @Column(nullable = false)
     private List<String> reactions;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "reply_to_message_id")
     private GroupMessage replyToMessage;
 

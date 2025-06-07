@@ -31,8 +31,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     @Override
     public void registerStompEndpoints(@NonNull StompEndpointRegistry registry) {
         registry.addEndpoint("/ws")
-                .setAllowedOrigins("http://localhost:8000")
-                .setAllowedOrigins("https://vynqtalk.vercel.app")
+                .setAllowedOrigins("http://localhost:3000","http://localhost:8000","https://vynqtalk.vercel.app")
                 .addInterceptors(authInterceptor)
                 .withSockJS();
     }

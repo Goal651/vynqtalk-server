@@ -8,5 +8,7 @@ import com.vynqtalk.server.model.User;
 @Mapper(componentModel = "spring")
 public interface UserMapper {
     UserDTO toDTO(User user);
+
+    User toEntity(UserDTO userDTO);
     
 }

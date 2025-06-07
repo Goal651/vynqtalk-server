@@ -10,8 +10,10 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import com.vynqtalk.server.model.User;
 import com.vynqtalk.server.model.response.JwtValidationResult;
 import com.vynqtalk.server.service.JwtService;
+import com.vynqtalk.server.service.UserService;
 
 import java.io.IOException;
 import jakarta.servlet.FilterChain;
@@ -24,6 +26,9 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
     @Autowired
     private JwtService jwtService;
+
+    @Autowired
+    private UserService userService;
  
     @Autowired
     private UserDetailsService userDetailsService;
@@ -58,6 +63,14 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             String jsonError = String.format("{\"error\": \"Invalid JWT\", \"details\": \"%s\"}",
                     result.getErrorMessage());
             response.getWriter().write(jsonError);
+            return;
+        }
+        User user=userService.getUserByEmail(result.getUsername());
+        System.out.println("User status: "+user.getStatus());
+        if (user.getStatus().equals("blocked")) {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.setContentType("application/json");
+            response.getWriter().write("{\"error\": \"User is blocked.\"}");
             return;
         }
 

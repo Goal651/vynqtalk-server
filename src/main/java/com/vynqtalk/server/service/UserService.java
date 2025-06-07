@@ -8,6 +8,7 @@ import com.vynqtalk.server.model.request.LoginRequest;
 import com.vynqtalk.server.model.response.AuthResult;
 import com.vynqtalk.server.repository.UserRepository;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
@@ -28,6 +29,14 @@ public class UserService {
     }
 
     public User saveUser(User user) {
+        user.setStatus("active");
+        user.setLastActive(Instant.now());
+        user.setBio("No bio yet");
+        user.setIsAdmin(false);
+        return userRepo.save(user);
+    }
+
+    public User updateUser(User user) {
         return userRepo.save(user);
     }
 

@@ -10,5 +10,6 @@ public class GroupDTO {
     public Boolean isPrivate;
     public UserDTO createdBy;
     public Instant createdAt;
+    public String status;
     public List<UserDTO> members;
 }

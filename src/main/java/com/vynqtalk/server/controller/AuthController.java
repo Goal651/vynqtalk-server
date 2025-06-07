@@ -1,5 +1,7 @@
 package com.vynqtalk.server.controller;
 
+import java.time.Instant;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,7 +21,7 @@ import com.vynqtalk.server.service.UserService;
 import com.vynqtalk.server.service.UserSettingsService;
 
 @RestController
-@RequestMapping("/api/v1/auth")
+@RequestMapping("/api/v1/auth") 
 public class AuthController {
     @Autowired
     private UserService userService;
@@ -49,6 +51,10 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.ACCEPTED)
                     .body(new ApiResponse<>(null, "Invalid email or password", HttpStatus.UNAUTHORIZED.value()));
         }
+        if (authenticatedUser.getStatus().equals("blocked")) {
+            return ResponseEntity.status(HttpStatus.ACCEPTED)
+                    .body(new ApiResponse<>(null, "User is blocked contact admin", HttpStatus.UNAUTHORIZED.value()));
+        }
 
         String token = jwtService.generateToken(authenticatedUser.getEmail());
         AuthData loginData = new AuthData(authenticatedUser, token);
@@ -63,6 +69,7 @@ public class AuthController {
                     new ApiResponse<>(null, "Email, password, and name are required", HttpStatus.BAD_REQUEST.value()));
         }
         user.setIsAdmin(false); // Default to non-admin user
+        user.setCreatedAt(Instant.now());
         // Check if user already exists
         if (userService.getUserByEmail(user.getEmail()) != null) {
             return ResponseEntity.status(HttpStatus.ACCEPTED)
