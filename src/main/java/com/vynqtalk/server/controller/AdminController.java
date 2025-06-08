@@ -3,9 +3,11 @@ package com.vynqtalk.server.controller;
 import com.vynqtalk.server.model.User;
 import com.vynqtalk.server.model.response.ApiResponse;
 import com.vynqtalk.server.dto.GroupDTO;
+import com.vynqtalk.server.dto.SystemMetric;
 import com.vynqtalk.server.dto.UserDTO;
 import com.vynqtalk.server.mapper.UserMapper;
 import com.vynqtalk.server.service.AdminService;
+import com.vynqtalk.server.service.SystemMetricsService;
 import com.vynqtalk.server.service.UserService;
 
 import java.util.List;
@@ -27,6 +29,15 @@ public class AdminController {
     @Autowired
     private AdminService adminService;
 
+    @Autowired
+    private SystemMetricsService systemMetricsService;
+
+    @GetMapping("/metrics")
+    public ResponseEntity<ApiResponse<List<SystemMetric>>> getSystemData() {
+        List<SystemMetric> systemMetric = systemMetricsService.getSystemMetrics();
+        return ResponseEntity.ok(new ApiResponse<>(systemMetric, "System data loaded", 200));
+    }
+
     @GetMapping("/users")
     public ResponseEntity<ApiResponse<List<UserDTO>>> getAllUsers() {
         return ResponseEntity.ok(new ApiResponse<>(adminService.getAllUsers(), "Users fetched successfully", 200));
@@ -40,17 +51,20 @@ public class AdminController {
 
     @PutMapping("/users/{id}")
     public ResponseEntity<ApiResponse<UserDTO>> updateUser(@PathVariable Long id, @RequestBody UserDTO userDTO) {
-        User user=userService.getUserById(id);
-        System.out.println("User status:             "+user.getStatus()+"User new status: "+userDTO.status);
-
+        User user = userService.getUserById(id);
         user.setEmail(userDTO.email);
         user.setIsAdmin(userDTO.isAdmin);
         user.setName(userDTO.name);
         user.setStatus(userDTO.status);
         user.setLastActive(userDTO.lastActive);
-        User response=userService.updateUser(user);
+        User response = userService.updateUser(user);
         return ResponseEntity
                 .ok(new ApiResponse<>(userMapper.toDTO(response), "User updated successfully", 200));
     }
 
+    @DeleteMapping("/users/{id}")
+    public ResponseEntity<ApiResponse<Void>> deleteUser(@PathVariable Long id) {
+        userService.deleteUser(id);
+        return ResponseEntity.ok(new ApiResponse<>("User deleted successfully", 200));
+    }
 }

@@ -31,7 +31,7 @@ public class UserController {
 
     // Get user by ID
     @GetMapping("/{id}")
-    public ResponseEntity<ApiResponse<UserDTO>>  getUserById(@PathVariable Long id) {
+    public ResponseEntity<ApiResponse<UserDTO>> getUserById(@PathVariable Long id) {
         User user = userService.getUserById(id);
         if (user == null) {
             return ResponseEntity.ok().body(new ApiResponse<>(null, "User not found", 404));
@@ -41,7 +41,16 @@ public class UserController {
 
     // Update user profile
     @PutMapping("/{id}")
-    public ResponseEntity<ApiResponse<UserDTO>> updateUser(@PathVariable Long id, @RequestBody User user) {
+    public ResponseEntity<ApiResponse<UserDTO>> updateUser(@PathVariable Long id, @RequestBody UserDTO userDTO) {
+        User user = userService.getUserById(id);
+        if (user == null) {
+            return ResponseEntity.ok(new ApiResponse<>("User don't exist", 403));
+        }
+        user.setEmail(userDTO.email);
+        user.setIsAdmin(userDTO.isAdmin);
+        user.setName(userDTO.name);
+        user.setStatus(userDTO.status);
+        user.setLastActive(userDTO.lastActive);
         User updatedUser = userService.updateUser(id, user);
         if (updatedUser == null) {
             return ResponseEntity.ok().body(new ApiResponse<>(null, "User not found", 404));

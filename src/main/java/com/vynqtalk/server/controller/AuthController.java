@@ -21,7 +21,7 @@ import com.vynqtalk.server.service.UserService;
 import com.vynqtalk.server.service.UserSettingsService;
 
 @RestController
-@RequestMapping("/api/v1/auth") 
+@RequestMapping("/api/v1/auth")
 public class AuthController {
     @Autowired
     private UserService userService;
@@ -31,6 +31,8 @@ public class AuthController {
 
     @Autowired
     private UserSettingsService userSettingsService;
+
+
 
     @PostMapping("/login")
     public ResponseEntity<ApiResponse<AuthData>> login(@RequestBody LoginRequest loginRequest) {
@@ -63,7 +65,7 @@ public class AuthController {
 
     @PostMapping("/signup")
     public ResponseEntity<ApiResponse<AuthData>> signup(@RequestBody User user) {
-        
+
         if (user.getEmail() == null || user.getPassword() == null || user.getName() == null) {
             return ResponseEntity.ok().body(
                     new ApiResponse<>(null, "Email, password, and name are required", HttpStatus.BAD_REQUEST.value()));
@@ -79,7 +81,7 @@ public class AuthController {
         userSettingsService.updateUserSettings(user, new UserSettings());
         String token = jwtService.generateToken(user.getEmail());
         AuthData authData = new AuthData(user, token);
-        System.out.println("User create"+authData);
+        System.out.println("User create" + authData);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(new ApiResponse<>(authData, "Signup successful", HttpStatus.CREATED.value()));
     }
