@@ -40,19 +40,25 @@ public class AuthController {
             return ResponseEntity.ok()
                     .body(new ApiResponse<>(null, "Email and password are required", HttpStatus.BAD_REQUEST.value()));
         }
+        User user = userService.getUserByEmail(loginRequest.getEmail());
+        if (user == null) {
+            return ResponseEntity.ok()
+                    .body(new ApiResponse<>(null, "User not found", HttpStatus.UNAUTHORIZED.value()));
+        }
+
         AuthResult authResult = userService.authenticate(loginRequest);
-        System.out.println("Auth result " + authResult);
 
         if (!authResult.isAuth()) {
             return ResponseEntity.status(HttpStatus.ACCEPTED)
-                    .body(new ApiResponse<>(null, "Invalid email or password", HttpStatus.UNAUTHORIZED.value()));
+                    .body(new ApiResponse<>(null, "Incorrect password", HttpStatus.UNAUTHORIZED.value()));
         }
 
         User authenticatedUser = authResult.getUser();
         if (authenticatedUser == null) {
             return ResponseEntity.status(HttpStatus.ACCEPTED)
-                    .body(new ApiResponse<>(null, "Invalid email or password", HttpStatus.UNAUTHORIZED.value()));
+                    .body(new ApiResponse<>(null, "User not found", HttpStatus.UNAUTHORIZED.value()));
         }
+
         if (authenticatedUser.getStatus().equals("blocked")) {
             return ResponseEntity.status(HttpStatus.ACCEPTED)
                     .body(new ApiResponse<>(null, "User is blocked contact admin", HttpStatus.UNAUTHORIZED.value()));

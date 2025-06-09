@@ -42,7 +42,10 @@ public class MessageController {
     // Delete a message
     @DeleteMapping("/{messageId}")
     public ResponseEntity<ApiResponse<Void>> deleteMessage(@PathVariable Long messageId) {
-        System.out.println("messageId" + messageId);
+        Message message = messageService.getMessageById(messageId).get();
+        if (message == null) {
+            return ResponseEntity.ok(new ApiResponse<>(null, "Message not found", 404));
+        }
         messageService.deleteMessage(messageId);
         return ResponseEntity.ok(new ApiResponse<>(null, "Message deleted successfully", 200));
     }
@@ -51,7 +54,13 @@ public class MessageController {
     @PutMapping("/{messageId}")
     public ResponseEntity<ApiResponse<MessageDTO>> updateMessage(@PathVariable Long messageId,
             @RequestBody Message updated) {
-        Message result = messageService.updateMessage(messageId, updated);
+        Message message = messageService.getMessageById(messageId).get();
+        if (message == null) {
+            return ResponseEntity.ok(new ApiResponse<>(null, "Message not found", 404));
+        }
+        message.setContent(updated.getContent());
+        message.setEdited(true);
+        Message result = messageService.updateMessage(messageId, message);
         return ResponseEntity.ok(new ApiResponse<>(messageMapper.toDTO(result), "Message updated successfully", 200));
     }
 

@@ -35,7 +35,7 @@ public class NotificationService {
             notification.setIsRead(true);
             return notificationRepository.save(notification);
         }
-        return null; // or throw an exception
+        return null; 
     }
 
     public void deleteNotification(Long id) {

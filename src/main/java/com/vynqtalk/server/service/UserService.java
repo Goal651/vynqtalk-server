@@ -1,6 +1,7 @@
 package com.vynqtalk.server.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.vynqtalk.server.model.User;
@@ -23,12 +24,15 @@ public class UserService {
         if (dbUser == null) {
             return new AuthResult(false, null);
         }
-        return (dbUser.getPassword().equals(loginRequest.getPassword()))
+        BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+        return (passwordEncoder.matches(loginRequest.getPassword(), dbUser.getPassword()))
                 ? new AuthResult(true, dbUser)
                 : new AuthResult(false, null);
     }
 
     public User saveUser(User user) {
+        BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
         user.setStatus("active");
         user.setLastActive(Instant.now());
         user.setBio("No bio yet");
