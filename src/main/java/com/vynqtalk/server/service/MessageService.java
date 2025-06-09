@@ -36,8 +36,7 @@ public class MessageService {
     public void deleteMessage(Long messageId) {
         Optional<Message> messageOpt = messageRepository.findById(messageId);
         if (messageOpt.isPresent()) {
-            Message message = messageOpt.get();
-            createMessageDeletedNotification(message);
+            // createMessageDeletedNotification(message);
             messageRepository.deleteById(messageId);
         }
     }
@@ -45,15 +44,11 @@ public class MessageService {
     public Message updateMessage(Long messageId, Message updatedMessage) {
         Optional<Message> existing = messageRepository.findById(messageId);
         if (existing.isPresent()) {
-            Message message = existing.get();
-            message.setContent(updatedMessage.getContent());
-            message.setEdited(true);
-            message.setTimestamp(Instant.now());
-            Message savedMessage = messageRepository.save(message);
-            createMessageEditedNotification(savedMessage);
+            Message savedMessage = messageRepository.save(updatedMessage);
+            // createMessageEditedNotification(savedMessage);
             return savedMessage;
         } else {
-            throw new RuntimeException("Message not found with ID: " + messageId);
+            return null;
         }
     }
 
@@ -63,7 +58,7 @@ public class MessageService {
             Message message = existing.get();
             message.setReactions(reactions);
             Message savedMessage = messageRepository.save(message);
-            createMessageReactionNotification(savedMessage);
+            // createMessageReactionNotification(savedMessage);
             return savedMessage;
         } else {
             throw new RuntimeException("Message not found with ID: " + messageId);
@@ -77,7 +72,7 @@ public class MessageService {
             reply.setReplyToMessage(message);
             reply.setTimestamp(Instant.now());
             Message savedReply = messageRepository.save(reply);
-            createMessageReplyNotification(savedReply, message);
+            // createMessageReplyNotification(savedReply, message);
             return savedReply;
         } else {
             throw new RuntimeException("Message not found with ID: " + messageId);
