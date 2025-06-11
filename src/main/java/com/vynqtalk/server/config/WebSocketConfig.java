@@ -16,7 +16,7 @@ import com.vynqtalk.server.filter.AuthChannelInterceptorAdapter;
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Autowired
-    private WebSocketEventLogger webSocketEventLogger;
+    private WebSocketInterceptor webSocketInterceptor;
 
 
     @Autowired
@@ -38,6 +38,6 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void configureClientInboundChannel(@NonNull ChannelRegistration registration) {
-        registration.interceptors(webSocketEventLogger);
+        registration.interceptors(webSocketInterceptor);
     }
 }

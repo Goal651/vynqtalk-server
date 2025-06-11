@@ -47,7 +47,7 @@ public class AdminService {
     }
 
     public void updateUser(Long id, UserDTO userDTO) {
-        User user = userMapper.toEntity(userDTO);
+        User user = userService.getUserById(id);
         user.setId(id);
         userService.updateUser(id, user);
     }

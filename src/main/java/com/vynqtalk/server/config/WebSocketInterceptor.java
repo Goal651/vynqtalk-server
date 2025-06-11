@@ -17,8 +17,8 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Component
-public class WebSocketEventLogger implements ChannelInterceptor {
-    private static final Logger logger = LoggerFactory.getLogger(WebSocketEventLogger.class);
+public class WebSocketInterceptor implements ChannelInterceptor {
+    private static final Logger logger = LoggerFactory.getLogger(WebSocketInterceptor.class);
 
     private final Map<String, String> connectedUsers = new ConcurrentHashMap<>();
 
@@ -46,11 +46,13 @@ public class WebSocketEventLogger implements ChannelInterceptor {
 
                 connectedUsers.put(userEmail, sessionId);
                 logger.info("STOMP client connected:" , "userEmail={}, sessionId={}", userEmail, sessionId);
+
                 broadcastUsers();
             }
         } else if (command == StompCommand.DISCONNECT) {
             connectedUsers.remove(sessionId);
             logger.info("STOMP client disconnected: sessionId={}", sessionId);
+            
             broadcastUsers();
         }
         return message;

@@ -14,7 +14,6 @@ import com.vynqtalk.server.model.User;
 import com.vynqtalk.server.model.UserSettings;
 import com.vynqtalk.server.model.request.LoginRequest;
 import com.vynqtalk.server.model.response.ApiResponse;
-import com.vynqtalk.server.model.response.AuthResult;
 import com.vynqtalk.server.model.response.AuthData;
 import com.vynqtalk.server.service.JwtService;
 import com.vynqtalk.server.service.UserService;
@@ -32,8 +31,6 @@ public class AuthController {
     @Autowired
     private UserSettingsService userSettingsService;
 
-
-
     @PostMapping("/login")
     public ResponseEntity<ApiResponse<AuthData>> login(@RequestBody LoginRequest loginRequest) {
         if (loginRequest.getEmail() == null || loginRequest.getPassword() == null) {
@@ -46,26 +43,21 @@ public class AuthController {
                     .body(new ApiResponse<>(null, "User not found", HttpStatus.UNAUTHORIZED.value()));
         }
 
-        AuthResult authResult = userService.authenticate(loginRequest);
-
-        if (!authResult.isAuth()) {
-            return ResponseEntity.status(HttpStatus.ACCEPTED)
-                    .body(new ApiResponse<>(null, "Incorrect password", HttpStatus.UNAUTHORIZED.value()));
-        }
-
-        User authenticatedUser = authResult.getUser();
-        if (authenticatedUser == null) {
-            return ResponseEntity.status(HttpStatus.ACCEPTED)
-                    .body(new ApiResponse<>(null, "User not found", HttpStatus.UNAUTHORIZED.value()));
-        }
-
-        if (authenticatedUser.getStatus().equals("blocked")) {
+        if (user.getStatus().equals("blocked")) {
             return ResponseEntity.status(HttpStatus.ACCEPTED)
                     .body(new ApiResponse<>(null, "User is blocked contact admin", HttpStatus.UNAUTHORIZED.value()));
         }
 
-        String token = jwtService.generateToken(authenticatedUser.getEmail());
-        AuthData loginData = new AuthData(authenticatedUser, token);
+        boolean authResult = userService.authenticate(loginRequest);
+
+        if (!authResult) {
+            return ResponseEntity.status(HttpStatus.ACCEPTED)
+                    .body(new ApiResponse<>(null, "Incorrect password", HttpStatus.UNAUTHORIZED.value()));
+        }
+
+
+        String token = jwtService.generateToken(user.getEmail());
+        AuthData loginData = new AuthData(user, token);
         return ResponseEntity.ok(new ApiResponse<>(loginData, "Login successful", HttpStatus.OK.value()));
     }
 

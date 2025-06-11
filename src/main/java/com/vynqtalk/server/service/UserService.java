@@ -4,9 +4,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.vynqtalk.server.dto.UserDTO;
 import com.vynqtalk.server.model.User;
 import com.vynqtalk.server.model.request.LoginRequest;
-import com.vynqtalk.server.model.response.AuthResult;
 import com.vynqtalk.server.repository.UserRepository;
 
 import java.time.Instant;
@@ -17,17 +17,15 @@ import java.util.Optional;
 public class UserService {
 
     @Autowired
-    private UserRepository userRepo;
+    private UserRepository userRepository;
 
-    public AuthResult authenticate(LoginRequest loginRequest) {
-        User dbUser = userRepo.findByEmail(loginRequest.getEmail());
+    public boolean authenticate(LoginRequest loginRequest) {
+        User dbUser = userRepository.findByEmail(loginRequest.getEmail());
         if (dbUser == null) {
-            return new AuthResult(false, null);
+            return false;
         }
         BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-        return (passwordEncoder.matches(loginRequest.getPassword(), dbUser.getPassword()))
-                ? new AuthResult(true, dbUser)
-                : new AuthResult(false, null);
+        return (passwordEncoder.matches(loginRequest.getPassword(), dbUser.getPassword()));
     }
 
     public User saveUser(User user) {
@@ -37,26 +35,32 @@ public class UserService {
         user.setLastActive(Instant.now());
         user.setBio("No bio yet");
         user.setIsAdmin(false);
-        return userRepo.save(user);
+        return userRepository.save(user);
     }
 
-    public User updateUser(User user) {
-        return userRepo.save(user);
+    public User updateUser(UserDTO userDTO) {
+        User user = this.getUserById(userDTO.id);
+        user.setEmail(userDTO.email);
+        user.setIsAdmin(userDTO.isAdmin);
+        user.setName(userDTO.name);
+        user.setStatus(userDTO.status);
+        user.setLastActive(userDTO.lastActive);
+        return userRepository.save(user);
     }
 
     // Get user by ID
     public User getUserById(Long id) {
-        Optional<User> user = userRepo.findById(id);
+        Optional<User> user = userRepository.findById(id);
         return user.orElse(null);
     }
 
     public User getUserByEmail(String email) {
-        return userRepo.findByEmail(email);
+        return userRepository.findByEmail(email);
     }
 
     // Update user profile
     public User updateUser(Long id, User user) {
-        Optional<User> existingUserOpt = userRepo.findById(id);
+        Optional<User> existingUserOpt = userRepository.findById(id);
         if (existingUserOpt.isPresent()) {
             User existingUser = existingUserOpt.get();
             // Update fields as needed
@@ -64,18 +68,18 @@ public class UserService {
             existingUser.setEmail(user.getEmail());
             existingUser.setPassword(user.getPassword());
             // Add other fields as necessary
-            return userRepo.save(existingUser);
+            return userRepository.save(existingUser);
         }
         return null;
     }
 
     // Delete user account
     public void deleteUser(Long id) {
-        userRepo.deleteById(id);
+        userRepository.deleteById(id);
     }
 
     // List all users
     public List<User> getAllUsers() {
-        return userRepo.findAll();
+        return userRepository.findAll();
     }
 }

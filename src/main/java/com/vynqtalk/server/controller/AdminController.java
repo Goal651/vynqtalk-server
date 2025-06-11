@@ -51,13 +51,7 @@ public class AdminController {
 
     @PutMapping("/users/{id}")
     public ResponseEntity<ApiResponse<UserDTO>> updateUser(@PathVariable Long id, @RequestBody UserDTO userDTO) {
-        User user = userService.getUserById(id);
-        user.setEmail(userDTO.email);
-        user.setIsAdmin(userDTO.isAdmin);
-        user.setName(userDTO.name);
-        user.setStatus(userDTO.status);
-        user.setLastActive(userDTO.lastActive);
-        User response = userService.updateUser(user);
+        User response = userService.updateUser(userDTO);
         return ResponseEntity
                 .ok(new ApiResponse<>(userMapper.toDTO(response), "User updated successfully", 200));
     }
