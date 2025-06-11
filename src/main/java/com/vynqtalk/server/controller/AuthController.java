@@ -87,16 +87,10 @@ public class AuthController {
     @PostMapping("/logout")
     public ResponseEntity<ApiResponse<String>> logout() {
         // Invalidate the JWT token logic can be implemented here
-        // For now, we will just return a success message
         return ResponseEntity.ok(new ApiResponse<>(null, "Logout successful", HttpStatus.OK.value()));
     }
 
-    @PostMapping("/refresh")
-    public ResponseEntity<ApiResponse<String>> refresh() {
-        // Refresh the JWT token logic can be implemented here
-        // For now, we will just return a success message
-        return ResponseEntity.ok(new ApiResponse<>(null, "Token refreshed successfully", HttpStatus.OK.value()));
-    }
+
 
     @PostMapping("/forgot-password")
     public ResponseEntity<ApiResponse<String>> forgotPassword(@RequestBody User user) {
@@ -104,8 +98,7 @@ public class AuthController {
             return ResponseEntity.badRequest()
                     .body(new ApiResponse<>(null, "Email is required", HttpStatus.BAD_REQUEST.value()));
         }
-        // Logic to handle forgot password (e.g., send reset link) can be implemented
-        // here
+        // Logic to handle forgot password 
         return ResponseEntity.ok(new ApiResponse<>(null, "Password reset link sent to email", HttpStatus.OK.value()));
     }
 
@@ -116,7 +109,6 @@ public class AuthController {
                     new ApiResponse<>(null, "Email and new password are required", HttpStatus.BAD_REQUEST.value()));
         }
         // Logic to reset the password can be implemented here
-        // For now, we will just return a success message
         return ResponseEntity.ok(new ApiResponse<>(null, "Password reset successfully", HttpStatus.OK.value()));
     }
 
@@ -127,7 +119,6 @@ public class AuthController {
                     new ApiResponse<>(null, "Email and new password are required", HttpStatus.BAD_REQUEST.value()));
         }
         // Logic to change the password can be implemented here
-        // For now, we will just return a success message
         return ResponseEntity.ok(new ApiResponse<>(null, "Password changed successfully", HttpStatus.OK.value()));
     }
 
@@ -138,7 +129,6 @@ public class AuthController {
                     .body(new ApiResponse<>(null, "Email is required", HttpStatus.BAD_REQUEST.value()));
         }
         // Logic to verify the email can be implemented here
-        // For now, we will just return a success message
         return ResponseEntity.ok(new ApiResponse<>(null, "Email verification link sent", HttpStatus.OK.value()));
     }
 
@@ -149,7 +139,6 @@ public class AuthController {
                     .body(new ApiResponse<>(null, "Email is required", HttpStatus.BAD_REQUEST.value()));
         }
         // Logic to resend the verification email can be implemented here
-        // For now, we will just return a success message
         return ResponseEntity.ok(new ApiResponse<>(null, "Verification email resent", HttpStatus.OK.value()));
     }
 
