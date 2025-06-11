@@ -1,6 +1,6 @@
 package com.vynqtalk.server.service;
 
-import com.vynqtalk.server.model.response.JwtValidationResult;
+import com.vynqtalk.server.dto.response.JwtValidationResult;
 import com.vynqtalk.server.interfaces.IJwtService;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.Claims;

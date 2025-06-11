@@ -1,4 +1,4 @@
-package com.vynqtalk.server.model.request;
+package com.vynqtalk.server.dto.request;
 
 import lombok.Data;
 

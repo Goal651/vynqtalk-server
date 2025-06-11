@@ -16,11 +16,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.vynqtalk.server.dto.GroupDTO;
+import com.vynqtalk.server.dto.group.GroupDTO;
+import com.vynqtalk.server.dto.response.ApiResponse;
 import com.vynqtalk.server.mapper.GroupMapper;
 import com.vynqtalk.server.model.Group;
 import com.vynqtalk.server.model.User;
-import com.vynqtalk.server.model.response.ApiResponse;
 import com.vynqtalk.server.service.GroupService;
 import com.vynqtalk.server.service.UserService;
 

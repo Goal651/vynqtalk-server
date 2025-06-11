@@ -1,18 +1,18 @@
 package com.vynqtalk.server.controller;
 
-import com.vynqtalk.server.dto.GroupMessageDTO;
-import com.vynqtalk.server.dto.MessageDTO;
+import com.vynqtalk.server.dto.messages.GroupMessageDTO;
+import com.vynqtalk.server.dto.messages.MessageDTO;
 import com.vynqtalk.server.mapper.GroupMessageMapper;
 import com.vynqtalk.server.mapper.MessageMapper;
 import com.vynqtalk.server.model.GroupMessage;
 import com.vynqtalk.server.model.Message;
-import com.vynqtalk.server.model.sockets.ChatGroupMessage;
-import com.vynqtalk.server.model.sockets.ChatGroupMessageReply;
-import com.vynqtalk.server.model.sockets.ChatMessage;
-import com.vynqtalk.server.model.sockets.ChatMessageReply;
-import com.vynqtalk.server.model.sockets.ReactMessage;
 import com.vynqtalk.server.service.GroupMessageService;
 import com.vynqtalk.server.service.MessageService;
+import com.vynqtalk.server.websocket.payload.ChatGroupMessage;
+import com.vynqtalk.server.websocket.payload.ChatGroupMessageReply;
+import com.vynqtalk.server.websocket.payload.ChatMessage;
+import com.vynqtalk.server.websocket.payload.ChatMessageReply;
+import com.vynqtalk.server.websocket.payload.ReactMessage;
 
 import java.time.Instant;
 import java.util.List;

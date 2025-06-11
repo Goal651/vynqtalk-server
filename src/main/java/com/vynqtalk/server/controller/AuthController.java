@@ -10,11 +10,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.vynqtalk.server.dto.request.LoginRequest;
+import com.vynqtalk.server.dto.response.ApiResponse;
+import com.vynqtalk.server.dto.response.AuthData;
 import com.vynqtalk.server.model.User;
 import com.vynqtalk.server.model.UserSettings;
-import com.vynqtalk.server.model.request.LoginRequest;
-import com.vynqtalk.server.model.response.ApiResponse;
-import com.vynqtalk.server.model.response.AuthData;
 import com.vynqtalk.server.service.JwtService;
 import com.vynqtalk.server.service.UserService;
 import com.vynqtalk.server.service.UserSettingsService;

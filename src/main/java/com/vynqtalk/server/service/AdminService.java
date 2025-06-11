@@ -6,8 +6,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.vynqtalk.server.mapper.GroupMapper;
-import com.vynqtalk.server.dto.GroupDTO;
-import com.vynqtalk.server.dto.UserDTO;
+import com.vynqtalk.server.dto.group.GroupDTO;
+import com.vynqtalk.server.dto.user.UserDTO;
 import com.vynqtalk.server.model.Group;
 import com.vynqtalk.server.model.User;
 import com.vynqtalk.server.mapper.UserMapper;

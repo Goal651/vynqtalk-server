@@ -1,6 +1,6 @@
 package com.vynqtalk.server.interfaces;
 
-import com.vynqtalk.server.model.response.JwtValidationResult;
+import com.vynqtalk.server.dto.response.JwtValidationResult;
 
 public interface IJwtService {
     String generateToken(String email);

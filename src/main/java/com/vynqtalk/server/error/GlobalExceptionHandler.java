@@ -7,7 +7,8 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import com.vynqtalk.server.model.response.ApiResponse;
+
+import com.vynqtalk.server.dto.response.ApiResponse;
 
 import java.util.HashMap;
 import java.util.Map;

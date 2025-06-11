@@ -1,4 +1,4 @@
-package com.vynqtalk.server.dto;
+package com.vynqtalk.server.dto.notifications;
 
 import java.time.Instant;
 

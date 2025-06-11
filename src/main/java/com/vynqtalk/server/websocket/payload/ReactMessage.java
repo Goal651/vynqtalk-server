@@ -1,4 +1,4 @@
-package com.vynqtalk.server.model.sockets;
+package com.vynqtalk.server.websocket.payload;
 
 import java.util.List;
 

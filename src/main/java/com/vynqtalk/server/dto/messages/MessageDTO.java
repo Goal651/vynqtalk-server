@@ -1,7 +1,9 @@
-package com.vynqtalk.server.dto;
+package com.vynqtalk.server.dto.messages;
 
 import java.time.Instant;
 import java.util.List;
+
+import com.vynqtalk.server.dto.user.UserDTO;
 
 public class MessageDTO {
     public Long id;

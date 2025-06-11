@@ -1,4 +1,4 @@
-package com.vynqtalk.server.filter;
+package com.vynqtalk.server.websocket.handler;
 
 import java.util.Map;
 

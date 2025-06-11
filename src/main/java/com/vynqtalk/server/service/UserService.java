@@ -4,9 +4,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import com.vynqtalk.server.dto.UserDTO;
+import com.vynqtalk.server.dto.request.LoginRequest;
+import com.vynqtalk.server.dto.user.UserDTO;
 import com.vynqtalk.server.model.User;
-import com.vynqtalk.server.model.request.LoginRequest;
 import com.vynqtalk.server.repository.UserRepository;
 
 import java.time.Instant;

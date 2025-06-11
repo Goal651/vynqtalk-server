@@ -1,7 +1,9 @@
-package com.vynqtalk.server.dto;
+package com.vynqtalk.server.dto.group;
 
 import java.time.Instant;
 import java.util.List;
+
+import com.vynqtalk.server.dto.user.UserDTO;
 
 public class GroupDTO {
     public Long id;

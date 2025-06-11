@@ -1,17 +1,15 @@
-package com.vynqtalk.server.model.sockets;
+package com.vynqtalk.server.websocket.payload;
 
 
-import com.vynqtalk.server.model.Message;
 import com.vynqtalk.server.model.User;
 
 import lombok.Data;
 
 @Data
-public class ChatMessageReply  {
+public class ChatMessage  {
     private User sender;
     private User receiver;
     private String content;
     private String type; 
-    private Message replyToMessage;
 }
 

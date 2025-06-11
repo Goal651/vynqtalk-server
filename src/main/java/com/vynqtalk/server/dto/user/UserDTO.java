@@ -1,4 +1,4 @@
-package com.vynqtalk.server.dto;
+package com.vynqtalk.server.dto.user;
 
 import java.time.Instant;
 

@@ -2,7 +2,7 @@ package com.vynqtalk.server.mapper;
 
 import org.mapstruct.Mapper;
 
-import com.vynqtalk.server.dto.GroupDTO;
+import com.vynqtalk.server.dto.group.GroupDTO;
 import com.vynqtalk.server.model.Group;
 
 @Mapper(componentModel = "spring")

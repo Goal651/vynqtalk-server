@@ -10,8 +10,8 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import com.vynqtalk.server.dto.response.JwtValidationResult;
 import com.vynqtalk.server.model.User;
-import com.vynqtalk.server.model.response.JwtValidationResult;
 import com.vynqtalk.server.service.JwtService;
 import com.vynqtalk.server.service.UserService;
 

@@ -1,9 +1,9 @@
 package com.vynqtalk.server.controller;
 
-import com.vynqtalk.server.dto.GroupMessageDTO;
+import com.vynqtalk.server.dto.messages.GroupMessageDTO;
+import com.vynqtalk.server.dto.response.ApiResponse;
 import com.vynqtalk.server.mapper.GroupMessageMapper;
 import com.vynqtalk.server.model.GroupMessage;
-import com.vynqtalk.server.model.response.ApiResponse;
 import com.vynqtalk.server.service.GroupMessageService;
 
 import java.util.List;

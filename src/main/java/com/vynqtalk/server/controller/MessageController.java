@@ -1,9 +1,9 @@
 package com.vynqtalk.server.controller;
 
-import com.vynqtalk.server.dto.MessageDTO;
+import com.vynqtalk.server.dto.messages.MessageDTO;
+import com.vynqtalk.server.dto.response.ApiResponse;
 import com.vynqtalk.server.mapper.MessageMapper;
 import com.vynqtalk.server.model.Message;
-import com.vynqtalk.server.model.response.ApiResponse;
 import com.vynqtalk.server.service.MessageService;
 
 import java.util.List;
