@@ -31,7 +31,7 @@ public class GroupMessageController {
         }
 
         List<GroupMessage> messages = groupMessageService.getAllGroupMessages(groupId);
-        
+
         if (messages.isEmpty()) {
             return ResponseEntity.ok(new ApiResponse<>(null, "No messages found for this group", 404));
         }
@@ -45,7 +45,7 @@ public class GroupMessageController {
     // Get messages by conversation ID
     @GetMapping("/{conversationId}")
     public ResponseEntity<ApiResponse<GroupMessageDTO>> getMessages(@PathVariable Long conversationId) {
-        GroupMessage messages = groupMessageService.getGroupMessageById(conversationId).get();
+        GroupMessage messages = groupMessageService.getGroupMessageById(conversationId);
         return ResponseEntity.ok(new ApiResponse<>(groupMessageMapper.toDTO(messages), "Message retrieved successfully", 200));
     }
 

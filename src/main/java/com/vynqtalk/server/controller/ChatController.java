@@ -129,11 +129,10 @@ public class ChatController {
     @MessageMapping("/group.sendMessageReaction")
     public String reactToGroupMessage(@Payload ReactMessage message) {
         System.out.println("Received message: " + message);
-        Optional<GroupMessage> exist = groupMessageService.getGroupMessageById(message.getMessageId());
-        if (exist.isPresent()) {
-            GroupMessage savedMessage = exist.get();
-            savedMessage.setReactions(message.getReactions());
-            groupMessageService.saveGroupMessage(savedMessage); // <-- persist the update
+        GroupMessage groupMessage = groupMessageService.getGroupMessageById(message.getMessageId());
+        if (groupMessage != null) {
+            groupMessage.setReactions(message.getReactions());
+            groupMessageService.saveGroupMessage(groupMessage); 
         }
         return "Successfully updated";
     }

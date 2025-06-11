@@ -46,10 +46,8 @@ public class ImageUploadService {
 
             // Generate unique filename
             String originalFilename = file.getOriginalFilename();
-            System.out.println("ORiginal file name " + originalFilename);
             String extension = originalFilename != null ? originalFilename.substring(originalFilename.lastIndexOf("."))
                     : ".jpg";
-            System.out.println("Final file name " + extension);
             String uniqueFilename = UUID.randomUUID().toString() + extension;
 
             Path filePath = uploadPath.resolve(uniqueFilename);
