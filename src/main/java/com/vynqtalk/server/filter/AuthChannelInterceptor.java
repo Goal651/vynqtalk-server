@@ -16,7 +16,7 @@ import org.springframework.web.socket.server.HandshakeInterceptor;
 import com.vynqtalk.server.service.JwtService;
 
 @Component
-public class AuthChannelInterceptorAdapter implements HandshakeInterceptor {
+public class AuthChannelInterceptor implements HandshakeInterceptor {
 
     @Autowired
     private JwtService jwtService;

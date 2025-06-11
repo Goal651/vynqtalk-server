@@ -25,7 +25,6 @@ import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.stereotype.Controller;
-import org.springframework.transaction.annotation.Transactional;
 
 @Controller
 public class ChatController {
@@ -65,7 +64,6 @@ public class ChatController {
 
     @MessageMapping("/chat.sendMessageReply")
     @SendTo("/topic/messages")
-    @Transactional
     public MessageDTO replyMessage(@Payload ChatMessageReply message) {
         Message savedMessage = new Message();
         savedMessage.setSender(message.getSender());
@@ -82,7 +80,6 @@ public class ChatController {
 
     @MessageMapping("/chat.sendMessageReaction")
     @SendTo("/topic/reactions")
-    @Transactional
     public MessageDTO reactToMessage(@Payload ReactMessage message) {
         System.out.println("Received message: " + message);
         Optional<Message> exist = messageService.getMessageById(message.getMessageId());

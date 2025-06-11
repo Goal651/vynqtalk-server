@@ -11,7 +11,7 @@ import com.vynqtalk.server.service.UserService;
 import com.vynqtalk.server.service.UserSettingsService;
 
 @RestController
-@RequestMapping("/api/v1/user-settings")
+@RequestMapping("/api/v1/user_settings")
 public class UserSettingsController {
 
     @Autowired

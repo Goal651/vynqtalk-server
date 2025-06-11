@@ -49,10 +49,11 @@ public class GroupController {
                     .filter(g -> g.getMembers().stream().anyMatch(m -> m.getId().equals(currentUser.getId())))
                     .toList();
         }
-        System.out.println("This is wigo test " + groups);
+
         if (groups.isEmpty()) {
             return ResponseEntity.ok(new ApiResponse<>(List.of(), "No groups found", 200));
         }
+
         List<GroupDTO> groupDTO = groups.stream()
                 .map(groupMapper::toDTO)
                 .toList();
@@ -75,8 +76,7 @@ public class GroupController {
     public ResponseEntity<ApiResponse<GroupDTO>> createGroup(Principal principal, @RequestBody Group group) {
         User createdBy = userService.getUserByEmail(principal.getName());
         if (createdBy == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(new ApiResponse<>(null, "User not found", HttpStatus.UNAUTHORIZED.value()));
+            return ResponseEntity.ok(new ApiResponse<>(null, "User not found", HttpStatus.UNAUTHORIZED.value()));
         }
         group.setMembers(List.of(createdBy)); 
         group.setCreatedBy(createdBy);

@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.vynqtalk.server.model.response.ApiResponse;
 import com.vynqtalk.server.service.ImageUploadService;
 
 @RestController
@@ -17,13 +18,11 @@ public class UploaderController {
     @Autowired
     private ImageUploadService imageUploadService;
 
-
     @PostMapping("/avatar")
-    public ResponseEntity<String> uploadImage(@RequestParam("file") MultipartFile file) {
+    public ResponseEntity<ApiResponse<String>> uploadImage(@RequestParam("file") MultipartFile file) {
 
-        String response = imageUploadService.uploadImage(file, "what");
-        System.out.println(response);
-        return ResponseEntity.ok(response);
+        String response = imageUploadService.uploadImage(file);
+        return ResponseEntity.ok(new ApiResponse<>(response, "Image uploaded successfully", 0));
     }
-    
+
 }

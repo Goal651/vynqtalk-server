@@ -48,7 +48,6 @@ public class SystemMetricsService {
             e.printStackTrace();
             metrics.add(new SystemMetric("Disk Usage", "N/A", "critical"));
         }
-
         return metrics;
     }
 }

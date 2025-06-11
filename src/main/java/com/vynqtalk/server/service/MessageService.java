@@ -90,47 +90,6 @@ public class MessageService {
         notificationService.createNotification(notification);
     }
 
-    private void createMessageDeletedNotification(Message message) {
-        Notification notification = new Notification();
-        notification.setTitle("Message Deleted");
-        notification.setMessage("A message from " + message.getSender().getName() + " was deleted");
-        notification.setUser(message.getReceiver());
-        notification.setTimestamp(Instant.now());
-        notification.setIsRead(false);
-        notification.setType("MESSAGE_DELETED");
-        notificationService.createNotification(notification);
-    }
-
-    private void createMessageEditedNotification(Message message) {
-        Notification notification = new Notification();
-        notification.setTitle("Message Edited");
-        notification.setMessage("A message from " + message.getSender().getName() + " was edited");
-        notification.setUser(message.getReceiver());
-        notification.setTimestamp(Instant.now());
-        notification.setIsRead(false);
-        notification.setType("MESSAGE_EDITED");
-        notificationService.createNotification(notification);
-    }
-
-    private void createMessageReactionNotification(Message message) {
-        Notification notification = new Notification();
-        notification.setTitle("Message Reaction");
-        notification.setMessage("Someone reacted to your message");
-        notification.setUser(message.getSender());
-        notification.setTimestamp(Instant.now());
-        notification.setIsRead(false);
-        notification.setType("MESSAGE_REACTION");
-        notificationService.createNotification(notification);
-    }
-
-    private void createMessageReplyNotification(Message reply, Message originalMessage) {
-        Notification notification = new Notification();
-        notification.setTitle("Message Reply");
-        notification.setMessage(reply.getSender().getName() + " replied to your message");
-        notification.setUser(originalMessage.getSender());
-        notification.setTimestamp(Instant.now());
-        notification.setIsRead(false);
-        notification.setType("MESSAGE_REPLY");
-        notificationService.createNotification(notification);
-    }
+    
+    
 }

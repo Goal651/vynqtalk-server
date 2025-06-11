@@ -9,7 +9,7 @@ import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBr
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
 
-import com.vynqtalk.server.filter.AuthChannelInterceptorAdapter;
+import com.vynqtalk.server.filter.AuthChannelInterceptor;
 
 @Configuration
 @EnableWebSocketMessageBroker
@@ -20,7 +20,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
 
     @Autowired
-    private AuthChannelInterceptorAdapter authInterceptor;
+    private AuthChannelInterceptor authInterceptor;
 
     @Override
     public void configureMessageBroker(@NonNull MessageBrokerRegistry config) {

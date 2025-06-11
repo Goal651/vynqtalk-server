@@ -13,11 +13,11 @@ import java.util.UUID;
 @Service
 public class ImageUploadService {
 
-    private static final String UPLOAD_DIR = "uploads/"; // Relative to project root
+    private static final String UPLOAD_DIR = "uploads/"; 
     private static final String[] ALLOWED_TYPES = { "image/jpeg", "image/png", "image/gif" };
     private static final long MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 
-    public String uploadImage(MultipartFile file, String username) {
+    public String uploadImage(MultipartFile file) {
         try {
             // Validate file
             if (file == null || file.isEmpty()) {
@@ -41,8 +41,7 @@ public class ImageUploadService {
             Path uploadPath = Paths.get(UPLOAD_DIR);
             if (!Files.exists(uploadPath)) {
                 Files.createDirectories(uploadPath);
-                // Set permissions for Deepin Linux
-                uploadPath.toFile().setWritable(true, false); // Owner and group writable
+                uploadPath.toFile().setWritable(true, false); 
             }
 
             // Generate unique filename

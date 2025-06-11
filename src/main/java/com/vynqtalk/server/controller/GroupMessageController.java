@@ -29,10 +29,13 @@ public class GroupMessageController {
             return ResponseEntity.badRequest()
                     .body(new ApiResponse<>(null, "Group ID cannot be null", 400));
         }
+
         List<GroupMessage> messages = groupMessageService.getAllGroupMessages(groupId);
+        
         if (messages.isEmpty()) {
             return ResponseEntity.ok(new ApiResponse<>(null, "No messages found for this group", 404));
         }
+
         List<GroupMessageDTO> messageDTO = messages.stream()
                 .map(groupMessageMapper::toDTO)
                 .toList();
