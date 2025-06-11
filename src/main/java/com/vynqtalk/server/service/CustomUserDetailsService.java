@@ -13,7 +13,7 @@ import com.vynqtalk.server.repository.UserRepository;
 public class CustomUserDetailsService implements UserDetailsService {
 
     @Autowired
-    private  UserRepository userRepository; // your user repo
+    private  UserRepository userRepository; 
 
 
     @Override
@@ -27,8 +27,8 @@ public class CustomUserDetailsService implements UserDetailsService {
         return org.springframework.security.core.userdetails.User
 
                 .withUsername(user.getEmail())
-                .password(user.getPassword()) // hashed password
-                .authorities(user.getIsAdmin() ? "ROLE_ADMIN" : "ROLE_USER") // or map real roles here
+                .password(user.getPassword())
+                .authorities(user.getIsAdmin() ? "ROLE_ADMIN" : "ROLE_USER") 
                 .build();
     }
 }
