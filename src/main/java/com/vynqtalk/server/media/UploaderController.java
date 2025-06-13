@@ -1,4 +1,4 @@
-package com.vynqtalk.server.controller;
+package com.vynqtalk.server.media;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;

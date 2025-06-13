@@ -1,6 +1,5 @@
-package com.vynqtalk.server.controller;
+package com.vynqtalk.server.media;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,8 +17,6 @@ public class ImageController {
 
     @Autowired
     private ImageService imageService;
-
-
 
     @GetMapping("/image/{fileName}")
     public ResponseEntity<byte[]> getImage(@PathVariable String fileName) throws IOException {
