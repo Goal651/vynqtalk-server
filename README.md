@@ -24,10 +24,11 @@ Set up PostgreSQL database:
 
 Create a database named vynqtalk:CREATE DATABASE vynqtalk;
 
-Update the application.properties file in src/main/resources with your MySQL credentials:spring.datasource.url=jdbc:postgresql://localhost:3306/vynqtalk
-spring.datasource.username=your-username
-spring.datasource.password=your-password
-spring.jpa.hibernate.ddl-auto=update
+Add .env file
+PORT=8080
+DATABASE_URL=jdbc:postgresql://localhost:5432/db_name
+DATABASE_USERNAME=db_username
+DATABASE_PASSWORD=db_password
 
 Build the project:
 mvn clean install
