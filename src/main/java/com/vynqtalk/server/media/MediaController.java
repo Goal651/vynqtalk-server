@@ -13,7 +13,7 @@ import java.io.IOException;
 
 @RestController
 @RequestMapping("/api/v1/public")
-public class ImageController {
+public class MediaController {
 
     @Autowired
     private ImageService imageService;

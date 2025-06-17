@@ -26,6 +26,4 @@ public class Reaction {
 
     @Column(nullable = false)
     private String userName;
-
-
 }

@@ -16,10 +16,12 @@ import lombok.Data;
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id; 
+    private Long id;
 
     @Column(nullable = false)
     private String name;
+
+    private String avatar;
 
     @Column(nullable = false)
     private String email;
@@ -40,5 +42,5 @@ public class User {
     private Instant createdAt;
 
     @Column(nullable = false)
-    private String bio;    
+    private String bio;
 }

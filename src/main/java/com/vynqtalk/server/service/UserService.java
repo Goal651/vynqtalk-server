@@ -67,6 +67,7 @@ public class UserService {
             existingUser.setName(user.getName());
             existingUser.setEmail(user.getEmail());
             existingUser.setPassword(user.getPassword());
+            existingUser.setAvatar(user.getAvatar());
             // Add other fields as necessary
             return userRepository.save(existingUser);
         }
