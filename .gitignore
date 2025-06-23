@@ -1,4 +1,5 @@
 target
 .vscode
 wigo.json
+.env
 uploads
