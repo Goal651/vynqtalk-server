@@ -19,7 +19,6 @@ public class GroupService {
     // Add methods to handle group-related operations
 
     public List<Group> findAll() {
-
         return groupRepository.findAll();
     }
 

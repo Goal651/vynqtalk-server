@@ -18,7 +18,7 @@ public class MediaController {
     @Autowired
     private ImageService imageService;
 
-    @GetMapping("/image/{fileName}")
+    @GetMapping("/profile/{fileName}")
     public ResponseEntity<byte[]> getImage(@PathVariable String fileName) throws IOException {
         byte[] image = imageService.getImage(fileName);
         return ResponseEntity.ok()

@@ -24,8 +24,8 @@ public class UploaderController {
     @Autowired
     private UserService userService;
 
-    @PostMapping("/avatar/{id}")
-    public ResponseEntity<ApiResponse<String>> uploadImage(@PathVariable Long id,
+    @PostMapping("/user/{id}")
+    public ResponseEntity<ApiResponse<String>> uploadUserProfileImage(@PathVariable Long id,
             @RequestParam("file") MultipartFile file) {
         User user = userService.getUserById(id);
 
@@ -33,10 +33,24 @@ public class UploaderController {
             return ResponseEntity.ok(new ApiResponse<>("User don't exist", 403));
         }
 
-        String response = imageUploadService.uploadImage(file);
+        String response = "http://localhost:8080/api/v1/public/profile/" + imageUploadService.uploadImage(file);
         user.setAvatar(response);
-        userService.updateUser(id,user);
+        userService.updateUser(id, user);
         return ResponseEntity.ok(new ApiResponse<>(response, "Image uploaded successfully", 0));
     }
 
+    @PostMapping("/group/{id}")
+    public ResponseEntity<ApiResponse<String>> uploadGroupProfileImage(@PathVariable Long id,
+            @RequestParam("file") MultipartFile file) {
+        User user = userService.getUserById(id);
+
+        if (user == null) {
+            return ResponseEntity.ok(new ApiResponse<>("User don't exist", 403));
+        }
+
+        String response = "http://localhost:8080/api/v1/public/profile/" + imageUploadService.uploadImage(file);
+        user.setAvatar(response);
+        userService.updateUser(id, user);
+        return ResponseEntity.ok(new ApiResponse<>(response, "Image uploaded successfully", 0));
+    }
 }

@@ -9,7 +9,7 @@
 		<relativePath/>
 	</parent>
 	<groupId>com.vynqtalk</groupId>
-	<artifactId>server</artifactId>
+	<artifactId>server</artifactId> 
 	<version>0.0.1-SNAPSHOT</version>
 	<packaging>war</packaging>
 	<name>server</name>

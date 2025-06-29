@@ -14,4 +14,5 @@ public class GroupDTO {
     public Instant createdAt;
     public String status;
     public List<UserDTO> members;
+    public List<UserDTO> admins;
 }

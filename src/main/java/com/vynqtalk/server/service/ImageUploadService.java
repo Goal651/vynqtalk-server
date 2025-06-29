@@ -56,7 +56,7 @@ public class ImageUploadService {
             Files.write(filePath, file.getBytes());
 
             // Return file URL
-            return "/uploads/" + uniqueFilename;
+            return  uniqueFilename;
         } catch (Error | IOException e) {
             return "There have been error";
         }

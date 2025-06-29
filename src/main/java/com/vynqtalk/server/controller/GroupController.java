@@ -25,7 +25,7 @@ import com.vynqtalk.server.service.GroupService;
 import com.vynqtalk.server.service.UserService;
 
 @RestController
-@RequestMapping("/api/v1/groups")
+@RequestMapping("/api/v1/group")
 public class GroupController {
 
     @Autowired
@@ -38,7 +38,7 @@ public class GroupController {
     private GroupMapper groupMapper;
 
     // Get all groups
-    @GetMapping
+    @GetMapping("/all")
     public ResponseEntity<ApiResponse<List<GroupDTO>>> getAllGroups(Principal principal) {
         List<Group> groups = groupService.findAll();
 
@@ -78,6 +78,7 @@ public class GroupController {
         if (createdBy == null) {
             return ResponseEntity.ok(new ApiResponse<>(null, "User not found", HttpStatus.UNAUTHORIZED.value()));
         }
+        group.setAdmins(List.of(createdBy));
         group.setMembers(List.of(createdBy)); 
         group.setCreatedBy(createdBy);
         group.setCreatedAt(Instant.now());
@@ -106,43 +107,7 @@ public class GroupController {
         return ResponseEntity.ok(new ApiResponse<>(groupMapper.toDTO(savedGroup), "Group updated successfully", 200));
     }
 
-    // Add member
-    @PostMapping("/{id}/members")
-    public ResponseEntity<ApiResponse<GroupDTO>> addMember(@PathVariable Long id, @RequestBody User user) {
-        User existingUser = userService.getUserByEmail(user.getEmail());
-        if (existingUser == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(new ApiResponse<>(null, "User not found", HttpStatus.NOT_FOUND.value()));
-        }
-
-        Group group = groupService.findById(id);
-        if (group == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(new ApiResponse<>(null, "Group not found", HttpStatus.NOT_FOUND.value()));
-        }
-        
-        Group updatedGroup = groupService.addMember(group, existingUser);
-        return ResponseEntity.ok(new ApiResponse<>(groupMapper.toDTO(updatedGroup), "Member added successfully", 200));
-    }
-
-    @DeleteMapping("/{id}/members/{userId}")
-    public ResponseEntity<ApiResponse<GroupDTO>> removeMember(@PathVariable Long id, @PathVariable Long userId) {
-        Group group = groupService.findById(id);
-        if (group == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(new ApiResponse<>(null, "Group not found", HttpStatus.NOT_FOUND.value()));
-        }
-        User user = userService.getUserById(userId);
-        if (user == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(new ApiResponse<>(null, "User not found", HttpStatus.NOT_FOUND.value()));
-        }
-        
-        Group updatedGroup = groupService.removeMember(group, user);
-        return ResponseEntity.ok(new ApiResponse<>(groupMapper.toDTO(updatedGroup), "Member removed successfully", 200));
-    }
-
-    // Delete group by ID
+       // Delete group by ID
     @DeleteMapping("/{id}")
     public ResponseEntity<ApiResponse<Void>> deleteGroup(@PathVariable Long id) {
         groupService.delete(id);

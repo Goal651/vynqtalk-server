@@ -29,11 +29,11 @@ public class Group {
 
     @Column(nullable = false)
     private String description;
-    
+
     @ManyToOne
     @JoinColumn(name = "created_by", nullable = false)
     private User createdBy;
-    
+
     @Column(nullable = false)
     private Instant createdAt;
 
@@ -46,4 +46,8 @@ public class Group {
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "group_members", joinColumns = @JoinColumn(name = "group_id"), inverseJoinColumns = @JoinColumn(name = "user_id"))
     private List<User> members;
+
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(name = "group_admins", joinColumns = @JoinColumn(name = "group_id"), inverseJoinColumns = @JoinColumn(name = "user_id"))
+    private List<User> admins;
 }

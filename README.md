@@ -33,7 +33,6 @@ DATABASE_URL=jdbc:postgresql://localhost:5432/db_name
 DATABASE_USERNAME=db_username
 DATABASE_PASSWORD=db_password
 
-
 Build the project:
 mvn clean install
 

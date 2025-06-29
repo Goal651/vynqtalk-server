@@ -13,7 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/v1/users")
+@RequestMapping("/api/v1/user")
 public class UserController {
 
     @Autowired
@@ -66,7 +66,7 @@ public class UserController {
     }
 
     // List all users
-    @GetMapping
+    @GetMapping("/all")
     public ResponseEntity<ApiResponse<List<UserDTO>>> getAllUsers() {
         List<User> users = userService.getAllUsers();
         System.out.println("This is wigo test " + users);
