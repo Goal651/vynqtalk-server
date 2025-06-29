@@ -21,18 +21,21 @@ This is the back-end for VynqTalk, a chat application built with Spring Boot and
 ## Setup Instructions
 
 1. Clone the repository:
+
 ```bash
 git clone https://github.com/goal651/vynqtalk-server.git
 cd vynqtalk-server
 ```
 
 2. Set up PostgreSQL database:
+
 ```sql
 CREATE DATABASE vynqtalk;
 ```
 
-3. Create a `.env` file with the following content:
-```
+3. Create a `.env` file with the following content      :
+
+```properties
 PORT=8080
 DATABASE_URL=jdbc:postgresql://localhost:5432/vynqtalk
 DATABASE_USERNAME=your_username
@@ -40,6 +43,7 @@ DATABASE_PASSWORD=your_password
 ```
 
 4. Build and run the project:
+
 ```bash
 # Build the project
 ./mvnw clean install
@@ -71,7 +75,8 @@ The application uses Spring Security for:
 - Verify database connection settings in `application.properties`
 - Check Java and Maven versions with `java -version` and `mvn -version`
 
-Contributing
+## Contributing
 Contributions are welcome! Fork the repo, submit pull requests, or report issues.
-Support
+
+## Support
 If you like this project, please give it a ⭐ on GitHub!

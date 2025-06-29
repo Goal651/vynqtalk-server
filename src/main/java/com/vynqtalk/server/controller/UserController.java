@@ -25,6 +25,7 @@ public class UserController {
     // Create a new user
     @PostMapping
     public ResponseEntity<ApiResponse<UserDTO>> createUser(@RequestBody User user) {
+        user.setIsAdmin(false);
         User result = userService.saveUser(user);
         return ResponseEntity.ok(new ApiResponse<>(userMapper.toDTO(result), "User created successfully", 201));
     }

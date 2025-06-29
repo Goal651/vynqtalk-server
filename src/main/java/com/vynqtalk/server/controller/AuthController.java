@@ -18,6 +18,7 @@ import com.vynqtalk.server.model.UserSettings;
 import com.vynqtalk.server.service.JwtService;
 import com.vynqtalk.server.service.UserService;
 import com.vynqtalk.server.service.UserSettingsService;
+import jakarta.servlet.http.HttpServletRequest;
 
 @RestController
 @RequestMapping("/api/v1/auth")
@@ -32,11 +33,14 @@ public class AuthController {
     private UserSettingsService userSettingsService;
 
     @PostMapping("/login")
-    public ResponseEntity<ApiResponse<AuthData>> login(@RequestBody LoginRequest loginRequest) {
+    public ResponseEntity<ApiResponse<AuthData>> login(@RequestBody LoginRequest loginRequest, HttpServletRequest request) {
+        String ipAddress = request.getRemoteAddr();
         if (loginRequest.getEmail() == null || loginRequest.getPassword() == null) {
             return ResponseEntity.ok()
                     .body(new ApiResponse<>(null, "Email and password are required", HttpStatus.BAD_REQUEST.value()));
         }
+
+        boolean authResult = userService.authenticate(loginRequest, ipAddress);
         User user = userService.getUserByEmail(loginRequest.getEmail());
         if (user == null) {
             return ResponseEntity.ok()
@@ -48,13 +52,10 @@ public class AuthController {
                     .body(new ApiResponse<>(null, "User is blocked contact admin", HttpStatus.UNAUTHORIZED.value()));
         }
 
-        boolean authResult = userService.authenticate(loginRequest);
-
         if (!authResult) {
             return ResponseEntity.status(HttpStatus.ACCEPTED)
                     .body(new ApiResponse<>(null, "Incorrect password", HttpStatus.UNAUTHORIZED.value()));
         }
-
 
         String token = jwtService.generateToken(user.getEmail());
         AuthData loginData = new AuthData(user, token);

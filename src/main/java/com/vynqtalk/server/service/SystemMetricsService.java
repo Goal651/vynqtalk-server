@@ -40,7 +40,6 @@ public class SystemMetricsService {
             long usableSpace = fileStore.getUsableSpace();
             double diskUsage = ((double) (totalSpace - usableSpace) / totalSpace) * 100;
             String diskStatus = diskUsage < 60 ? "good" : diskUsage < 80 ? "warning" : "critical";
-            System.out.println("test data " + fileStore);
 
             metrics.add(new SystemMetric("Disk Usage", DECIMAL_FORMAT.format(diskUsage) + "%", diskStatus));
         } catch (Exception e) {

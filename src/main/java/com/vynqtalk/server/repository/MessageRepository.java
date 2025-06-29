@@ -1,6 +1,7 @@
 package com.vynqtalk.server.repository;
 
 import java.util.List;
+import java.time.Instant;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -22,4 +23,5 @@ public interface MessageRepository extends JpaRepository<Message, Long> {
             """)
     List<Message> findChatBetweenUsers(@Param("userA") Long userA, @Param("userB") Long userB);
 
+    long countByTimestampBetween(Instant start, Instant end);
 }

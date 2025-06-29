@@ -11,7 +11,9 @@ import com.vynqtalk.server.repository.UserRepository;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 public class UserService {
@@ -19,13 +21,29 @@ public class UserService {
     @Autowired
     private UserRepository userRepository;
 
-    public boolean authenticate(LoginRequest loginRequest) {
+    @Autowired
+    private AlertService alertService;
+
+    private final Map<String, Integer> failedLoginAttempts = new ConcurrentHashMap<>();
+
+    public boolean authenticate(LoginRequest loginRequest, String ipAddress) {
         User dbUser = userRepository.findByEmail(loginRequest.getEmail());
-        if (dbUser == null) {
-            return false;
-        }
         BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-        return (passwordEncoder.matches(loginRequest.getPassword(), dbUser.getPassword()));
+        boolean success = dbUser != null && passwordEncoder.matches(loginRequest.getPassword(), dbUser.getPassword());
+
+        if (!success) {
+            String key = ipAddress;
+            int attempts = failedLoginAttempts.getOrDefault(key, 0) + 1;
+            failedLoginAttempts.put(key, attempts);
+
+            if (attempts >= 3) {
+                alertService.logAlert("warning", "3+ failed login attempts for " + loginRequest.getEmail(), ipAddress);
+                failedLoginAttempts.remove(key);
+            }
+        } else {
+            failedLoginAttempts.remove(ipAddress);
+        }
+        return success;
     }
 
     public User saveUser(User user) {
@@ -34,7 +52,7 @@ public class UserService {
         user.setStatus("active");
         user.setLastActive(Instant.now());
         user.setBio("No bio yet");
-        user.setIsAdmin(false);
+        user.setIsAdmin(user.getIsAdmin());
         return userRepository.save(user);
     }
 
