@@ -1,51 +1,75 @@
 # VynqTalk Server (Back-end)
 
-This is the back-end for VynqTalk, a chat application built with Spring Boot and Java. It provides RESTful APIs for messaging, user authentication, and data management, using MySQL as the database.
-Features
+This is the back-end for VynqTalk, a chat application built with Spring Boot and Java. It provides RESTful APIs for messaging, user authentication, and data management.
 
-REST APIs for real-time messaging
-User authentication with Spring Security
-Database integration with MySQL
+## Features
 
-Prerequisites
+- REST APIs for real-time messaging
+- WebSocket support for real-time communication
+- User authentication with Spring Security
+- PostgreSQL database integration
+- Spring Data JPA for data persistence
+- Spring Boot Actuator for monitoring
 
-Java (JDK 21 or higher)
-Maven (v3.8 or higher)
-PostgreSQL
-A running Postgresql server
+## Prerequisites
 
-Setup Instructions
+- Java (JDK 21 or higher)
+- Maven (v3.8 or higher)
+- PostgreSQL 14+ (or compatible version)
+- Git
 
-Clone the repository:
-git clone <https://github.com/goal651/vynqtalk-server.git>
+## Setup Instructions
+
+1. Clone the repository:
+```bash
+git clone https://github.com/goal651/vynqtalk-server.git
 cd vynqtalk-server
+```
 
-Set up PostgreSQL database:
+2. Set up PostgreSQL database:
+```sql
+CREATE DATABASE vynqtalk;
+```
 
-Create a database named vynqtalk:CREATE DATABASE vynqtalk;
-
-Add .env file
-
+3. Create a `.env` file with the following content:
+```
 PORT=8080
+DATABASE_URL=jdbc:postgresql://localhost:5432/vynqtalk
+DATABASE_USERNAME=your_username
+DATABASE_PASSWORD=your_password
+```
 
-DATABASE_URL=jdbc:postgresql://localhost:5432/db_name
+4. Build and run the project:
+```bash
+# Build the project
+./mvnw clean install
 
-DATABASE_USERNAME=db_username
-DATABASE_PASSWORD=db_password
+# Run the application
+./mvnw spring-boot:run
+```
 
-Build the project:
-mvn clean install
+The server will start at http://localhost:8080.
 
-Run the application:
-mvn spring-boot:run
+## API Documentation
 
-The server will start at <http://localhost:8080>.
+The API documentation is available at:
+- Swagger UI: http://localhost:8080/swagger-ui.html
+- Actuator endpoints: http://localhost:8080/actuator
 
-Troubleshooting
+## Security
 
-Ensure PostgreSQL is running and accessible with the provided credentials.
-Check application.properties for correct database settings.
-Verify Java and Maven versions with java -version and mvn -version.
+The application uses Spring Security for:
+- JWT-based authentication
+- Role-based access control
+- CSRF protection
+- XSS protection
+- Rate limiting
+
+## Troubleshooting
+
+- Ensure PostgreSQL is running and accessible with the provided credentials
+- Verify database connection settings in `application.properties`
+- Check Java and Maven versions with `java -version` and `mvn -version`
 
 Contributing
 Contributions are welcome! Fork the repo, submit pull requests, or report issues.
