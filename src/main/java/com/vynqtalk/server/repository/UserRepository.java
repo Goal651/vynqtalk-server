@@ -7,9 +7,10 @@ import org.springframework.data.repository.query.Param;
 import com.vynqtalk.server.model.User;
 import java.time.Instant;
 import java.util.List;
+import java.util.Optional;
 
 public interface UserRepository extends JpaRepository<User, Long> {
-    User findByEmail(String email);
+    Optional<User> findByEmail(String email);
 
     @Query("SELECT DATE(u.createdAt) as date, COUNT(u.id) as newUsers FROM User u GROUP BY DATE(u.createdAt)")
     List<Object[]> countNewUsersPerDay();

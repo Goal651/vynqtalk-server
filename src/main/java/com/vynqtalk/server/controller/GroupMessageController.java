@@ -5,10 +5,12 @@ import com.vynqtalk.server.dto.response.ApiResponse;
 import com.vynqtalk.server.mapper.GroupMessageMapper;
 import com.vynqtalk.server.model.GroupMessage;
 import com.vynqtalk.server.service.GroupMessageService;
+import com.vynqtalk.server.error.GroupMessageNotFoundException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,43 +18,40 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 public class GroupMessageController {
 
-    @Autowired
-    private GroupMessageService groupMessageService;
+    private static final Logger logger = LoggerFactory.getLogger(GroupMessageController.class);
 
-    @Autowired
-    private GroupMessageMapper groupMessageMapper;
+    private final GroupMessageService groupMessageService;
+    private final GroupMessageMapper groupMessageMapper;
+
+    public GroupMessageController(GroupMessageService groupMessageService, GroupMessageMapper groupMessageMapper) {
+        this.groupMessageService = groupMessageService;
+        this.groupMessageMapper = groupMessageMapper;
+    }
 
     // Get all messages in a conversation or group
     @GetMapping("/conv/{groupId}")
     public ResponseEntity<ApiResponse<List<GroupMessageDTO>>> getMessagesByConversation(@PathVariable Long groupId) {
-        if (groupId == null) {
-            return ResponseEntity.badRequest()
-                    .body(new ApiResponse<>(null, "Group ID cannot be null", 400));
-        }
-
         List<GroupMessage> messages = groupMessageService.getAllGroupMessages(groupId);
-
-        if (messages.isEmpty()) {
-            return ResponseEntity.ok(new ApiResponse<>(null, "No messages found for this group", 404));
-        }
-
         List<GroupMessageDTO> messageDTO = messages.stream()
                 .map(groupMessageMapper::toDTO)
                 .toList();
-        return ResponseEntity.ok(new ApiResponse<>(messageDTO, "Messages retrieved successfully", 200));
+        return ResponseEntity.ok(new ApiResponse<>(messageDTO, messageDTO.isEmpty() ? "No messages found for this group" : "Messages retrieved successfully", 200));
     }
 
-    // Get messages by conversation ID
+    // Get message by ID
     @GetMapping("/{conversationId}")
     public ResponseEntity<ApiResponse<GroupMessageDTO>> getMessages(@PathVariable Long conversationId) {
-        GroupMessage messages = groupMessageService.getGroupMessageById(conversationId);
-        return ResponseEntity.ok(new ApiResponse<>(groupMessageMapper.toDTO(messages), "Message retrieved successfully", 200));
+        GroupMessage message = groupMessageService.getGroupMessageById(conversationId);
+        if (message == null) {
+            throw new GroupMessageNotFoundException("Group message not found with id: " + conversationId);
+        }
+        return ResponseEntity.ok(new ApiResponse<>(groupMessageMapper.toDTO(message), "Message retrieved successfully", 200));
     }
 
     // Delete a message
     @DeleteMapping("/{messageId}")
     public ResponseEntity<ApiResponse<Void>> deleteMessage(@PathVariable Long messageId) {
-        System.out.println("messageId" + messageId);
+        logger.info("Deleting group message with id: {}", messageId);
         groupMessageService.deleteGroupMessage(messageId);
         return ResponseEntity.ok(new ApiResponse<>(null, "Message deleted successfully", 200));
     }

@@ -1,13 +1,15 @@
 package com.vynqtalk.server.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.vynqtalk.server.dto.request.LoginRequest;
 import com.vynqtalk.server.dto.user.UserDTO;
 import com.vynqtalk.server.model.User;
 import com.vynqtalk.server.repository.UserRepository;
+import com.vynqtalk.server.mapper.UserMapper;
+import com.vynqtalk.server.error.UserNotFoundException;
 
 import java.time.Instant;
 import java.util.List;
@@ -15,19 +17,29 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * Service for user-related operations, including authentication, user
+ * management, and login attempt tracking.
+ */
 @Service
 public class UserService {
-
-    @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
-    private AlertService alertService;
-
+    private final UserRepository userRepository;
+    private final AlertService alertService;
+    private final UserMapper userMapper;
     private final Map<String, Integer> failedLoginAttempts = new ConcurrentHashMap<>();
 
+    public UserService(UserRepository userRepository, AlertService alertService, UserMapper userMapper) {
+        this.userRepository = userRepository;
+        this.alertService = alertService;
+        this.userMapper = userMapper;
+    }
+
+    /**
+     * Authenticates a user by email and password, tracking failed attempts by IP.
+     */
     public boolean authenticate(LoginRequest loginRequest, String ipAddress) {
-        User dbUser = userRepository.findByEmail(loginRequest.getEmail());
+        User dbUser = userRepository.findByEmail(loginRequest.getEmail())
+                .orElseThrow(() -> new UserNotFoundException("User not found with email: " + loginRequest.getEmail()));
         BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
         boolean success = dbUser != null && passwordEncoder.matches(loginRequest.getPassword(), dbUser.getPassword());
 
@@ -46,6 +58,10 @@ public class UserService {
         return success;
     }
 
+    /**
+     * Saves a new user, encoding the password and setting default fields.
+     */
+    @Transactional
     public User saveUser(User user) {
         BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
         user.setPassword(passwordEncoder.encode(user.getPassword()));
@@ -56,48 +72,60 @@ public class UserService {
         return userRepository.save(user);
     }
 
+    /**
+     * Updates a user using a UserDTO.
+     */
+    @Transactional
     public User updateUser(UserDTO userDTO) {
-        User user = this.getUserById(userDTO.id);
-        user.setEmail(userDTO.email);
-        user.setIsAdmin(userDTO.isAdmin);
-        user.setName(userDTO.name);
-        user.setStatus(userDTO.status);
-        user.setLastActive(userDTO.lastActive);
+        User user = this.getUserById(userDTO.getId())
+                .orElseThrow(() -> new UserNotFoundException("User not found with id: " + userDTO.getId()));
+        user.setEmail(userDTO.getEmail());
+        user.setIsAdmin(userDTO.getIsAdmin());
+        user.setName(userDTO.getName());
+        user.setStatus(userDTO.getStatus());
+        user.setLastActive(userDTO.getLastActive());
         return userRepository.save(user);
     }
 
-    // Get user by ID
-    public User getUserById(Long id) {
-        Optional<User> user = userRepository.findById(id);
-        return user.orElse(null);
+    /**
+     * Gets a user by ID.
+     */
+    public Optional<User> getUserById(Long id) {
+        return userRepository.findById(id);
     }
 
-    public User getUserByEmail(String email) {
+    /**
+     * Gets a user by email.
+     */
+    public Optional<User> getUserByEmail(String email) {
         return userRepository.findByEmail(email);
     }
 
-    // Update user profile
+    /**
+     * Updates a user by ID using a User entity.
+     */
+    @Transactional
     public User updateUser(Long id, User user) {
-        Optional<User> existingUserOpt = userRepository.findById(id);
-        if (existingUserOpt.isPresent()) {
-            User existingUser = existingUserOpt.get();
-            // Update fields as needed
-            existingUser.setName(user.getName());
-            existingUser.setEmail(user.getEmail());
-            existingUser.setPassword(user.getPassword());
-            existingUser.setAvatar(user.getAvatar());
-            // Add other fields as necessary
-            return userRepository.save(existingUser);
-        }
-        return null;
+        User existingUser = userRepository.findById(id)
+                .orElseThrow(() -> new UserNotFoundException("User not found with id: " + id));
+        existingUser.setName(user.getName());
+        existingUser.setEmail(user.getEmail());
+        existingUser.setPassword(user.getPassword());
+        existingUser.setAvatar(user.getAvatar());
+        return userRepository.save(existingUser);
     }
 
-    // Delete user account
+    /**
+     * Deletes a user by ID.
+     */
+    @Transactional
     public void deleteUser(Long id) {
         userRepository.deleteById(id);
     }
 
-    // List all users
+    /**
+     * Returns all users.
+     */
     public List<User> getAllUsers() {
         return userRepository.findAll();
     }

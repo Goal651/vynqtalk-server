@@ -5,10 +5,10 @@ import com.vynqtalk.server.dto.response.ApiResponse;
 import com.vynqtalk.server.mapper.MessageMapper;
 import com.vynqtalk.server.model.Message;
 import com.vynqtalk.server.service.MessageService;
+import com.vynqtalk.server.error.MessageNotFoundException;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,11 +16,13 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 public class MessageController {
 
-    @Autowired
-    private MessageService messageService;
+    private final MessageService messageService;
+    private final MessageMapper messageMapper;
 
-    @Autowired
-    private MessageMapper messageMapper;
+    public MessageController(MessageService messageService, MessageMapper messageMapper) {
+        this.messageService = messageService;
+        this.messageMapper = messageMapper;
+    }
 
     // Get all messages in a conversation or group
     @GetMapping("/conv/{senderId}/{receiverId}")
@@ -31,21 +33,20 @@ public class MessageController {
         return ResponseEntity.ok(new ApiResponse<>(result, "Messages retrieved successfully", 200));
     }
 
-    // Get messages by conversation ID
+    // Get message by ID
     @GetMapping("/{conversationId}")
     public ResponseEntity<ApiResponse<MessageDTO>> getMessages(@PathVariable Long conversationId) {
-        Message messages = messageService.getMessageById(conversationId).get();
+        Message message = messageService.getMessageById(conversationId)
+            .orElseThrow(() -> new MessageNotFoundException("Message not found with id: " + conversationId));
         return ResponseEntity
-                .ok(new ApiResponse<>(messageMapper.toDTO(messages), "Message retrieved successfully", 200));
+                .ok(new ApiResponse<>(messageMapper.toDTO(message), "Message retrieved successfully", 200));
     }
 
     // Delete a message
     @DeleteMapping("/{messageId}")
     public ResponseEntity<ApiResponse<Void>> deleteMessage(@PathVariable Long messageId) {
-        Message message = messageService.getMessageById(messageId).get();
-        if (message == null) {
-            return ResponseEntity.ok(new ApiResponse<>(null, "Message not found", 404));
-        }
+        Message message = messageService.getMessageById(messageId)
+            .orElseThrow(() -> new MessageNotFoundException("Message not found with id: " + messageId));
         messageService.deleteMessage(messageId);
         return ResponseEntity.ok(new ApiResponse<>(null, "Message deleted successfully", 200));
     }
@@ -54,10 +55,8 @@ public class MessageController {
     @PutMapping("/{messageId}")
     public ResponseEntity<ApiResponse<MessageDTO>> updateMessage(@PathVariable Long messageId,
             @RequestBody Message updated) {
-        Message message = messageService.getMessageById(messageId).get();
-        if (message == null) {
-            return ResponseEntity.ok(new ApiResponse<>(null, "Message not found", 404));
-        }
+        Message message = messageService.getMessageById(messageId)
+            .orElseThrow(() -> new MessageNotFoundException("Message not found with id: " + messageId));
         message.setContent(updated.getContent());
         message.setEdited(true);
         Message result = messageService.updateMessage(messageId, message);

@@ -3,8 +3,9 @@ package com.vynqtalk.server.service;
 import com.vynqtalk.server.model.Message;
 import com.vynqtalk.server.model.Notification;
 import com.vynqtalk.server.repository.MessageRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import com.vynqtalk.server.error.MessageNotFoundException;
 
 import java.time.Instant;
 import java.util.List;
@@ -13,70 +14,90 @@ import java.util.Optional;
 @Service
 public class MessageService {
 
-    @Autowired
-    private MessageRepository messageRepository;
+    private final MessageRepository messageRepository;
+    private final NotificationService notificationService;
 
-    @Autowired
-    private NotificationService notificationService;
+    public MessageService(MessageRepository messageRepository, NotificationService notificationService) {
+        this.messageRepository = messageRepository;
+        this.notificationService = notificationService;
+    }
 
+    /**
+     * Saves a message and creates a notification.
+     */
+    @Transactional
     public Message saveMessage(Message message) {
         Message savedMessage = messageRepository.save(message);
         createMessageNotification(savedMessage);
         return savedMessage;
     }
 
+    /**
+     * Gets a message by ID.
+     */
     public Optional<Message> getMessageById(Long id) {
         return messageRepository.findById(id);
     }
 
+    /**
+     * Gets messages between two users.
+     */
     public List<Message> getMessages(Long senderId, Long receiverId) {
         return messageRepository.findChatBetweenUsers(senderId, receiverId);
     }
 
+    /**
+     * Deletes a message by ID.
+     * @throws MessageNotFoundException if not found
+     */
+    @Transactional
     public void deleteMessage(Long messageId) {
-        Optional<Message> messageOpt = messageRepository.findById(messageId);
-        if (messageOpt.isPresent()) {
-            // createMessageDeletedNotification(message);
-            messageRepository.deleteById(messageId);
-        }
+        Message message = messageRepository.findById(messageId)
+            .orElseThrow(() -> new MessageNotFoundException("Message not found with ID: " + messageId));
+        // createMessageDeletedNotification(message);
+        messageRepository.deleteById(messageId);
     }
 
+    /**
+     * Updates a message by ID.
+     * @throws MessageNotFoundException if not found
+     */
+    @Transactional
     public Message updateMessage(Long messageId, Message updatedMessage) {
-        Optional<Message> existing = messageRepository.findById(messageId);
-        if (existing.isPresent()) {
-            Message savedMessage = messageRepository.save(updatedMessage);
-            // createMessageEditedNotification(savedMessage);
-            return savedMessage;
-        } else {
-            return null;
-        }
+        messageRepository.findById(messageId)
+            .orElseThrow(() -> new MessageNotFoundException("Message not found with ID: " + messageId));
+        Message savedMessage = messageRepository.save(updatedMessage);
+        // createMessageEditedNotification(savedMessage);
+        return savedMessage;
     }
 
+    /**
+     * Reacts to a message by ID.
+     * @throws MessageNotFoundException if not found
+     */
+    @Transactional
     public Message reactToMessage(Long messageId, List<String> reactions) {
-        Optional<Message> existing = messageRepository.findById(messageId);
-        if (existing.isPresent()) {
-            Message message = existing.get();
-            message.setReactions(reactions);
-            Message savedMessage = messageRepository.save(message);
-            // createMessageReactionNotification(savedMessage);
-            return savedMessage;
-        } else {
-            throw new RuntimeException("Message not found with ID: " + messageId);
-        }
+        Message message = messageRepository.findById(messageId)
+            .orElseThrow(() -> new MessageNotFoundException("Message not found with ID: " + messageId));
+        message.setReactions(reactions);
+        Message savedMessage = messageRepository.save(message);
+        // createMessageReactionNotification(savedMessage);
+        return savedMessage;
     }
 
+    /**
+     * Replies to a message by ID.
+     * @throws MessageNotFoundException if not found
+     */
+    @Transactional
     public Message replyMessage(Long messageId, Message reply) {
-        Optional<Message> existing = messageRepository.findById(messageId);
-        if (existing.isPresent()) {
-            Message message = existing.get();
-            reply.setReplyToMessage(message);
-            reply.setTimestamp(Instant.now());
-            Message savedReply = messageRepository.save(reply);
-            // createMessageReplyNotification(savedReply, message);
-            return savedReply;
-        } else {
-            throw new RuntimeException("Message not found with ID: " + messageId);
-        }
+        Message message = messageRepository.findById(messageId)
+            .orElseThrow(() -> new MessageNotFoundException("Message not found with ID: " + messageId));
+        reply.setReplyToMessage(message);
+        reply.setTimestamp(Instant.now());
+        Message savedReply = messageRepository.save(reply);
+        // createMessageReplyNotification(savedReply, message);
+        return savedReply;
     }
 
     private void createMessageNotification(Message message) {
@@ -89,7 +110,4 @@ public class MessageService {
         notification.setType("NEW_MESSAGE");
         notificationService.createNotification(notification);
     }
-
-    
-    
 }

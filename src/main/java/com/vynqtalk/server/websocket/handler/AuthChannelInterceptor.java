@@ -4,6 +4,8 @@ import java.util.Map;
 
 import jakarta.servlet.http.HttpServletRequest;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.http.server.ServerHttpResponse;
@@ -18,14 +20,19 @@ import com.vynqtalk.server.service.JwtService;
 @Component
 public class AuthChannelInterceptor implements HandshakeInterceptor {
 
-    @Autowired
-    private JwtService jwtService;
+    private static final Logger logger = LoggerFactory.getLogger(AuthChannelInterceptor.class);
 
+    private final JwtService jwtService;
+
+    public AuthChannelInterceptor(JwtService jwtService) {
+        this.jwtService = jwtService;
+    }
 
     @Override
     public boolean beforeHandshake(@NonNull ServerHttpRequest request,@NonNull ServerHttpResponse response,
            @NonNull WebSocketHandler wsHandler,@NonNull Map<String, Object> attributes) throws Exception {
         if (!(request instanceof ServletServerHttpRequest servletRequest)) {
+            logger.warn("Rejected non-servlet request for WebSocket handshake");
             return false; // Reject non-servlet requests
         }
 
@@ -37,23 +44,23 @@ public class AuthChannelInterceptor implements HandshakeInterceptor {
         String token = httpServletRequest.getParameter("token");
 
         if (token == null || token.isEmpty()) {
-            System.out.println("Token is missing or empty");
+            logger.warn("Token is missing or empty");
             response.setStatusCode(org.springframework.http.HttpStatus.UNAUTHORIZED);
             return false;
         }
 
         String userEmail = jwtService.getUsernameFromToken(token);
-        System.out.println("User email extracted from token: " + userEmail);
+        logger.info("User email extracted from token: {}", userEmail);
 
         if (userEmail == null) {
-            System.out.println("Invalid token, user ID is null");
+            logger.warn("Invalid token, user email is null");
             response.setStatusCode(org.springframework.http.HttpStatus.UNAUTHORIZED);
             return false;
         }
 
-        System.out.println("User ID is valid: " + userEmail);
+        logger.info("User email is valid: {}", userEmail);
         attributes.put("userEmail", userEmail);
-           attributes.put("stompUser", userEmail);
+        attributes.put("stompUser", userEmail);
         return true;
     }
 
@@ -63,9 +70,9 @@ public class AuthChannelInterceptor implements HandshakeInterceptor {
             WebSocketHandler wsHandler, Exception exception) {
 
         if (exception == null) {
-            System.out.println("WebSocket connection established for client: {}" + request.getRemoteAddress());
+            logger.info("WebSocket connection established for client: {}", request.getRemoteAddress());
         } else {
-            System.out.println("WebSocket handshake failed: {}" + exception.getMessage());
+            logger.warn("WebSocket handshake failed: {}", exception.getMessage());
         }
     }
 }

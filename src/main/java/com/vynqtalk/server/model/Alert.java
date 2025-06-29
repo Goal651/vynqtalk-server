@@ -10,8 +10,10 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
 import lombok.Data;
+import lombok.AllArgsConstructor;
 
 @Data
+@AllArgsConstructor
 @Entity
 @Table(name = "alerts")
 public class Alert {
@@ -40,3 +42,5 @@ public class Alert {
         this.ipAddress = ipAddress;
     }
 }
+
+// Note: Ensure all required fields are set before persisting.

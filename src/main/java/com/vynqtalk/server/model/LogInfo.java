@@ -7,7 +7,13 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
 
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
 public class LogInfo {
     @Id
@@ -43,5 +49,6 @@ public class LogInfo {
 
     @Column(nullable = false)
     private String error;
-    
 }
+
+// Note: Ensure all required fields are set before persisting.

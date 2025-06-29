@@ -23,10 +23,13 @@ public class SystemMetricsWebSocketHandler extends TextWebSocketHandler {
 
     private final Set<WebSocketSession> sessions = Collections.synchronizedSet(new HashSet<>());
 
-    @Autowired
-    private SystemMetricsService systemMetricsService;
+    private final SystemMetricsService systemMetricsService;
 
     private final ObjectMapper objectMapper = new ObjectMapper();
+
+    public SystemMetricsWebSocketHandler(SystemMetricsService systemMetricsService) {
+        this.systemMetricsService = systemMetricsService;
+    }
 
     @Override
     public void afterConnectionEstablished(@NonNull WebSocketSession session) {

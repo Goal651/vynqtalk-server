@@ -2,46 +2,69 @@ package com.vynqtalk.server.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.vynqtalk.server.model.Notification;
 import com.vynqtalk.server.repository.NotificationRepository;
 import java.util.List;
 import java.util.Optional;
+import com.vynqtalk.server.error.NotificationNotFoundException;
 
 @Service
 public class NotificationService {
     
-    @Autowired
-    private NotificationRepository notificationRepository;
+    private final NotificationRepository notificationRepository;
 
-    // Add methods to handle notification operations, such as saving notifications,
-    
+    public NotificationService(NotificationRepository notificationRepository) {
+        this.notificationRepository = notificationRepository;
+    }
+
+    /**
+     * Gets notifications by user ID.
+     */
     public List<Notification> getNotificationsByUserId(Long userId) {
         return notificationRepository.findByUserId(userId);
     }
 
+    /**
+     * Gets a notification by ID.
+     * @throws NotificationNotFoundException if not found
+     */
     public Optional<Notification> getNotificationById(Long id) {
         return notificationRepository.findById(id);
     }
 
+    /**
+     * Creates a notification.
+     */
+    @Transactional
     public Notification createNotification(Notification notification) {
         return notificationRepository.save(notification);
     }
 
+    /**
+     * Marks a notification as read by ID.
+     * @throws NotificationNotFoundException if not found
+     */
+    @Transactional
     public Notification markAsRead(Long id) {
-        Optional<Notification> notificationOpt = notificationRepository.findById(id);
-        if (notificationOpt.isPresent()) {
-            Notification notification = notificationOpt.get();
-            notification.setIsRead(true);
-            return notificationRepository.save(notification);
-        }
-        return null; 
+        Notification notification = notificationRepository.findById(id)
+            .orElseThrow(() -> new NotificationNotFoundException("Notification not found with id: " + id));
+        notification.setIsRead(true);
+        return notificationRepository.save(notification);
     }
 
+    /**
+     * Deletes a notification by ID.
+     */
+    @Transactional
     public void deleteNotification(Long id) {
         notificationRepository.deleteById(id);
     }
 
+    /**
+     * Gets notifications by type.
+     */
     public List<Notification> getNotificationsByType(String type) {
         return notificationRepository.findByType(type);
     }

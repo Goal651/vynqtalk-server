@@ -5,10 +5,13 @@ import com.vynqtalk.server.dto.user.UserDTO;
 import com.vynqtalk.server.mapper.UserMapper;
 import com.vynqtalk.server.model.User;
 import com.vynqtalk.server.service.UserService;
+import jakarta.validation.Valid;
+import com.vynqtalk.server.dto.user.UserCreateRequest;
+import com.vynqtalk.server.error.UserNotFoundException;
+import com.vynqtalk.server.dto.user.UserUpdateRequest;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,46 +19,46 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/v1/user")
 public class UserController {
 
-    @Autowired
-    private UserService userService;
+    private final UserService userService;
+    private final UserMapper userMapper;
 
-    @Autowired
-    private UserMapper userMapper;
+    public UserController(UserService userService, UserMapper userMapper) {
+        this.userService = userService;
+        this.userMapper = userMapper;
+    }
 
     // Create a new user
     @PostMapping
-    public ResponseEntity<ApiResponse<UserDTO>> createUser(@RequestBody User user) {
+    public ResponseEntity<ApiResponse<UserDTO>> createUser(@Valid @RequestBody UserCreateRequest userRequest) {
+        User user = new User();
+        user.setEmail(userRequest.getEmail());
+        user.setName(userRequest.getName());
+        user.setPassword(userRequest.getPassword());
         user.setIsAdmin(false);
         User result = userService.saveUser(user);
-        return ResponseEntity.ok(new ApiResponse<>(userMapper.toDTO(result), "User created successfully", 201));
+        return ResponseEntity.status(201).body(new ApiResponse<>(userMapper.toDTO(result), "User created successfully", 201));
     }
 
     // Get user by ID
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<UserDTO>> getUserById(@PathVariable Long id) {
-        User user = userService.getUserById(id);
-        if (user == null) {
-            return ResponseEntity.ok().body(new ApiResponse<>(null, "User not found", 404));
-        }
+        User user = userService.getUserById(id)
+            .orElseThrow(() -> new UserNotFoundException("User not found with id: " + id));
         return ResponseEntity.ok(new ApiResponse<>(userMapper.toDTO(user), "User retrieved successfully", 200));
     }
 
     // Update user profile
     @PutMapping("/{id}")
-    public ResponseEntity<ApiResponse<UserDTO>> updateUser(@PathVariable Long id, @RequestBody UserDTO userDTO) {
-        User user = userService.getUserById(id);
-        if (user == null) {
-            return ResponseEntity.ok(new ApiResponse<>("User don't exist", 403));
-        }
-        user.setEmail(userDTO.email);
-        user.setIsAdmin(userDTO.isAdmin);
-        user.setName(userDTO.name);
-        user.setStatus(userDTO.status);
-        user.setLastActive(userDTO.lastActive);
+    public ResponseEntity<ApiResponse<UserDTO>> updateUser(@PathVariable Long id, @Valid @RequestBody UserUpdateRequest userUpdateRequest) {
+        User user = userService.getUserById(id)
+            .orElseThrow(() -> new UserNotFoundException("User not found with id: " + id));
+        user.setEmail(userUpdateRequest.getEmail());
+        user.setIsAdmin(userUpdateRequest.getIsAdmin());
+        user.setName(userUpdateRequest.getName());
+        user.setStatus(userUpdateRequest.getStatus());
+        user.setLastActive(userUpdateRequest.getLastActive());
+        // Do not set password here; handle in service if needed
         User updatedUser = userService.updateUser(id, user);
-        if (updatedUser == null) {
-            return ResponseEntity.ok().body(new ApiResponse<>(null, "User not found", 404));
-        }
         return ResponseEntity.ok(new ApiResponse<>(userMapper.toDTO(updatedUser), "User updated successfully", 200));
     }
 
@@ -70,13 +73,9 @@ public class UserController {
     @GetMapping("/all")
     public ResponseEntity<ApiResponse<List<UserDTO>>> getAllUsers() {
         List<User> users = userService.getAllUsers();
-        System.out.println("This is wigo test " + users);
-        if (users.isEmpty()) {
-            return ResponseEntity.ok().body(new ApiResponse<>(null, "No users found", 404));
-        }
         List<UserDTO> userDTO = users.stream()
                 .map(userMapper::toDTO)
                 .toList();
-        return ResponseEntity.ok(new ApiResponse<>(userDTO, "Users retrieved successfully", 200));
+        return ResponseEntity.ok(new ApiResponse<>(userDTO, userDTO.isEmpty() ? "No users found" : "Users retrieved successfully", 200));
     }
 }

@@ -5,8 +5,12 @@ import java.time.Instant;
 import com.vynqtalk.server.model.User;
 
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
 
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class NotificationDTO {
     private Long id;
     private String title;
@@ -15,4 +19,6 @@ public class NotificationDTO {
     private Instant timestamp;
     private Boolean isRead;
     private String type;
-} 
+}
+
+// Note: Use this DTO for notification responses only (never for requests). 

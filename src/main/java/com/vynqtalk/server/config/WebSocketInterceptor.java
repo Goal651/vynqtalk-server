@@ -12,6 +12,7 @@ import org.springframework.messaging.simp.stomp.StompCommand;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.messaging.support.ChannelInterceptor;
 import org.springframework.stereotype.Component;
+import org.springframework.beans.factory.annotation.Qualifier;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -22,9 +23,11 @@ public class WebSocketInterceptor implements ChannelInterceptor {
 
     private final Map<String, String> connectedUsers = new ConcurrentHashMap<>();
 
-    @Autowired
-    @Lazy
-    private SimpMessagingTemplate messagingTemplate;
+    private final SimpMessagingTemplate messagingTemplate;
+
+    public WebSocketInterceptor(@Lazy SimpMessagingTemplate messagingTemplate) {
+        this.messagingTemplate = messagingTemplate;
+    }
 
     public String getSessionIdByEmail(String email) {
         return connectedUsers.get(email);
@@ -43,17 +46,24 @@ public class WebSocketInterceptor implements ChannelInterceptor {
         if (command == StompCommand.CONNECT) {
             if (attributes != null) {
                 String userEmail = (String) attributes.get("userEmail");
-
                 connectedUsers.put(userEmail, sessionId);
-                logger.info("STOMP client connected:" , "userEmail={}, sessionId={}", userEmail, sessionId);
-
+                logger.info("STOMP client connected: userEmail={}, sessionId={}", userEmail, sessionId);
                 broadcastUsers();
             }
         } else if (command == StompCommand.DISCONNECT) {
-            connectedUsers.remove(sessionId);
-            logger.info("STOMP client disconnected: sessionId={}", sessionId);
-            
-            broadcastUsers();
+            // Remove user by email (reverse lookup)
+            String userToRemove = null;
+            for (Map.Entry<String, String> entry : connectedUsers.entrySet()) {
+                if (entry.getValue().equals(sessionId)) {
+                    userToRemove = entry.getKey();
+                    break;
+                }
+            }
+            if (userToRemove != null) {
+                connectedUsers.remove(userToRemove);
+                logger.info("STOMP client disconnected: userEmail={}, sessionId={}", userToRemove, sessionId);
+                broadcastUsers();
+            }
         }
         return message;
     }

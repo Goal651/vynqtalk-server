@@ -11,8 +11,12 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
 
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Table(name = "notifications")
 public class Notification {
@@ -23,9 +27,9 @@ public class Notification {
     @Column(nullable = false)
     private String title;
 
-    @ManyToOne
+    @ManyToOne(optional = false)
     @JoinColumn(name = "user_id", nullable = false)
-    private User user;          
+    private User user;
 
     @Column(nullable = false)
     private String message;
@@ -38,5 +42,7 @@ public class Notification {
 
     @Column(nullable = false)
     private String type;
-
 }
+
+// Note: Consider fetch/cascade types for relationships based on use case.
+// Note: Ensure all required fields are set before persisting.

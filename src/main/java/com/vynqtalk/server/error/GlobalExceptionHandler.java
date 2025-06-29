@@ -38,4 +38,10 @@ public class GlobalExceptionHandler {
                 .body(new ApiResponse<>(null, "Internal server error: " + ex.getMessage(), 
                         HttpStatus.INTERNAL_SERVER_ERROR.value()));
     }
+
+    @ExceptionHandler(UserNotFoundException.class)
+    public ResponseEntity<ApiResponse<?>> handleUserNotFoundException(UserNotFoundException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(new ApiResponse<>(null, ex.getMessage(), HttpStatus.NOT_FOUND.value()));
+    }
 }

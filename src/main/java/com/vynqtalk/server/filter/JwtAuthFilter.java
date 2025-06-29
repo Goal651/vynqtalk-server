@@ -20,18 +20,24 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.util.Optional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Component
 public class JwtAuthFilter extends OncePerRequestFilter {
 
-    @Autowired
-    private JwtService jwtService;
+    private static final Logger logger = LoggerFactory.getLogger(JwtAuthFilter.class);
 
-    @Autowired
-    private UserService userService;
- 
-    @Autowired
-    private UserDetailsService userDetailsService;
+    private final JwtService jwtService;
+    private final UserService userService;
+    private final UserDetailsService userDetailsService;
+
+    public JwtAuthFilter(JwtService jwtService, UserService userService, UserDetailsService userDetailsService) {
+        this.jwtService = jwtService;
+        this.userService = userService;
+        this.userDetailsService = userDetailsService;
+    }
 
     @Override
     protected void doFilterInternal(@NonNull HttpServletRequest request,
@@ -65,8 +71,15 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             response.getWriter().write(jsonError);
             return;
         }
-        User user=userService.getUserByEmail(result.getUsername());
-        System.out.println("User status: "+user.getStatus());
+        Optional<User> userOpt = userService.getUserByEmail(result.getUsername());
+        if (userOpt.isEmpty()) {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.setContentType("application/json");
+            response.getWriter().write("{\"error\": \"User not found.\"}");
+            return;
+        }
+        User user = userOpt.get();
+        logger.debug("User status: {}", user.getStatus());
         if (user.getStatus().equals("blocked")) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             response.setContentType("application/json");

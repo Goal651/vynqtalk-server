@@ -1,16 +1,16 @@
 package com.vynqtalk.server.dto.response;
 
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
 
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class JwtValidationResult {
-    private final boolean valid;
-    private final String username;
-    private final String errorMessage;
-    
-    public JwtValidationResult(boolean valid, String username, String errorMessage) {
-        this.valid = valid;
-        this.username = username;
-        this.errorMessage = errorMessage;
-    }
+    private boolean valid;
+    private String username;
+    private String errorMessage;
 }
+
+// Note: Use this DTO for JWT validation results only.

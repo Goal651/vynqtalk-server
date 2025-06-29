@@ -2,14 +2,18 @@ package com.vynqtalk.server.dto.response;
 
 import com.vynqtalk.server.interfaces.IResponse;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
 import jakarta.annotation.Nullable;
 
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class ApiResponse<T> implements IResponse<T> {
-    private final boolean success;
-    private final T data;
-    private final String message;
-    private final int status;
+    private boolean success;
+    private T data;
+    private String message;
+    private int status;
 
     // Success response constructor
     public ApiResponse(T data, String message, int status) {
@@ -49,3 +53,5 @@ public class ApiResponse<T> implements IResponse<T> {
         return status;
     }
 }
+
+// Note: Use this generic DTO for all API responses.

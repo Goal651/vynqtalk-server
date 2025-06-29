@@ -5,9 +5,11 @@ import com.vynqtalk.server.dto.response.ApiResponse;
 import com.vynqtalk.server.mapper.NotificationMapper;
 import com.vynqtalk.server.model.Notification;
 import com.vynqtalk.server.service.NotificationService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import jakarta.validation.Valid;
+import com.vynqtalk.server.dto.notifications.NotificationCreateRequest;
+import com.vynqtalk.server.error.NotificationNotFoundException;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -16,41 +18,48 @@ import java.util.stream.Collectors;
 @RequestMapping("/api/v1/notifications")
 public class NotificationController {
 
-    @Autowired
-    private NotificationService notificationService;
+    private final NotificationService notificationService;
+    private final NotificationMapper notificationMapper;
 
-    @Autowired
-    private NotificationMapper notificationMapper;
+    public NotificationController(NotificationService notificationService, NotificationMapper notificationMapper) {
+        this.notificationService = notificationService;
+        this.notificationMapper = notificationMapper;
+    }
 
     @GetMapping("/user/{userId}")
     public ResponseEntity<ApiResponse<List<NotificationDTO>>> getNotificationsByUserId(@PathVariable Long userId) {
         List<Notification> results = notificationService.getNotificationsByUserId(userId);
-        List<NotificationDTO> notifications =results.stream()
+        List<NotificationDTO> notifications = results.stream()
                 .map(notificationMapper::toDTO)
-                .collect(Collectors.toList());
+                .toList();
         return ResponseEntity.ok(new ApiResponse<>(notifications, "Notifications retrieved successfully", 200));
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<NotificationDTO>> getNotificationById(@PathVariable Long id) {
-        Notification notification = notificationService.getNotificationById(id).orElse(null);
-        if (notification == null) {
-            return ResponseEntity.notFound().build();
-        }
+        Notification notification = notificationService.getNotificationById(id)
+            .orElseThrow(() -> new NotificationNotFoundException("Notification not found with id: " + id));
         return ResponseEntity.ok(new ApiResponse<>(notificationMapper.toDTO(notification), "Notification retrieved successfully", 200));
     }
 
     @PostMapping
-    public ResponseEntity<ApiResponse<NotificationDTO>> createNotification(@RequestBody Notification notification) {
+    public ResponseEntity<ApiResponse<NotificationDTO>> createNotification(@Valid @RequestBody NotificationCreateRequest notificationRequest) {
+        Notification notification = new Notification();
+        notification.setTitle(notificationRequest.getTitle());
+        notification.setMessage(notificationRequest.getMessage());
+        notification.setType(notificationRequest.getType());
+        notification.setIsRead(false);
+        notification.setTimestamp(java.time.Instant.now());
+        // Set user if needed (userService.getUserById(notificationRequest.getUserId()))
         Notification savedNotification = notificationService.createNotification(notification);
-        return ResponseEntity.ok(new ApiResponse<>(notificationMapper.toDTO(savedNotification), "Notification created successfully", 201));
+        return ResponseEntity.status(201).body(new ApiResponse<>(notificationMapper.toDTO(savedNotification), "Notification created successfully", 201));
     }
 
     @PutMapping("/{id}/read")
     public ResponseEntity<ApiResponse<NotificationDTO>> markAsRead(@PathVariable Long id) {
         Notification notification = notificationService.markAsRead(id);
         if (notification == null) {
-            return ResponseEntity.notFound().build();
+            throw new NotificationNotFoundException("Notification not found with id: " + id);
         }
         return ResponseEntity.ok(new ApiResponse<>(notificationMapper.toDTO(notification), "Notification marked as read", 200));
     }
@@ -66,7 +75,7 @@ public class NotificationController {
         List<Notification> notifications = notificationService.getNotificationsByType(type);
         List<NotificationDTO> notificationDTOs = notifications.stream()
                 .map(notificationMapper::toDTO)
-                .collect(Collectors.toList());
+                .toList();
         return ResponseEntity.ok(new ApiResponse<>(notificationDTOs, "Notifications retrieved successfully", 200));
     }
 

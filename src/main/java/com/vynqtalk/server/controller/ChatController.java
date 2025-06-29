@@ -2,17 +2,19 @@ package com.vynqtalk.server.controller;
 
 import com.vynqtalk.server.dto.messages.GroupMessageDTO;
 import com.vynqtalk.server.dto.messages.MessageDTO;
+import com.vynqtalk.server.dto.websocket.ChatGroupMessage;
+import com.vynqtalk.server.dto.websocket.ChatGroupMessageReply;
+import com.vynqtalk.server.dto.websocket.ChatMessage;
+import com.vynqtalk.server.dto.websocket.ChatMessageReply;
+import com.vynqtalk.server.dto.websocket.ReactMessage;
 import com.vynqtalk.server.mapper.GroupMessageMapper;
 import com.vynqtalk.server.mapper.MessageMapper;
 import com.vynqtalk.server.model.GroupMessage;
 import com.vynqtalk.server.model.Message;
 import com.vynqtalk.server.service.GroupMessageService;
 import com.vynqtalk.server.service.MessageService;
-import com.vynqtalk.server.websocket.payload.ChatGroupMessage;
-import com.vynqtalk.server.websocket.payload.ChatGroupMessageReply;
-import com.vynqtalk.server.websocket.payload.ChatMessage;
-import com.vynqtalk.server.websocket.payload.ChatMessageReply;
-import com.vynqtalk.server.websocket.payload.ReactMessage;
+import com.vynqtalk.server.error.MessageNotFoundException;
+import com.vynqtalk.server.error.GroupMessageNotFoundException;
 
 import java.time.Instant;
 import java.util.List;
@@ -20,7 +22,6 @@ import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.handler.annotation.SendTo;
@@ -29,20 +30,19 @@ import org.springframework.stereotype.Controller;
 @Controller
 public class ChatController {
 
-
     private static final Logger logger = LoggerFactory.getLogger(ChatController.class);
 
-    @Autowired
-    private MessageService messageService;
+    private final MessageService messageService;
+    private final GroupMessageService groupMessageService;
+    private final MessageMapper messageMapper;
+    private final GroupMessageMapper groupMessageMapper;
 
-    @Autowired
-    private GroupMessageService groupMessageService;
-
-    @Autowired
-    private MessageMapper messageMapper;
-
-    @Autowired
-    private GroupMessageMapper groupMessageMapper;
+    public ChatController(MessageService messageService, GroupMessageService groupMessageService, MessageMapper messageMapper, GroupMessageMapper groupMessageMapper) {
+        this.messageService = messageService;
+        this.groupMessageService = groupMessageService;
+        this.messageMapper = messageMapper;
+        this.groupMessageMapper = groupMessageMapper;
+    }
 
     @MessageMapping("/chat.sendMessage")
     @SendTo("/topic/messages")
@@ -65,6 +65,7 @@ public class ChatController {
     @MessageMapping("/chat.sendMessageReply")
     @SendTo("/topic/messages")
     public MessageDTO replyMessage(@Payload ChatMessageReply message) {
+        logger.info("Received reply message: {}", message);
         Message savedMessage = new Message();
         savedMessage.setSender(message.getSender());
         savedMessage.setReceiver(message.getReceiver());
@@ -81,14 +82,11 @@ public class ChatController {
     @MessageMapping("/chat.sendMessageReaction")
     @SendTo("/topic/reactions")
     public MessageDTO reactToMessage(@Payload ReactMessage message) {
-        System.out.println("Received message: " + message);
-        Optional<Message> exist = messageService.getMessageById(message.getMessageId());
-        if (!exist.isPresent()) {
-            return null;
-        }
-        Message savedMessage = exist.get();
-        savedMessage.setReactions(message.getReactions());
-        messageService.saveMessage(savedMessage);
+        logger.info("Received message reaction: {}", message);
+        Message exist = messageService.getMessageById(message.getMessageId())
+            .orElseThrow(() -> new MessageNotFoundException("Message not found with id: " + message.getMessageId()));
+        exist.setReactions(message.getReactions());
+        Message savedMessage = messageService.saveMessage(exist);
         return messageMapper.toDTO(savedMessage);
     }
 
@@ -97,7 +95,7 @@ public class ChatController {
     @MessageMapping("/group.sendMessage")
     @SendTo("/topic/groupMessages")
     public GroupMessageDTO receiveGroupMessage(@Payload ChatGroupMessage message) {
-        System.out.println("Received message: " + message);
+        logger.info("Received group message: {}", message);
         GroupMessage savedMessage = new GroupMessage();
         savedMessage.setSender(message.getSender());
         savedMessage.setGroup(message.getGroup());
@@ -112,7 +110,7 @@ public class ChatController {
 
     @MessageMapping("/group.sendMessageReply")
     public GroupMessageDTO replyGroupMessage(@Payload ChatGroupMessageReply message) {
-        System.out.println("Received message: " + message);
+        logger.info("Received group reply message: {}", message);
         GroupMessage savedMessage = new GroupMessage();
         savedMessage.setSender(message.getSender());
         savedMessage.setGroup(message.getGroup());
@@ -127,14 +125,15 @@ public class ChatController {
     }
 
     @MessageMapping("/group.sendMessageReaction")
-    public String reactToGroupMessage(@Payload ReactMessage message) {
-        System.out.println("Received message: " + message);
+    @SendTo("/topic/groupReactions")
+    public GroupMessageDTO reactToGroupMessage(@Payload ReactMessage message) {
+        logger.info("Received group message reaction: {}", message);
         GroupMessage groupMessage = groupMessageService.getGroupMessageById(message.getMessageId());
-        if (groupMessage != null) {
-            groupMessage.setReactions(message.getReactions());
-            groupMessageService.saveGroupMessage(groupMessage); 
+        if (groupMessage == null) {
+            throw new GroupMessageNotFoundException("Group message not found with id: " + message.getMessageId());
         }
-        return "Successfully updated";
+        groupMessage.setReactions(message.getReactions());
+        GroupMessage saved = groupMessageService.saveGroupMessage(groupMessage);
+        return groupMessageMapper.toDTO(saved);
     }
-
 }

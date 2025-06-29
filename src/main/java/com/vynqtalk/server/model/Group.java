@@ -15,9 +15,13 @@ import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
 
-@Entity
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Entity
 @Table(name = "groups")
 public class Group {
     @Id
@@ -30,7 +34,7 @@ public class Group {
     @Column(nullable = false)
     private String description;
 
-    @ManyToOne
+    @ManyToOne(optional = false)
     @JoinColumn(name = "created_by", nullable = false)
     private User createdBy;
 
@@ -51,3 +55,6 @@ public class Group {
     @JoinTable(name = "group_admins", joinColumns = @JoinColumn(name = "group_id"), inverseJoinColumns = @JoinColumn(name = "user_id"))
     private List<User> admins;
 }
+
+// Note: Consider fetch/cascade types for relationships based on use case.
+// Note: Ensure all required fields are set before persisting.
