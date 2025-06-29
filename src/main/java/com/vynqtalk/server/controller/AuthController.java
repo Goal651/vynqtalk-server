@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.vynqtalk.server.dto.request.LoginRequest;
@@ -141,6 +142,26 @@ public class AuthController {
         }
         // Logic to resend the verification email can be implemented here
         return ResponseEntity.ok(new ApiResponse<>(null, "Verification email resent", HttpStatus.OK.value()));
+    }
+
+    @PostMapping("/check-token")
+    public ResponseEntity<ApiResponse<User>> checkToken(@RequestHeader("Authorization") String authHeader) {
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(new ApiResponse<>(null, "Missing or invalid Authorization header", HttpStatus.UNAUTHORIZED.value()));
+        }
+        String token = authHeader.substring(7);
+        String email = jwtService.getUsernameFromToken(token);
+        if (email == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(new ApiResponse<>(null, "Invalid or expired token", HttpStatus.UNAUTHORIZED.value()));
+        }
+        User user = userService.getUserByEmail(email);
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(new ApiResponse<>(null, "User not found", HttpStatus.UNAUTHORIZED.value()));
+        }
+        return ResponseEntity.ok(new ApiResponse<>(user, "Token is valid", HttpStatus.OK.value()));
     }
 
 }

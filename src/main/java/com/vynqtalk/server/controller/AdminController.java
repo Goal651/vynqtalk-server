@@ -10,6 +10,8 @@ import com.vynqtalk.server.service.AdminService;
 import com.vynqtalk.server.service.SystemMetricsService;
 import com.vynqtalk.server.service.UserService;
 import com.vynqtalk.server.model.Alert;
+import com.vynqtalk.server.model.SystemStatus;
+import com.vynqtalk.server.service.SystemStatusService;
 
 import java.util.List;
 import java.util.HashMap;
@@ -34,6 +36,9 @@ public class AdminController {
 
     @Autowired
     private SystemMetricsService systemMetricsService;
+
+    @Autowired
+    private SystemStatusService systemStatusService;
 
     @GetMapping("/metrics")
     public ResponseEntity<ApiResponse<List<SystemMetric>>> getSystemData() {
@@ -95,5 +100,17 @@ public class AdminController {
         stats.put("messagesYesterday", messagesYesterday);
         stats.put("messagesPercentChange", percentChange);
         return ResponseEntity.ok(new ApiResponse<>(stats, "Dashboard stats loaded", 200));
+    }
+
+    @GetMapping("/system-status")
+    public ResponseEntity<ApiResponse<SystemStatus>> getSystemStatus() {
+        SystemStatus status = systemStatusService.getStatus();
+        return ResponseEntity.ok(new ApiResponse<>(status, "System status fetched", 200));
+    }
+
+    @PutMapping("/system-status")
+    public ResponseEntity<ApiResponse<SystemStatus>> updateSystemStatus(@RequestParam boolean inMaintenance, @RequestParam String message) {
+        SystemStatus status = systemStatusService.updateStatus(inMaintenance, message);
+        return ResponseEntity.ok(new ApiResponse<>(status, "System status updated", 200));
     }
 }
