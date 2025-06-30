@@ -2,8 +2,12 @@ package com.vynqtalk.server.model;
 
 import java.time.Instant;
 
+import com.vynqtalk.server.model.enums.NotificationType;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -40,8 +44,9 @@ public class Notification {
     @Column(name = "is_read", nullable = false)
     private Boolean isRead;
 
+    @Enumerated(EnumType.STRING) 
     @Column(nullable = false)
-    private String type;
+    private NotificationType type;
 }
 
 // Note: Consider fetch/cascade types for relationships based on use case.

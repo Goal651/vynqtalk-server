@@ -14,7 +14,7 @@ import com.vynqtalk.server.dto.request.LoginRequest;
 import com.vynqtalk.server.dto.response.ApiResponse;
 import com.vynqtalk.server.dto.response.AuthData;
 import com.vynqtalk.server.model.User;
-import com.vynqtalk.server.model.UserSettings;
+import com.vynqtalk.server.model.enums.UserRole;
 import com.vynqtalk.server.service.JwtService;
 import com.vynqtalk.server.service.UserService;
 import com.vynqtalk.server.service.UserSettingsService;
@@ -83,7 +83,7 @@ public class AuthController {
         user.setEmail(signupRequest.getEmail());
         user.setPassword(signupRequest.getPassword());
         user.setName(signupRequest.getName());
-        user.setIsAdmin(false); // Default to non-admin user
+        user.setUserRole(UserRole.USER);
         user.setCreatedAt(Instant.now());
         if (userService.getUserByEmail(user.getEmail()).isPresent()) {
             return ResponseEntity.status(HttpStatus.CONFLICT)

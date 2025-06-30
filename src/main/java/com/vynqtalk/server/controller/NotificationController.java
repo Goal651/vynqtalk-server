@@ -12,7 +12,6 @@ import com.vynqtalk.server.dto.notifications.NotificationCreateRequest;
 import com.vynqtalk.server.error.NotificationNotFoundException;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/v1/notifications")

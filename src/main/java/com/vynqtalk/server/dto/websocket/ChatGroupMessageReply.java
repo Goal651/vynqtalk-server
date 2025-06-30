@@ -3,6 +3,8 @@ package com.vynqtalk.server.dto.websocket;
 import com.vynqtalk.server.model.Group;
 import com.vynqtalk.server.model.GroupMessage;
 import com.vynqtalk.server.model.User;
+import com.vynqtalk.server.model.enums.MessageType;
+
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
@@ -25,8 +27,8 @@ public class ChatGroupMessageReply  {
     @NotBlank
     private String content;
     @NotBlank
-    private String type;
+    private MessageType type;
     @NotNull
-    private GroupMessage replyToMessage;
+    private GroupMessage replyTo;
 }
 

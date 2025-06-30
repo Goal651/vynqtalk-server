@@ -1,6 +1,9 @@
 package com.vynqtalk.server.dto.user;
 
 import jakarta.validation.constraints.NotNull;
+
+import com.vynqtalk.server.model.enums.Theme;
+
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -20,7 +23,7 @@ public class UserSettingsUpdateRequest {
     private Boolean pushNotifications;
 
     @NotBlank(message = "Theme is required")
-    private String theme;
+    private Theme theme;
 
     @NotBlank(message = "Language is required")
     private String language;

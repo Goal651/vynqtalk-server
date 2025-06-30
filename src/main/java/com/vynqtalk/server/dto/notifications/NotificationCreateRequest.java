@@ -1,5 +1,7 @@
 package com.vynqtalk.server.dto.notifications;
 
+import com.vynqtalk.server.model.enums.NotificationType;
+
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -16,6 +18,6 @@ public class NotificationCreateRequest {
     private String message;
 
     @NotBlank(message = "Type is required")
-    private String type;
+    private NotificationType type;
 }
 // Note: Use this DTO for notification creation requests only. 

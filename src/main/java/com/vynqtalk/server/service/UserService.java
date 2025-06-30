@@ -68,7 +68,7 @@ public class UserService {
         user.setStatus("active");
         user.setLastActive(Instant.now());
         user.setBio("No bio yet");
-        user.setIsAdmin(user.getIsAdmin());
+        user.setUserRole(user.getUserRole());;
         return userRepository.save(user);
     }
 
@@ -80,7 +80,7 @@ public class UserService {
         User user = this.getUserById(userDTO.getId())
                 .orElseThrow(() -> new UserNotFoundException("User not found with id: " + userDTO.getId()));
         user.setEmail(userDTO.getEmail());
-        user.setIsAdmin(userDTO.getIsAdmin());
+        user.setUserRole(userDTO.getUserRole());
         user.setName(userDTO.getName());
         user.setStatus(userDTO.getStatus());
         user.setLastActive(userDTO.getLastActive());

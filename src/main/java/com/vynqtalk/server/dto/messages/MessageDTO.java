@@ -4,6 +4,9 @@ import java.time.Instant;
 import java.util.List;
 
 import com.vynqtalk.server.dto.user.UserDTO;
+import com.vynqtalk.server.model.Reaction;
+import com.vynqtalk.server.model.enums.MessageType;
+
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
@@ -14,12 +17,12 @@ import lombok.AllArgsConstructor;
 public class MessageDTO {
     private Long id;
     private String content;
-    private String type;
+    private MessageType type;
     private UserDTO sender;
     private UserDTO receiver;
     private Instant timestamp;
     private boolean edited;
-    private List<String> reactions;
+    private List<Reaction> reactions;
     private MessageDTO replyToMessage;
 }
 

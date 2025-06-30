@@ -11,6 +11,7 @@ import com.vynqtalk.server.mapper.GroupMessageMapper;
 import com.vynqtalk.server.mapper.MessageMapper;
 import com.vynqtalk.server.model.GroupMessage;
 import com.vynqtalk.server.model.Message;
+import com.vynqtalk.server.model.enums.MessageType;
 import com.vynqtalk.server.service.GroupMessageService;
 import com.vynqtalk.server.service.MessageService;
 import com.vynqtalk.server.error.MessageNotFoundException;
@@ -18,7 +19,6 @@ import com.vynqtalk.server.error.GroupMessageNotFoundException;
 
 import java.time.Instant;
 import java.util.List;
-import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,7 +53,7 @@ public class ChatController {
         savedMessage.setReceiver(message.getReceiver());
         savedMessage.setContent(message.getContent());
         savedMessage.setEdited(false);
-        savedMessage.setType("text");
+        savedMessage.setType(MessageType.TEXT);
         savedMessage.setTimestamp(Instant.now());
         savedMessage.setReactions(List.of());
 
@@ -70,9 +70,9 @@ public class ChatController {
         savedMessage.setSender(message.getSender());
         savedMessage.setReceiver(message.getReceiver());
         savedMessage.setContent(message.getContent());
-        savedMessage.setReplyToMessage(message.getReplyToMessage());
+        savedMessage.setReplyTo(message.getReplyTo());
         savedMessage.setEdited(false);
-        savedMessage.setType("text");
+        savedMessage.setType(MessageType.TEXT);
         savedMessage.setTimestamp(Instant.now());
         savedMessage.setReactions(List.of());
         savedMessage = messageService.saveMessage(savedMessage);
@@ -101,7 +101,7 @@ public class ChatController {
         savedMessage.setGroup(message.getGroup());
         savedMessage.setContent(message.getContent());
         savedMessage.setEdited(false);
-        savedMessage.setType("text");
+        savedMessage.setType(MessageType.TEXT);
         savedMessage.setTimestamp(Instant.now());
         savedMessage.setReactions(List.of());
         GroupMessage saved = groupMessageService.saveGroupMessage(savedMessage);
@@ -115,9 +115,9 @@ public class ChatController {
         savedMessage.setSender(message.getSender());
         savedMessage.setGroup(message.getGroup());
         savedMessage.setContent(message.getContent());
-        savedMessage.setReplyToMessage(message.getReplyToMessage());
+        savedMessage.setReplyTo(message.getReplyTo());
         savedMessage.setEdited(false);
-        savedMessage.setType("text");
+        savedMessage.setType(MessageType.TEXT);
         savedMessage.setTimestamp(Instant.now());
         savedMessage.setReactions(List.of());
         savedMessage = groupMessageService.saveGroupMessage(savedMessage);

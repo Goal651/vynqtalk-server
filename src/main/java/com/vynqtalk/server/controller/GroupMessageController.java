@@ -4,6 +4,7 @@ import com.vynqtalk.server.dto.messages.GroupMessageDTO;
 import com.vynqtalk.server.dto.response.ApiResponse;
 import com.vynqtalk.server.mapper.GroupMessageMapper;
 import com.vynqtalk.server.model.GroupMessage;
+import com.vynqtalk.server.model.Reaction;
 import com.vynqtalk.server.service.GroupMessageService;
 import com.vynqtalk.server.error.GroupMessageNotFoundException;
 import org.slf4j.Logger;
@@ -66,7 +67,7 @@ public class GroupMessageController {
 
     @PutMapping("/react/{messageId}")
     public ResponseEntity<ApiResponse<GroupMessageDTO>> reactMessage(@PathVariable Long messageId,
-            @RequestBody List<String> reactions) {
+            @RequestBody List<Reaction> reactions) {
         GroupMessage result = groupMessageService.reactToMessage(messageId, reactions);
         return ResponseEntity.ok(new ApiResponse<>(groupMessageMapper.toDTO(result), "Message reactions updated successfully", 200));
     }

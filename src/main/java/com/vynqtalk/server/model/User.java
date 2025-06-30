@@ -4,6 +4,8 @@ import java.time.Instant;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -12,6 +14,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.vynqtalk.server.model.enums.UserRole;
 
 @Data
 @NoArgsConstructor
@@ -35,8 +38,9 @@ public class User {
     @Column(nullable = false)
     private String password;
 
-    @Column(name = "is_admin", nullable = true)
-    private Boolean isAdmin;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "user_role", nullable = true)
+    private UserRole userRole;
 
     @Column(nullable = false)
     private String status;

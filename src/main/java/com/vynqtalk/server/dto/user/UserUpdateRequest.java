@@ -8,6 +8,8 @@ import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 import java.time.Instant;
 
+import com.vynqtalk.server.model.enums.UserRole;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -20,7 +22,7 @@ public class UserUpdateRequest {
     private String name;
 
     @NotNull(message = "isAdmin is required")
-    private Boolean isAdmin;
+    private UserRole userRole;
 
     private String status;
     private Instant lastActive;

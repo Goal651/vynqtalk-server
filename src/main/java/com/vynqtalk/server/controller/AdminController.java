@@ -94,7 +94,7 @@ public class AdminController {
         User user = userService.getUserById(id)
             .orElseThrow(() -> new com.vynqtalk.server.error.UserNotFoundException("User not found with id: " + id));
         user.setEmail(userUpdateRequest.getEmail());
-        user.setIsAdmin(userUpdateRequest.getIsAdmin());
+        user.setUserRole(userUpdateRequest.getUserRole());
         user.setName(userUpdateRequest.getName());
         user.setStatus(userUpdateRequest.getStatus());
         user.setLastActive(userUpdateRequest.getLastActive());

@@ -4,6 +4,7 @@ import com.vynqtalk.server.dto.response.ApiResponse;
 import com.vynqtalk.server.dto.user.UserDTO;
 import com.vynqtalk.server.mapper.UserMapper;
 import com.vynqtalk.server.model.User;
+import com.vynqtalk.server.model.enums.UserRole;
 import com.vynqtalk.server.service.UserService;
 import jakarta.validation.Valid;
 import com.vynqtalk.server.dto.user.UserCreateRequest;
@@ -34,26 +35,28 @@ public class UserController {
         user.setEmail(userRequest.getEmail());
         user.setName(userRequest.getName());
         user.setPassword(userRequest.getPassword());
-        user.setIsAdmin(false);
+        user.setUserRole(UserRole.USER);
         User result = userService.saveUser(user);
-        return ResponseEntity.status(201).body(new ApiResponse<>(userMapper.toDTO(result), "User created successfully", 201));
+        return ResponseEntity.status(201)
+                .body(new ApiResponse<>(userMapper.toDTO(result), "User created successfully", 201));
     }
 
     // Get user by ID
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<UserDTO>> getUserById(@PathVariable Long id) {
         User user = userService.getUserById(id)
-            .orElseThrow(() -> new UserNotFoundException("User not found with id: " + id));
+                .orElseThrow(() -> new UserNotFoundException("User not found with id: " + id));
         return ResponseEntity.ok(new ApiResponse<>(userMapper.toDTO(user), "User retrieved successfully", 200));
     }
 
     // Update user profile
     @PutMapping("/{id}")
-    public ResponseEntity<ApiResponse<UserDTO>> updateUser(@PathVariable Long id, @Valid @RequestBody UserUpdateRequest userUpdateRequest) {
+    public ResponseEntity<ApiResponse<UserDTO>> updateUser(@PathVariable Long id,
+            @Valid @RequestBody UserUpdateRequest userUpdateRequest) {
         User user = userService.getUserById(id)
-            .orElseThrow(() -> new UserNotFoundException("User not found with id: " + id));
+                .orElseThrow(() -> new UserNotFoundException("User not found with id: " + id));
         user.setEmail(userUpdateRequest.getEmail());
-        user.setIsAdmin(userUpdateRequest.getIsAdmin());
+        user.setUserRole(userUpdateRequest.getUserRole());
         user.setName(userUpdateRequest.getName());
         user.setStatus(userUpdateRequest.getStatus());
         user.setLastActive(userUpdateRequest.getLastActive());
@@ -76,6 +79,7 @@ public class UserController {
         List<UserDTO> userDTO = users.stream()
                 .map(userMapper::toDTO)
                 .toList();
-        return ResponseEntity.ok(new ApiResponse<>(userDTO, userDTO.isEmpty() ? "No users found" : "Users retrieved successfully", 200));
+        return ResponseEntity.ok(
+                new ApiResponse<>(userDTO, userDTO.isEmpty() ? "No users found" : "Users retrieved successfully", 200));
     }
 }

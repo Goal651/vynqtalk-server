@@ -3,6 +3,7 @@ package com.vynqtalk.server.dto.notifications;
 import java.time.Instant;
 
 import com.vynqtalk.server.model.User;
+import com.vynqtalk.server.model.enums.NotificationType;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -18,7 +19,7 @@ public class NotificationDTO {
     private String message;
     private Instant timestamp;
     private Boolean isRead;
-    private String type;
+    private NotificationType type;
 }
 
 // Note: Use this DTO for notification responses only (never for requests). 

@@ -1,6 +1,9 @@
 package com.vynqtalk.server.dto.websocket;
 
 import java.util.List;
+
+import com.vynqtalk.server.model.Reaction;
+
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -18,5 +21,5 @@ public class ReactMessage {
     @NotNull
     private Long messageId;
     @NotNull
-    private List<String> reactions;
+    private List<Reaction> reactions;
 }

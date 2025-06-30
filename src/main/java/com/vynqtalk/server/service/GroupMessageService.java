@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.vynqtalk.server.model.GroupMessage;
+import com.vynqtalk.server.model.Reaction;
 import com.vynqtalk.server.repository.GroupMessageRepository;
 import com.vynqtalk.server.error.GroupMessageNotFoundException;
 
@@ -74,7 +75,7 @@ public class GroupMessageService {
      * @throws GroupMessageNotFoundException if not found
      */
     @Transactional
-    public GroupMessage reactToMessage(Long messageId, List<String> reactions) {
+    public GroupMessage reactToMessage(Long messageId, List<Reaction> reactions) {
         GroupMessage message = groupMessageRepository.findById(messageId)
             .orElseThrow(() -> new GroupMessageNotFoundException("Group message not found with id: " + messageId));
         message.setReactions(reactions);

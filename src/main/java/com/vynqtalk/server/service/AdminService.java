@@ -11,6 +11,7 @@ import com.vynqtalk.server.dto.group.GroupDTO;
 import com.vynqtalk.server.dto.user.UserDTO;
 import com.vynqtalk.server.model.Group;
 import com.vynqtalk.server.model.User;
+import com.vynqtalk.server.model.enums.UserRole;
 import com.vynqtalk.server.mapper.UserMapper;
 import com.vynqtalk.server.model.Alert;
 import com.vynqtalk.server.repository.AlertRepository;
@@ -22,7 +23,8 @@ import java.time.ZoneId;
 import com.vynqtalk.server.error.UserNotFoundException;
 
 /**
- * Service for admin-related operations, including user, group, and alert management,
+ * Service for admin-related operations, including user, group, and alert
+ * management,
  * as well as dashboard statistics.
  */
 @Service
@@ -37,8 +39,8 @@ public class AdminService {
     private final MessageRepository messageRepository;
 
     public AdminService(UserService userService, UserMapper userMapper, GroupMapper groupMapper,
-                       GroupService groupService, AlertRepository alertRepository, UserRepository userRepository,
-                       GroupRepository groupRepository, MessageRepository messageRepository) {
+            GroupService groupService, AlertRepository alertRepository, UserRepository userRepository,
+            GroupRepository groupRepository, MessageRepository messageRepository) {
         this.userService = userService;
         this.userMapper = userMapper;
         this.groupMapper = groupMapper;
@@ -54,7 +56,7 @@ public class AdminService {
      */
     @Transactional
     public UserDTO createAdmin(User user) {
-        user.setIsAdmin(true);
+        user.setUserRole(UserRole.USER);
         user.setStatus("active");
         user.setLastActive(Instant.now());
         user.setBio("No bio yet");
@@ -80,13 +82,14 @@ public class AdminService {
 
     /**
      * Updates a user by ID using a UserDTO.
+     * 
      * @return the updated UserDTO
      * @throws UserNotFoundException if not found
      */
     @Transactional
     public UserDTO updateUser(Long id, UserDTO userDTO) {
         User user = userService.getUserById(id)
-            .orElseThrow(() -> new UserNotFoundException("User not found with id: " + id));
+                .orElseThrow(() -> new UserNotFoundException("User not found with id: " + id));
         user.setId(id);
         userService.updateUser(id, user);
         return userMapper.toDTO(user);

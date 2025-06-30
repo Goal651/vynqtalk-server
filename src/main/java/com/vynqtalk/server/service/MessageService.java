@@ -1,7 +1,7 @@
 package com.vynqtalk.server.service;
 
 import com.vynqtalk.server.model.Message;
-import com.vynqtalk.server.model.Notification;
+import com.vynqtalk.server.model.Reaction;
 import com.vynqtalk.server.repository.MessageRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,11 +15,9 @@ import java.util.Optional;
 public class MessageService {
 
     private final MessageRepository messageRepository;
-    private final NotificationService notificationService;
 
-    public MessageService(MessageRepository messageRepository, NotificationService notificationService) {
+    public MessageService(MessageRepository messageRepository) {
         this.messageRepository = messageRepository;
-        this.notificationService = notificationService;
     }
 
     /**
@@ -28,7 +26,6 @@ public class MessageService {
     @Transactional
     public Message saveMessage(Message message) {
         Message savedMessage = messageRepository.save(message);
-        createMessageNotification(savedMessage);
         return savedMessage;
     }
 
@@ -76,7 +73,7 @@ public class MessageService {
      * @throws MessageNotFoundException if not found
      */
     @Transactional
-    public Message reactToMessage(Long messageId, List<String> reactions) {
+    public Message reactToMessage(Long messageId, List<Reaction> reactions) {
         Message message = messageRepository.findById(messageId)
             .orElseThrow(() -> new MessageNotFoundException("Message not found with ID: " + messageId));
         message.setReactions(reactions);
@@ -93,21 +90,11 @@ public class MessageService {
     public Message replyMessage(Long messageId, Message reply) {
         Message message = messageRepository.findById(messageId)
             .orElseThrow(() -> new MessageNotFoundException("Message not found with ID: " + messageId));
-        reply.setReplyToMessage(message);
+        reply.setReplyTo(message);
         reply.setTimestamp(Instant.now());
         Message savedReply = messageRepository.save(reply);
         // createMessageReplyNotification(savedReply, message);
         return savedReply;
     }
 
-    private void createMessageNotification(Message message) {
-        Notification notification = new Notification();
-        notification.setTitle("New Message");
-        notification.setMessage("You received a new message from " + message.getSender().getName());
-        notification.setUser(message.getReceiver());
-        notification.setTimestamp(Instant.now());
-        notification.setIsRead(false);
-        notification.setType("NEW_MESSAGE");
-        notificationService.createNotification(notification);
-    }
 }

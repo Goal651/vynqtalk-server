@@ -2,6 +2,9 @@ package com.vynqtalk.server.dto.user;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import com.vynqtalk.server.model.enums.Theme;
+
 import lombok.AllArgsConstructor;
 
 @Data
@@ -11,7 +14,7 @@ public class UserSettingsDTO {
     private Boolean notificationEnabled;
     private Boolean emailNotifications;
     private Boolean pushNotifications;
-    private String theme;
+    private Theme theme;
     private String language;
     private String timezone;
     private Boolean showOnlineStatus;

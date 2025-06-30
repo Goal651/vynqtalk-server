@@ -12,7 +12,6 @@ public class GroupCreateRequest {
     @NotBlank(message = "Group name is required")
     private String name;
 
-    @NotBlank(message = "Description is required")
     private String description;
 
     private Boolean isPrivate;

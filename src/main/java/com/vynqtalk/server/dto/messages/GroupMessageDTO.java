@@ -5,6 +5,9 @@ import java.util.List;
 
 import com.vynqtalk.server.dto.group.GroupDTO;
 import com.vynqtalk.server.dto.user.UserDTO;
+import com.vynqtalk.server.model.Reaction;
+import com.vynqtalk.server.model.enums.MessageType;
+
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
@@ -15,11 +18,11 @@ import lombok.AllArgsConstructor;
 public class GroupMessageDTO {
     private Long id;
     private String content;
-    private String type;
+    private MessageType type;
     private UserDTO sender;
     private GroupDTO group;
     private Instant timestamp;
-    private List<String> reactions;
+    private List<Reaction> reactions;
 }
 
 // Note: Use this DTO for group message responses only (never for requests).

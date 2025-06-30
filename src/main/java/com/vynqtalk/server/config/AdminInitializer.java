@@ -1,6 +1,7 @@
 package com.vynqtalk.server.config;
 
 import com.vynqtalk.server.model.User;
+import com.vynqtalk.server.model.enums.UserRole;
 import com.vynqtalk.server.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
@@ -25,7 +26,7 @@ public class AdminInitializer implements CommandLineRunner {
             admin.setEmail(adminEmail);
             admin.setPassword(adminPassword); // Will be hashed by saveUser
             admin.setName(adminName);
-            admin.setIsAdmin(true);
+            admin.setUserRole(UserRole.ADMIN);
             admin.setStatus("active");
             admin.setLastActive(Instant.now());
             admin.setCreatedAt(Instant.now());
