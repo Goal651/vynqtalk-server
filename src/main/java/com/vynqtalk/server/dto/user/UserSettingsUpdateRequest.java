@@ -22,7 +22,7 @@ public class UserSettingsUpdateRequest {
     @NotNull(message = "Push notifications is required")
     private Boolean pushNotifications;
 
-    @NotBlank(message = "Theme is required")
+    @NotNull(message = "Theme is required")
     private Theme theme;
 
     @NotBlank(message = "Language is required")
