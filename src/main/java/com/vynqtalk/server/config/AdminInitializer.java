@@ -19,7 +19,7 @@ public class AdminInitializer implements CommandLineRunner {
     public void run(String... args) {
         String adminEmail = "bugiriwilson651@gmail.com";
         String adminPassword = "bugiri";
-        String adminName = "wigo";
+        String adminName = "ADMIN";
 
         if (userService.getUserByEmail(adminEmail) == null) {
             User admin = new User();
