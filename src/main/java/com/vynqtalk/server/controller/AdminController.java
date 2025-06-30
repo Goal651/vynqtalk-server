@@ -11,7 +11,6 @@ import com.vynqtalk.server.service.AdminService;
 import com.vynqtalk.server.service.SystemMetricsService;
 import com.vynqtalk.server.service.UserService;
 import com.vynqtalk.server.model.Alert;
-import com.vynqtalk.server.model.SystemStatus;
 import com.vynqtalk.server.service.SystemStatusService;
 
 import java.util.List;
@@ -32,7 +31,6 @@ public class AdminController {
     private final UserMapper userMapper;
     private final AdminService adminService;
     private final SystemMetricsService systemMetricsService;
-    private final SystemStatusService systemStatusService;
 
     public AdminController(UserService userService, UserMapper userMapper, AdminService adminService,
                           SystemMetricsService systemMetricsService, SystemStatusService systemStatusService) {
@@ -40,7 +38,7 @@ public class AdminController {
         this.userMapper = userMapper;
         this.adminService = adminService;
         this.systemMetricsService = systemMetricsService;
-        this.systemStatusService = systemStatusService;
+        
     }
 
     /**
@@ -134,21 +132,5 @@ public class AdminController {
         return ResponseEntity.ok(new ApiResponse<>(stats, "Dashboard stats loaded", 200));
     }
 
-    /**
-     * Gets the current system maintenance status.
-     */
-    @GetMapping("/system-status")
-    public ResponseEntity<ApiResponse<SystemStatus>> getSystemStatus() {
-        SystemStatus status = systemStatusService.getStatus();
-        return ResponseEntity.ok(new ApiResponse<>(status, "System status fetched", 200));
-    }
-
-    /**
-     * Updates the system maintenance status and message.
-     */
-    @PutMapping("/system-status")
-    public ResponseEntity<ApiResponse<SystemStatus>> updateSystemStatus(@RequestParam boolean inMaintenance, @RequestParam String message) {
-        SystemStatus status = systemStatusService.updateStatus(inMaintenance, message);
-        return ResponseEntity.ok(new ApiResponse<>(status, "System status updated", 200));
-    }
+   
 }

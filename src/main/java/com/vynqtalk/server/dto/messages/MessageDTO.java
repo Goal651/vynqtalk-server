@@ -23,7 +23,7 @@ public class MessageDTO {
     private Instant timestamp;
     private boolean edited;
     private List<Reaction> reactions;
-    private MessageDTO replyToMessage;
+    private MessageDTO replyTo;
 }
 
 // Note: Use this DTO for message responses only (never for requests).

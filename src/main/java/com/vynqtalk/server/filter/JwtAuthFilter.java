@@ -1,6 +1,5 @@
 package com.vynqtalk.server.filter;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -48,7 +47,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
         String requestURI = request.getRequestURI();
         // Skip JWT processing for the auth route
-        if (requestURI.startsWith("/api/v1/auth/") || requestURI.startsWith("/api/v1/public/")||requestURI.startsWith("/ws/") || requestURI.startsWith("/actuator/")) {
+        if (requestURI.startsWith("/api/v1/auth/") || requestURI.startsWith("/api/v1/public/")||requestURI.startsWith("/ws/") || requestURI.startsWith("/actuator/")||requestURI.startsWith("/api/v1/system/")) {
             filterChain.doFilter(request, response);
             return;
         }

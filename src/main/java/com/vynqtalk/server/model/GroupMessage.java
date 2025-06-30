@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.vynqtalk.server.model.enums.MessageType;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -15,6 +16,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -53,8 +55,9 @@ public class GroupMessage {
     @Column(nullable = false)
     private boolean isEdited;
 
-    @Column(nullable = false)
+    @OneToMany(mappedBy = "groupMessage", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Reaction> reactions;
+
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "reply_to_id")

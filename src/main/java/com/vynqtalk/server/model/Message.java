@@ -19,6 +19,8 @@ import jakarta.persistence.Table;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.CascadeType;
 
 @Data
 @NoArgsConstructor
@@ -52,11 +54,11 @@ public class Message {
     @Column(nullable = false)
     private boolean isEdited;
 
-    @Column(nullable = false)
+    @OneToMany(mappedBy = "message", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Reaction> reactions;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "reply_to_message_id")
+    @JoinColumn(name = "reply_to_id")
     private Message replyTo;
 
 }
