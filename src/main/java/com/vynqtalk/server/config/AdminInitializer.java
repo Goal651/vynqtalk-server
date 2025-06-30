@@ -4,27 +4,38 @@ import com.vynqtalk.server.model.User;
 import com.vynqtalk.server.model.enums.UserRole;
 import com.vynqtalk.server.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.CommandLineRunner;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.event.EventListener;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 
 @Component
-public class AdminInitializer implements CommandLineRunner {
+public class AdminInitializer {
 
     @Autowired
     private UserService userService;
 
-    @Override
-    public void run(String... args) {
-        String adminEmail = "bugiriwilson651@gmail.com";
-        String adminPassword = "bugiri";
-        String adminName = "ADMIN";
+    @Value("${admin.email}")
+    private String adminEmail;
 
-        if (userService.getUserByEmail(adminEmail) == null) {
+    @Value("${admin.password}")
+    private String adminPassword;
+
+    @Value("${admin.name}")
+    private String adminName;
+
+    @Transactional
+    @EventListener(ApplicationReadyEvent.class)
+    public void createAdminIfNotExists() {
+        System.out.println("[AdminInitializer] Checking for admin user...");
+        System.out.println(userService.getUserByEmail(adminEmail));
+        if (!userService.getUserByEmail(adminEmail).isPresent()) {
             User admin = new User();
             admin.setEmail(adminEmail);
-            admin.setPassword(adminPassword); // Will be hashed by saveUser
+            admin.setPassword(adminPassword);
             admin.setName(adminName);
             admin.setUserRole(UserRole.ADMIN);
             admin.setStatus("active");
@@ -33,7 +44,9 @@ public class AdminInitializer implements CommandLineRunner {
             admin.setBio("Auto-created admin");
 
             userService.saveUser(admin);
-            System.out.println("Admin user created: " + adminEmail);
+            System.out.println("[AdminInitializer] Admin user created: " + adminEmail);
+        } else {
+            System.out.println("[AdminInitializer] Admin user already exists: " + adminEmail);
         }
     }
 }
