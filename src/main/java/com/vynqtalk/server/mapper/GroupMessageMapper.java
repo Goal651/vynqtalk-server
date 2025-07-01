@@ -3,7 +3,8 @@ package com.vynqtalk.server.mapper;
 import org.mapstruct.Mapper;
 
 import com.vynqtalk.server.dto.messages.GroupMessageDTO;
-import com.vynqtalk.server.model.GroupMessage;
+import com.vynqtalk.server.model.messages.GroupMessage;
+
 import java.util.List;
 
 @Mapper(componentModel = "spring")

@@ -1,7 +1,9 @@
-package com.vynqtalk.server.model;
+package com.vynqtalk.server.model.groups;
 
 import java.time.Instant;
 import java.util.List;
+
+import com.vynqtalk.server.model.users.User;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

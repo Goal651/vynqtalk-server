@@ -19,7 +19,6 @@ This is the back-end for VynqTalk, a chat application built with Spring Boot and
 - Git
 
 ## Setup Instructions
-
 1. Clone the repository:
 
 ```bash

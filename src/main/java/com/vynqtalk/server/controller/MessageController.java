@@ -3,7 +3,7 @@ package com.vynqtalk.server.controller;
 import com.vynqtalk.server.dto.messages.MessageDTO;
 import com.vynqtalk.server.dto.response.ApiResponse;
 import com.vynqtalk.server.mapper.MessageMapper;
-import com.vynqtalk.server.model.Message;
+import com.vynqtalk.server.model.messages.Message;
 import com.vynqtalk.server.service.MessageService;
 import com.vynqtalk.server.error.MessageNotFoundException;
 
@@ -37,7 +37,7 @@ public class MessageController {
     @GetMapping("/{conversationId}")
     public ResponseEntity<ApiResponse<MessageDTO>> getMessages(@PathVariable Long conversationId) {
         Message message = messageService.getMessageById(conversationId)
-            .orElseThrow(() -> new MessageNotFoundException("Message not found with id: " + conversationId));
+                .orElseThrow(() -> new MessageNotFoundException("Message not found with id: " + conversationId));
         return ResponseEntity
                 .ok(new ApiResponse<>(messageMapper.toDTO(message), "Message retrieved successfully", 200));
     }
@@ -45,8 +45,8 @@ public class MessageController {
     // Delete a message
     @DeleteMapping("/{messageId}")
     public ResponseEntity<ApiResponse<Void>> deleteMessage(@PathVariable Long messageId) {
-        Message message = messageService.getMessageById(messageId)
-            .orElseThrow(() -> new MessageNotFoundException("Message not found with id: " + messageId));
+        messageService.getMessageById(messageId)
+                .orElseThrow(() -> new MessageNotFoundException("Message not found with id: " + messageId));
         messageService.deleteMessage(messageId);
         return ResponseEntity.ok(new ApiResponse<>(null, "Message deleted successfully", 200));
     }
@@ -56,7 +56,7 @@ public class MessageController {
     public ResponseEntity<ApiResponse<MessageDTO>> updateMessage(@PathVariable Long messageId,
             @RequestBody Message updated) {
         Message message = messageService.getMessageById(messageId)
-            .orElseThrow(() -> new MessageNotFoundException("Message not found with id: " + messageId));
+                .orElseThrow(() -> new MessageNotFoundException("Message not found with id: " + messageId));
         message.setContent(updated.getContent());
         message.setEdited(true);
         Message result = messageService.updateMessage(messageId, message);

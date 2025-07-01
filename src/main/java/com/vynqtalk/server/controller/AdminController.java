@@ -1,6 +1,5 @@
 package com.vynqtalk.server.controller;
 
-import com.vynqtalk.server.model.User;
 import com.vynqtalk.server.dto.SystemMetric;
 import com.vynqtalk.server.dto.group.GroupDTO;
 import com.vynqtalk.server.dto.response.ApiResponse;
@@ -10,7 +9,8 @@ import com.vynqtalk.server.mapper.UserMapper;
 import com.vynqtalk.server.service.AdminService;
 import com.vynqtalk.server.service.SystemMetricsService;
 import com.vynqtalk.server.service.UserService;
-import com.vynqtalk.server.model.Alert;
+import com.vynqtalk.server.model.system.Alert;
+import com.vynqtalk.server.model.users.User;
 import com.vynqtalk.server.service.SystemStatusService;
 
 import java.util.List;

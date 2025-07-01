@@ -3,7 +3,8 @@ package com.vynqtalk.server.mapper;
 import org.mapstruct.Mapper;
 
 import com.vynqtalk.server.dto.notifications.NotificationDTO;
-import com.vynqtalk.server.model.Notification;
+import com.vynqtalk.server.model.system.Notification;
+
 import java.util.List;
 
 @Mapper(componentModel = "spring")

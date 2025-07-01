@@ -4,8 +4,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.vynqtalk.server.model.User;
-import com.vynqtalk.server.model.UserSettings;
+import com.vynqtalk.server.model.users.User;
+import com.vynqtalk.server.model.users.UserSettings;
 import com.vynqtalk.server.repository.UserSettingsRepository;
 import com.vynqtalk.server.error.UserSettingsNotFoundException;
 import com.vynqtalk.server.dto.user.UserSettingsUpdateRequest;

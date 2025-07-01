@@ -2,7 +2,7 @@ package com.vynqtalk.server.dto.websocket;
 
 import java.util.List;
 
-import com.vynqtalk.server.model.Reaction;
+import com.vynqtalk.server.model.messages.Reaction;
 
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;

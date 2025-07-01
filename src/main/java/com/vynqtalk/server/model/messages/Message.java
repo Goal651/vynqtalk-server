@@ -1,11 +1,11 @@
-package com.vynqtalk.server.model;
+package com.vynqtalk.server.model.messages;
 
 import java.time.Instant;
 import java.util.List;
 
 import com.vynqtalk.server.model.enums.MessageType;
+import com.vynqtalk.server.model.users.User;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -15,19 +15,21 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
+import com.vladmihalcea.hibernate.type.json.JsonType;
+import org.hibernate.annotations.Type;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "group_messages")
-public class GroupMessage {
+@Table(name = "messages")
+public class Message {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -36,6 +38,9 @@ public class GroupMessage {
     @Column(nullable = false, columnDefinition = "TEXT")
     private String content;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private MessageType type;
 
     @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @JoinColumn(nullable = false, name = "sender_id")
@@ -43,24 +48,20 @@ public class GroupMessage {
 
     @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @JoinColumn(nullable = false, name = "receiver_id")
-    private Group group;
+    private User receiver;
 
     @Column(nullable = false)
     private Instant timestamp;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable=false)
-    private MessageType type;
-
     @Column(nullable = false)
     private boolean isEdited;
 
-    @OneToMany(mappedBy = "groupMessage", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Type(JsonType.class)
+    @Column(columnDefinition = "json")
     private List<Reaction> reactions;
-
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "reply_to_id")
-    private GroupMessage replyTo;
+    private Message replyTo;
 
 }

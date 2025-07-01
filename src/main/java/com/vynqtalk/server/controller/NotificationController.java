@@ -3,7 +3,7 @@ package com.vynqtalk.server.controller;
 import com.vynqtalk.server.dto.notifications.NotificationDTO;
 import com.vynqtalk.server.dto.response.ApiResponse;
 import com.vynqtalk.server.mapper.NotificationMapper;
-import com.vynqtalk.server.model.Notification;
+import com.vynqtalk.server.model.system.Notification;
 import com.vynqtalk.server.service.NotificationService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

@@ -2,7 +2,8 @@ package com.vynqtalk.server.mapper;
 
 import org.mapstruct.Mapper;
 import com.vynqtalk.server.dto.user.UserSettingsDTO;
-import com.vynqtalk.server.model.UserSettings;
+import com.vynqtalk.server.model.users.UserSettings;
+
 import java.util.List;
 
 @Mapper(componentModel = "spring")

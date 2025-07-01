@@ -1,10 +1,9 @@
 package com.vynqtalk.server.service;
 
-import com.vynqtalk.server.model.Message;
-import com.vynqtalk.server.model.Reaction;
+import com.vynqtalk.server.model.messages.Message;
+import com.vynqtalk.server.model.messages.Reaction;
 import com.vynqtalk.server.repository.MessageRepository;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import com.vynqtalk.server.error.MessageNotFoundException;
 
 import java.time.Instant;
@@ -23,7 +22,7 @@ public class MessageService {
     /**
      * Saves a message and creates a notification.
      */
-    @Transactional
+
     public Message saveMessage(Message message) {
         Message savedMessage = messageRepository.save(message);
         return savedMessage;
@@ -47,7 +46,7 @@ public class MessageService {
      * Deletes a message by ID.
      * @throws MessageNotFoundException if not found
      */
-    @Transactional
+    
     public void deleteMessage(Long messageId) {
         Message message = messageRepository.findById(messageId)
             .orElseThrow(() -> new MessageNotFoundException("Message not found with ID: " + messageId));
@@ -59,7 +58,7 @@ public class MessageService {
      * Updates a message by ID.
      * @throws MessageNotFoundException if not found
      */
-    @Transactional
+    
     public Message updateMessage(Long messageId, Message updatedMessage) {
         messageRepository.findById(messageId)
             .orElseThrow(() -> new MessageNotFoundException("Message not found with ID: " + messageId));
@@ -72,7 +71,7 @@ public class MessageService {
      * Reacts to a message by ID.
      * @throws MessageNotFoundException if not found
      */
-    @Transactional
+    
     public Message reactToMessage(Long messageId, List<Reaction> reactions) {
         Message message = messageRepository.findById(messageId)
             .orElseThrow(() -> new MessageNotFoundException("Message not found with ID: " + messageId));
@@ -86,7 +85,7 @@ public class MessageService {
      * Replies to a message by ID.
      * @throws MessageNotFoundException if not found
      */
-    @Transactional
+    
     public Message replyMessage(Long messageId, Message reply) {
         Message message = messageRepository.findById(messageId)
             .orElseThrow(() -> new MessageNotFoundException("Message not found with ID: " + messageId));

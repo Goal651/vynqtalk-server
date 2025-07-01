@@ -2,7 +2,7 @@ package com.vynqtalk.server.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import com.vynqtalk.server.model.Notification;
+import com.vynqtalk.server.model.system.Notification;
 
 import java.util.List;
 

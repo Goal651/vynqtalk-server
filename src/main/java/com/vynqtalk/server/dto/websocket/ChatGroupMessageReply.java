@@ -1,9 +1,9 @@
 package com.vynqtalk.server.dto.websocket;
 
-import com.vynqtalk.server.model.Group;
-import com.vynqtalk.server.model.GroupMessage;
-import com.vynqtalk.server.model.User;
 import com.vynqtalk.server.model.enums.MessageType;
+import com.vynqtalk.server.model.groups.Group;
+import com.vynqtalk.server.model.messages.GroupMessage;
+import com.vynqtalk.server.model.users.User;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;

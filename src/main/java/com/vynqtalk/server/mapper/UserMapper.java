@@ -4,7 +4,8 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
 import com.vynqtalk.server.dto.user.UserDTO;
-import com.vynqtalk.server.model.User;
+import com.vynqtalk.server.model.users.User;
+
 import java.util.List;
 
 @Mapper(componentModel = "spring")

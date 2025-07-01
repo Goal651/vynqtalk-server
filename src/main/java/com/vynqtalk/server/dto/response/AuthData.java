@@ -1,6 +1,6 @@
 package com.vynqtalk.server.dto.response;
 
-import com.vynqtalk.server.model.User;
+import com.vynqtalk.server.model.users.User;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

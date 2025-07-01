@@ -4,8 +4,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import com.vynqtalk.server.dto.response.ApiResponse;
-import com.vynqtalk.server.model.User;
-import com.vynqtalk.server.model.UserSettings;
+import com.vynqtalk.server.model.users.User;
+import com.vynqtalk.server.model.users.UserSettings;
 import com.vynqtalk.server.service.UserService;
 import com.vynqtalk.server.service.UserSettingsService;
 import jakarta.validation.Valid;

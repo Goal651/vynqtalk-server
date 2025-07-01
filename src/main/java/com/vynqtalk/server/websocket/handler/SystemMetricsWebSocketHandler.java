@@ -6,7 +6,6 @@ import com.vynqtalk.server.service.SystemMetricsService;
 
 import org.springframework.lang.NonNull;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.TextMessage;

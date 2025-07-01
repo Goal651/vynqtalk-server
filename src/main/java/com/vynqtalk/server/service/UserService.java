@@ -6,9 +6,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.vynqtalk.server.dto.request.LoginRequest;
 import com.vynqtalk.server.dto.user.UserDTO;
-import com.vynqtalk.server.model.User;
 import com.vynqtalk.server.repository.UserRepository;
 import com.vynqtalk.server.mapper.UserMapper;
+import com.vynqtalk.server.model.users.User;
 import com.vynqtalk.server.error.UserNotFoundException;
 
 import java.time.Instant;

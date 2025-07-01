@@ -1,8 +1,9 @@
-package com.vynqtalk.server.model;
+package com.vynqtalk.server.model.system;
 
 import java.time.Instant;
 
 import com.vynqtalk.server.model.enums.NotificationType;
+import com.vynqtalk.server.model.users.User;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

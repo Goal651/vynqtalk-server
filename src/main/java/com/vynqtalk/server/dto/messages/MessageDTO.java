@@ -4,8 +4,8 @@ import java.time.Instant;
 import java.util.List;
 
 import com.vynqtalk.server.dto.user.UserDTO;
-import com.vynqtalk.server.model.Reaction;
 import com.vynqtalk.server.model.enums.MessageType;
+import com.vynqtalk.server.model.messages.Reaction;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;

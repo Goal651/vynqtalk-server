@@ -2,8 +2,8 @@ package com.vynqtalk.server.dto.notifications;
 
 import java.time.Instant;
 
-import com.vynqtalk.server.model.User;
 import com.vynqtalk.server.model.enums.NotificationType;
+import com.vynqtalk.server.model.users.User;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;

@@ -1,9 +1,14 @@
-package com.vynqtalk.server.model;
+package com.vynqtalk.server.model.messages;
 
 import java.time.Instant;
 import java.util.List;
 
+import org.hibernate.annotations.Type;
+
+import com.vladmihalcea.hibernate.type.json.JsonType;
 import com.vynqtalk.server.model.enums.MessageType;
+import com.vynqtalk.server.model.groups.Group;
+import com.vynqtalk.server.model.users.User;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -19,15 +24,13 @@ import jakarta.persistence.Table;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.CascadeType;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "messages")
-public class Message {
+@Table(name = "group_messages")
+public class GroupMessage {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -36,9 +39,6 @@ public class Message {
     @Column(nullable = false, columnDefinition = "TEXT")
     private String content;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private MessageType type;
 
     @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @JoinColumn(nullable = false, name = "sender_id")
@@ -46,19 +46,24 @@ public class Message {
 
     @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @JoinColumn(nullable = false, name = "receiver_id")
-    private User receiver;
+    private Group group;
 
     @Column(nullable = false)
     private Instant timestamp;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable=false)
+    private MessageType type;
+
     @Column(nullable = false)
     private boolean isEdited;
 
-    @OneToMany(mappedBy = "message", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Type(JsonType.class)
+    @Column(columnDefinition = "json")
     private List<Reaction> reactions;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "reply_to_id")
-    private Message replyTo;
+    private GroupMessage replyTo;
 
 }

@@ -1,6 +1,6 @@
 package com.vynqtalk.server.service;
 
-import com.vynqtalk.server.model.SystemStatus;
+import com.vynqtalk.server.model.system.SystemStatus;
 import com.vynqtalk.server.repository.SystemStatusRepository;
 import org.springframework.stereotype.Service;
 

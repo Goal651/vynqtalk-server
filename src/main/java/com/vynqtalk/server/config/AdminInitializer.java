@@ -1,7 +1,7 @@
 package com.vynqtalk.server.config;
 
-import com.vynqtalk.server.model.User;
 import com.vynqtalk.server.model.enums.UserRole;
+import com.vynqtalk.server.model.users.User;
 import com.vynqtalk.server.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;

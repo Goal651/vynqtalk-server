@@ -1,4 +1,4 @@
-package com.vynqtalk.server.model;
+package com.vynqtalk.server.model.users;
 
 import com.vynqtalk.server.model.enums.Theme;
 

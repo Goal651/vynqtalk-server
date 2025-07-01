@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.vynqtalk.server.dto.response.ApiResponse;
-import com.vynqtalk.server.model.SystemStatus;
+import com.vynqtalk.server.model.system.SystemStatus;
 import com.vynqtalk.server.service.SystemStatusService;
 
 @RestController

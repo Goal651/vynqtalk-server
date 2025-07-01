@@ -1,6 +1,6 @@
 package com.vynqtalk.server.service;
 
-import com.vynqtalk.server.model.Alert;
+import com.vynqtalk.server.model.system.Alert;
 import com.vynqtalk.server.repository.AlertRepository;
 import org.springframework.stereotype.Service;
 

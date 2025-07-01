@@ -9,10 +9,11 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.vynqtalk.server.dto.response.ApiResponse;
-import com.vynqtalk.server.model.User;
 import com.vynqtalk.server.service.ImageUploadService;
 import com.vynqtalk.server.service.UserService;
 import com.vynqtalk.server.error.UserNotFoundException;
+import com.vynqtalk.server.model.users.User;
+
 import jakarta.servlet.http.HttpServletRequest;
 
 @RestController

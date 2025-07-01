@@ -1,7 +1,9 @@
 package com.vynqtalk.server.repository;
 
-import com.vynqtalk.server.model.Alert;
 import org.springframework.data.jpa.repository.JpaRepository;
+
+import com.vynqtalk.server.model.system.Alert;
+
 import org.springframework.data.domain.Pageable;
 import java.util.List;
 

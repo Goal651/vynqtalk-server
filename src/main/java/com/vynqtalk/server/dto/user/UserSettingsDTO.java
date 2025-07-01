@@ -3,8 +3,8 @@ package com.vynqtalk.server.dto.user;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import com.vynqtalk.server.model.User;
 import com.vynqtalk.server.model.enums.Theme;
+import com.vynqtalk.server.model.users.User;
 
 import lombok.AllArgsConstructor;
 

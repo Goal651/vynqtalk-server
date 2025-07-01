@@ -1,4 +1,4 @@
-package com.vynqtalk.server.model;
+package com.vynqtalk.server.model.system;
 
 import java.time.Instant;
 

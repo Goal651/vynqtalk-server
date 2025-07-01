@@ -1,7 +1,7 @@
 package com.vynqtalk.server.mapper;
 
 import com.vynqtalk.server.dto.messages.MessageDTO;
-import com.vynqtalk.server.model.Message;
+import com.vynqtalk.server.model.messages.Message;
 
 import org.mapstruct.Mapper;
 import java.util.List;

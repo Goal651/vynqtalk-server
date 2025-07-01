@@ -4,11 +4,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.vynqtalk.server.model.Notification;
 import com.vynqtalk.server.repository.NotificationRepository;
 import java.util.List;
 import java.util.Optional;
 import com.vynqtalk.server.error.NotificationNotFoundException;
+import com.vynqtalk.server.model.system.Notification;
 
 @Service
 public class NotificationService {

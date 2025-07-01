@@ -2,7 +2,8 @@ package com.vynqtalk.server.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import com.vynqtalk.server.model.Group;
+import com.vynqtalk.server.model.groups.Group;
+
 import java.time.Instant;
 
 public interface GroupRepository extends JpaRepository<Group, Long> {
