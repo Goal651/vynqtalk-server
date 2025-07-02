@@ -52,7 +52,7 @@ public class GroupService {
      */
     @Transactional
     public void delete(Long id) {
-        Group group = findById(id);
+        findById(id);
         // Create notification for group deletion if needed
         groupRepository.deleteById(id);
     }

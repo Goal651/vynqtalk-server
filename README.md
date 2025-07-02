@@ -19,20 +19,21 @@ This is the back-end for VynqTalk, a chat application built with Spring Boot and
 - Git
 
 ## Setup Instructions
-1. Clone the repository:
+
+### 1. Clone the repository
 
 ```bash
-git clone https://github.com/goal651/vynqtalk-server.git
+git clone https://github.com/goal651/ vynqtalk-server.git
 cd vynqtalk-server
 ```
 
-2. Set up PostgreSQL database:
+### 2. Set up PostgreSQL database
 
 ```sql
 CREATE DATABASE vynqtalk;
 ```
 
-3. Create a `.env` file with the following content      :
+### 3. Create a `.env` file with the following content
 
 ```properties
 PORT=8080
@@ -41,7 +42,7 @@ DATABASE_USERNAME=your_username
 DATABASE_PASSWORD=your_password
 ```
 
-4. Build and run the project:
+### 4. Build and run the project
 
 ```bash
 # Build the project
@@ -51,17 +52,20 @@ DATABASE_PASSWORD=your_password
 ./mvnw spring-boot:run
 ```
 
-The server will start at http://localhost:8080.
+The server will start at  <http://localhost:8080>.
 
 ## API Documentation
 
-The API documentation is available at:
-- Swagger UI: http://localhost:8080/swagger-ui.html
-- Actuator endpoints: http://localhost:8080/actuator
+### The API documentation is available at
+
+#### - Swagger UI: <http://localhost:8080/swagger-ui.html>
+
+#### - Actuator endpoints: <http://localhost:8080/actuator>
 
 ## Security
 
-The application uses Spring Security for:
+### The application uses Spring Security for
+
 - JWT-based authentication
 - Role-based access control
 - CSRF protection
@@ -75,7 +79,9 @@ The application uses Spring Security for:
 - Check Java and Maven versions with `java -version` and `mvn -version`
 
 ## Contributing
+
 Contributions are welcome! Fork the repo, submit pull requests, or report issues.
 
 ## Support
-If you like this project, please give it a ⭐ on GitHub!
+
+### ``If you like this project, please give it a ⭐ on GitHub!``

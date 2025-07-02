@@ -12,7 +12,7 @@ import com.vynqtalk.server.model.system.SystemStatus;
 import com.vynqtalk.server.service.SystemStatusService;
 
 @RestController
-@RequestMapping("/api/v1/system")
+@RequestMapping("/system")
 public class SystemController {
 
     private final SystemStatusService systemStatusService;

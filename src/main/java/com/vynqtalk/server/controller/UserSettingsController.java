@@ -16,7 +16,7 @@ import com.vynqtalk.server.error.UserNotFoundException;
 import com.vynqtalk.server.error.UserSettingsNotFoundException;
 
 @RestController
-@RequestMapping("/api/v1/user_settings")
+@RequestMapping("/user_settings")
 public class UserSettingsController {
 
     private final UserSettingsService userSettingsService;

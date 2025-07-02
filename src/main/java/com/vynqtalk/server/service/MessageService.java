@@ -48,7 +48,7 @@ public class MessageService {
      */
     
     public void deleteMessage(Long messageId) {
-        Message message = messageRepository.findById(messageId)
+         messageRepository.findById(messageId)
             .orElseThrow(() -> new MessageNotFoundException("Message not found with ID: " + messageId));
         // createMessageDeletedNotification(message);
         messageRepository.deleteById(messageId);

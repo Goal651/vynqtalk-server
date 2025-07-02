@@ -28,20 +28,21 @@ public class AuthChannelInterceptor implements HandshakeInterceptor {
     }
 
     @Override
-    public boolean beforeHandshake(@NonNull ServerHttpRequest request,@NonNull ServerHttpResponse response,
-           @NonNull WebSocketHandler wsHandler,@NonNull Map<String, Object> attributes) throws Exception {
+    public boolean beforeHandshake(@NonNull ServerHttpRequest request, @NonNull ServerHttpResponse response,
+            @NonNull WebSocketHandler wsHandler, @NonNull Map<String, Object> attributes) throws Exception {
         if (!(request instanceof ServletServerHttpRequest servletRequest)) {
             logger.warn("Rejected non-servlet request for WebSocket handshake");
             return false; // Reject non-servlet requests
         }
 
         HttpServletRequest httpServletRequest = servletRequest.getServletRequest();
-        if (!request.getURI().getPath().startsWith("/ws")) {
-            return true; // Allow non-websocket requests
+        String path = request.getURI().getPath();
+        if (!path.contains("/ws")) {
+            return true;
         }
 
         String token = httpServletRequest.getParameter("token");
-
+        System.out.println("This token to be checked ......................" + token);
         if (token == null || token.isEmpty()) {
             logger.warn("Token is missing or empty");
             response.setStatusCode(org.springframework.http.HttpStatus.UNAUTHORIZED);

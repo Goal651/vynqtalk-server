@@ -25,7 +25,7 @@ import jakarta.validation.Valid;
  * Controller for admin-related endpoints, including user, group, alert, and system status management.
  */
 @RestController
-@RequestMapping("/api/v1/admin")
+@RequestMapping("/admin")
 public class AdminController {
     private final UserService userService;
     private final UserMapper userMapper;

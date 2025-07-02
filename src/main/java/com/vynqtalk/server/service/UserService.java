@@ -7,7 +7,6 @@ import org.springframework.transaction.annotation.Transactional;
 import com.vynqtalk.server.dto.request.LoginRequest;
 import com.vynqtalk.server.dto.user.UserDTO;
 import com.vynqtalk.server.repository.UserRepository;
-import com.vynqtalk.server.mapper.UserMapper;
 import com.vynqtalk.server.model.users.User;
 import com.vynqtalk.server.error.UserNotFoundException;
 
@@ -25,13 +24,11 @@ import java.util.concurrent.ConcurrentHashMap;
 public class UserService {
     private final UserRepository userRepository;
     private final AlertService alertService;
-    private final UserMapper userMapper;
     private final Map<String, Integer> failedLoginAttempts = new ConcurrentHashMap<>();
 
-    public UserService(UserRepository userRepository, AlertService alertService, UserMapper userMapper) {
+    public UserService(UserRepository userRepository, AlertService alertService) {
         this.userRepository = userRepository;
         this.alertService = alertService;
-        this.userMapper = userMapper;
     }
 
     /**

@@ -32,7 +32,7 @@ import com.vynqtalk.server.error.UserNotFoundException;
  * Controller for authentication-related endpoints, including login, signup, token check, and password management.
  */
 @RestController
-@RequestMapping("/api/v1/auth")
+@RequestMapping("/auth")
 public class AuthController {
     private final UserService userService;
     private final JwtService jwtService;

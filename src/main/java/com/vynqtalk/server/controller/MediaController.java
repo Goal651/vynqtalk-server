@@ -12,7 +12,7 @@ import com.vynqtalk.server.service.ImageService;
 import java.io.IOException;
 
 @RestController
-@RequestMapping("/api/v1/public")
+@RequestMapping("/public")
 public class MediaController {
 
     private final ImageService imageService;

@@ -14,7 +14,7 @@ import com.vynqtalk.server.error.NotificationNotFoundException;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/v1/notifications")
+@RequestMapping("/notifications")
 public class NotificationController {
 
     private final NotificationService notificationService;

@@ -28,7 +28,7 @@ import com.vynqtalk.server.dto.group.GroupUpdateRequest;
 import com.vynqtalk.server.error.UserNotFoundException;
 
 @RestController
-@RequestMapping("/api/v1/group")
+@RequestMapping("/group")
 public class GroupController {
 
     private final GroupService groupService;

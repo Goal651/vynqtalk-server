@@ -15,7 +15,7 @@ import java.util.List;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-@RequestMapping("/api/v1/group_messages")
+@RequestMapping("/group_messages")
 @RestController
 public class GroupMessageController {
 

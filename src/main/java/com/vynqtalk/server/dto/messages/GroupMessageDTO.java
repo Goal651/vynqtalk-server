@@ -23,6 +23,7 @@ public class GroupMessageDTO {
     private GroupDTO group;
     private Instant timestamp;
     private List<Reaction> reactions;
+    private GroupMessageDTO replyTo;
 }
 
 // Note: Use this DTO for group message responses only (never for requests).

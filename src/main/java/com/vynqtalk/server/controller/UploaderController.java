@@ -17,7 +17,7 @@ import com.vynqtalk.server.model.users.User;
 import jakarta.servlet.http.HttpServletRequest;
 
 @RestController
-@RequestMapping("/api/v1/upload")
+@RequestMapping("/upload")
 public class UploaderController {
 
     private final ImageUploadService imageUploadService;

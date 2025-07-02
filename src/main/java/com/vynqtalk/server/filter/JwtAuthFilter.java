@@ -45,9 +45,17 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
         String authHeader = request.getHeader("Authorization");
 
-        String requestURI = request.getRequestURI();
+        String contextPath = request.getContextPath(); // "/api/v1"
+        String requestURI = request.getRequestURI();   // "/api/v1/auth/login"
+        String path = requestURI.substring(contextPath.length()); // "/auth/login"
+
+        System.out.println("This endpoint to be checked ......................"+path);
         // Skip JWT processing for the auth route
-        if (requestURI.startsWith("/api/v1/auth/") || requestURI.startsWith("/api/v1/public/")||requestURI.startsWith("/ws/") || requestURI.startsWith("/actuator/")||requestURI.startsWith("/api/v1/system/")) {
+        if (path.startsWith("/auth/") || path.startsWith("/public/") ||
+                path.startsWith("/ws") || path.startsWith("/actuator/") ||
+                path.startsWith("/system/") || path.startsWith("/swagger-ui.html") ||
+                path.startsWith("/swagger-ui/") || path.startsWith("/v3/api-docs/") ||
+                path.startsWith("/v3/api-docs") ) {
             filterChain.doFilter(request, response);
             return;
         }

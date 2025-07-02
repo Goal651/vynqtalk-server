@@ -1,9 +1,7 @@
 package com.vynqtalk.server.service;
 
 import java.util.List;
-import java.util.Optional;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,11 +29,12 @@ public class GroupMessageService {
 
     /**
      * Gets a group message by ID.
+     * 
      * @throws GroupMessageNotFoundException if not found
      */
     public GroupMessage getGroupMessageById(Long id) {
         return groupMessageRepository.findById(id)
-            .orElseThrow(() -> new GroupMessageNotFoundException("Group message not found with id: " + id));
+                .orElseThrow(() -> new GroupMessageNotFoundException("Group message not found with id: " + id));
     }
 
     /**
@@ -47,23 +46,25 @@ public class GroupMessageService {
 
     /**
      * Deletes a group message by ID.
+     * 
      * @throws GroupMessageNotFoundException if not found
      */
     @Transactional
     public void deleteGroupMessage(Long id) {
-        GroupMessage message = groupMessageRepository.findById(id)
-            .orElseThrow(() -> new GroupMessageNotFoundException("Group message not found with id: " + id));
+        groupMessageRepository.findById(id)
+                .orElseThrow(() -> new GroupMessageNotFoundException("Group message not found with id: " + id));
         groupMessageRepository.deleteById(id);
     }
 
     /**
      * Updates a group message by ID.
+     * 
      * @throws GroupMessageNotFoundException if not found
      */
     @Transactional
     public GroupMessage updateGroupMessage(Long id, GroupMessage updatedGroupMessage) {
         GroupMessage groupMessage = groupMessageRepository.findById(id)
-            .orElseThrow(() -> new GroupMessageNotFoundException("Group message not found with id: " + id));
+                .orElseThrow(() -> new GroupMessageNotFoundException("Group message not found with id: " + id));
         groupMessage.setContent(updatedGroupMessage.getContent());
         groupMessage.setSender(updatedGroupMessage.getSender());
         groupMessage.setTimestamp(updatedGroupMessage.getTimestamp());
@@ -72,12 +73,13 @@ public class GroupMessageService {
 
     /**
      * Reacts to a group message by ID.
+     * 
      * @throws GroupMessageNotFoundException if not found
      */
     @Transactional
     public GroupMessage reactToMessage(Long messageId, List<Reaction> reactions) {
         GroupMessage message = groupMessageRepository.findById(messageId)
-            .orElseThrow(() -> new GroupMessageNotFoundException("Group message not found with id: " + messageId));
+                .orElseThrow(() -> new GroupMessageNotFoundException("Group message not found with id: " + messageId));
         message.setReactions(reactions);
         return groupMessageRepository.save(message);
     }
