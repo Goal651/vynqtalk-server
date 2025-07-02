@@ -4,7 +4,7 @@ dockerfilePath = "Dockerfile"
 buildTimeout = 1800  # 30 minutes build timeout
 
 [deploy]
-healthcheckPath = "/actuator/health"
+healthcheckPath = "/api/v1/actuator/health"
 healthcheckTimeout = 300
 healthcheckInterval = 30
 restartPolicyType = "ON_FAILURE"
