@@ -10,7 +10,6 @@ import com.vynqtalk.server.dto.websocket.ReactMessage;
 import com.vynqtalk.server.mapper.GroupMessageMapper;
 import com.vynqtalk.server.mapper.MessageMapper;
 import com.vynqtalk.server.model.messages.Message;
-import com.vynqtalk.server.model.enums.MessageType;
 import com.vynqtalk.server.model.messages.GroupMessage;
 import com.vynqtalk.server.service.GroupMessageService;
 import com.vynqtalk.server.service.MessageService;

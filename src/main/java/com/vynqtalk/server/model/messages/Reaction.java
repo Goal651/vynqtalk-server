@@ -7,7 +7,6 @@ import lombok.AllArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-
 public class Reaction {
     private String emoji;
     private Long userId;
