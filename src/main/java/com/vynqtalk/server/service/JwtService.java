@@ -1,6 +1,6 @@
 package com.vynqtalk.server.service;
 
-import com.vynqtalk.server.dto.response.JwtValidationResult;
+import com.vynqtalk.server.dto.response.JwtValidation;
 import com.vynqtalk.server.interfaces.IJwtService;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.Claims;
@@ -29,7 +29,7 @@ public class JwtService implements IJwtService {
 
     @Override
     public String getUsernameFromToken(String token) {
-        JwtValidationResult result = validateToken(token);
+        JwtValidation result = validateToken(token);
         return result.isValid() ? result.getUsername() : null;
     }
 
@@ -40,7 +40,7 @@ public class JwtService implements IJwtService {
     }
 
     @Override
-    public JwtValidationResult validateToken(String token) {
+    public JwtValidation validateToken(String token) {
         try {
             Claims claims = Jwts.parser()
                     .verifyWith(SECRET_KEY)
@@ -48,21 +48,21 @@ public class JwtService implements IJwtService {
                     .parseSignedClaims(token)
                     .getPayload();
             String username = claims.get("sub", String.class);
-            return new JwtValidationResult(true, username, null);
+            return new JwtValidation(true, username, null);
         } catch (io.jsonwebtoken.security.SignatureException e) {
-            return new JwtValidationResult(false, null,
+            return new JwtValidation(false, null,
                     "JWT signature does not match locally computed signature. " + e.getMessage());
         } catch (io.jsonwebtoken.ExpiredJwtException e) {
-            return new JwtValidationResult(false, null, "Token expired");
+            return new JwtValidation(false, null, "Token expired");
         } catch (io.jsonwebtoken.MalformedJwtException e) {
-            return new JwtValidationResult(false, null, "Malformed token: " + e.getMessage());
+            return new JwtValidation(false, null, "Malformed token: " + e.getMessage());
         } catch (io.jsonwebtoken.UnsupportedJwtException e) {
-            return new JwtValidationResult(false, null, "Unsupported token: " + e.getMessage());
+            return new JwtValidation(false, null, "Unsupported token: " + e.getMessage());
         } catch (io.jsonwebtoken.JwtException e) {
-            return new JwtValidationResult(false, null, "JWT error: " + e.getMessage());
+            return new JwtValidation(false, null, "JWT error: " + e.getMessage());
         }
         catch (Exception e) {
-            return new JwtValidationResult(false, null, "Unexpected error: " + e.getMessage());
+            return new JwtValidation(false, null, "Unexpected error: " + e.getMessage());
         }
     }
 }

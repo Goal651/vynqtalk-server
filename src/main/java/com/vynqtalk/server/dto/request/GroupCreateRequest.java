@@ -1,4 +1,4 @@
-package com.vynqtalk.server.dto.group;
+package com.vynqtalk.server.dto.request;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;

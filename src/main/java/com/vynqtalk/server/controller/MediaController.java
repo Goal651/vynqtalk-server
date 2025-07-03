@@ -32,4 +32,16 @@ public class MediaController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         }
     }
+
+    @GetMapping("/message/{fileName}")
+    public ResponseEntity<byte[]> getMessageFile(@PathVariable String fileName) {
+        try {
+            var fileWithType = imageService.getFileWithType(fileName);
+            return ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType(fileWithType.getContentType()))
+                .body(fileWithType.getBytes());
+        } catch (IOException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
+    }
 }

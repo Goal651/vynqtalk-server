@@ -29,25 +29,11 @@ public class UserSettings {
     @Column(name = "notification_enabled", nullable = false)
     private Boolean notificationEnabled = true;
 
-    @Column(name = "email_notifications", nullable = false)
-    private Boolean emailNotifications = true;
-
-    @Column(name = "push_notifications", nullable = false)
-    private Boolean pushNotifications = true;
-
     @Enumerated(EnumType.STRING)
     @Column(name = "theme", nullable = false)
     private Theme theme = Theme.BLUE;
 
-    @Column(name = "language", nullable = false)
-    private String language = "en";
-
-    @Column(name = "timezone", nullable = false)
-    private String timezone = "UTC";
-
     @Column(nullable = false)
     private Boolean showOnlineStatus = true;
 
-    @Column(nullable = false)
-    private Boolean readReceipts = true;
 }

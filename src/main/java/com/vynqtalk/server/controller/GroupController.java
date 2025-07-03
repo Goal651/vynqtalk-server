@@ -23,8 +23,9 @@ import com.vynqtalk.server.model.users.User;
 import com.vynqtalk.server.service.GroupService;
 import com.vynqtalk.server.service.UserService;
 import jakarta.validation.Valid;
-import com.vynqtalk.server.dto.group.GroupCreateRequest;
-import com.vynqtalk.server.dto.group.GroupUpdateRequest;
+
+import com.vynqtalk.server.dto.request.GroupCreateRequest;
+import com.vynqtalk.server.dto.request.GroupUpdateRequest;
 import com.vynqtalk.server.error.UserNotFoundException;
 
 @RestController

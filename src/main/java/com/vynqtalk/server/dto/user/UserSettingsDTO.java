@@ -15,12 +15,7 @@ public class UserSettingsDTO {
     private Long id;
     private User user;
     private Boolean notificationEnabled;
-    private Boolean emailNotifications;
-    private Boolean pushNotifications;
     private Theme theme;
-    private String language;
-    private String timezone;
     private Boolean showOnlineStatus;
-    private Boolean readReceipts;
 }
 // Note: Use this DTO for user settings responses only. 

@@ -38,6 +38,8 @@ public class Message {
     @Column(nullable = false, columnDefinition = "TEXT")
     private String content;
 
+    private String fileName;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private MessageType type;
@@ -49,7 +51,7 @@ public class Message {
     @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @JoinColumn(nullable = false, name = "receiver_id")
     private User receiver;
-
+ 
     @Column(nullable = false)
     private Instant timestamp;
 

@@ -1,4 +1,4 @@
-package com.vynqtalk.server.dto.user;
+package com.vynqtalk.server.dto.request;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;

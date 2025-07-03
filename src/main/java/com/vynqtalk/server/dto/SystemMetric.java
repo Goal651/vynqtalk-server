@@ -9,7 +9,7 @@ public class SystemMetric {
     private String metric;
 
     @NonNull
-    private String value;
+    private Double value;
     
     @NonNull
     private String status;

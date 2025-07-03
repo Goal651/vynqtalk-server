@@ -9,7 +9,7 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import com.vynqtalk.server.dto.response.JwtValidationResult;
+import com.vynqtalk.server.dto.response.JwtValidation;
 import com.vynqtalk.server.model.users.User;
 import com.vynqtalk.server.service.JwtService;
 import com.vynqtalk.server.service.UserService;
@@ -68,7 +68,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         }
 
         String token = authHeader.substring(7);
-        JwtValidationResult result = jwtService.validateToken(token);
+        JwtValidation result = jwtService.validateToken(token);
 
         if (!result.isValid()) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);

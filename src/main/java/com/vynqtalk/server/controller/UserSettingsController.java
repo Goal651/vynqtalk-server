@@ -3,13 +3,14 @@ package com.vynqtalk.server.controller;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import com.vynqtalk.server.dto.request.UserSettingsUpdateRequest;
 import com.vynqtalk.server.dto.response.ApiResponse;
 import com.vynqtalk.server.model.users.User;
 import com.vynqtalk.server.model.users.UserSettings;
 import com.vynqtalk.server.service.UserService;
 import com.vynqtalk.server.service.UserSettingsService;
 import jakarta.validation.Valid;
-import com.vynqtalk.server.dto.user.UserSettingsUpdateRequest;
+
 import com.vynqtalk.server.dto.user.UserSettingsDTO;
 import com.vynqtalk.server.mapper.UserSettingsMapper;
 import com.vynqtalk.server.error.UserNotFoundException;

@@ -1,5 +1,7 @@
 package com.vynqtalk.server.controller;
 
+import com.vynqtalk.server.dto.request.UserCreateRequest;
+import com.vynqtalk.server.dto.request.UserUpdateRequest;
 import com.vynqtalk.server.dto.response.ApiResponse;
 import com.vynqtalk.server.dto.user.UserDTO;
 import com.vynqtalk.server.mapper.UserMapper;
@@ -7,9 +9,8 @@ import com.vynqtalk.server.model.enums.UserRole;
 import com.vynqtalk.server.model.users.User;
 import com.vynqtalk.server.service.UserService;
 import jakarta.validation.Valid;
-import com.vynqtalk.server.dto.user.UserCreateRequest;
+
 import com.vynqtalk.server.error.UserNotFoundException;
-import com.vynqtalk.server.dto.user.UserUpdateRequest;
 
 import java.util.List;
 

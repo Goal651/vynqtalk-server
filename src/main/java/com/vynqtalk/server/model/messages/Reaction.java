@@ -10,5 +10,5 @@ import lombok.AllArgsConstructor;
 
 public class Reaction {
     private String emoji;
-    private String userId;
+    private Long userId;
 }

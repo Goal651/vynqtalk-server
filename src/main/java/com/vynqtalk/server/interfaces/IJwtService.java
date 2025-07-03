@@ -1,6 +1,6 @@
 package com.vynqtalk.server.interfaces;
 
-import com.vynqtalk.server.dto.response.JwtValidationResult;
+import com.vynqtalk.server.dto.response.JwtValidation;
 
 public interface IJwtService {
     String generateToken(String email);
@@ -9,5 +9,5 @@ public interface IJwtService {
     boolean isTokenValid(String token, String username);
     
     // New method that returns detailed validation result
-    JwtValidationResult validateToken(String token);
+    JwtValidation validateToken(String token);
 }

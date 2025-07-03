@@ -6,8 +6,8 @@ import org.springframework.transaction.annotation.Transactional;
 import com.vynqtalk.server.model.users.User;
 import com.vynqtalk.server.model.users.UserSettings;
 import com.vynqtalk.server.repository.UserSettingsRepository;
+import com.vynqtalk.server.dto.request.UserSettingsUpdateRequest;
 import com.vynqtalk.server.error.UserSettingsNotFoundException;
-import com.vynqtalk.server.dto.user.UserSettingsUpdateRequest;
 
 @Service
 public class UserSettingsService {
@@ -45,26 +45,13 @@ public class UserSettingsService {
         if (updatedSettings.getNotificationEnabled() != null) {
             existingSettings.setNotificationEnabled(updatedSettings.getNotificationEnabled());
         }
-        if (updatedSettings.getEmailNotifications() != null) {
-            existingSettings.setEmailNotifications(updatedSettings.getEmailNotifications());
-        }
-        if (updatedSettings.getPushNotifications() != null) {
-            existingSettings.setPushNotifications(updatedSettings.getPushNotifications());
-        }
+
         if (updatedSettings.getTheme() != null) {
             existingSettings.setTheme(updatedSettings.getTheme());
         }
-        if (updatedSettings.getLanguage() != null) {
-            existingSettings.setLanguage(updatedSettings.getLanguage());
-        }
-        if (updatedSettings.getTimezone() != null) {
-            existingSettings.setTimezone(updatedSettings.getTimezone());
-        }
+
         if (updatedSettings.getShowOnlineStatus() != null) {
             existingSettings.setShowOnlineStatus(updatedSettings.getShowOnlineStatus());
-        }
-        if (updatedSettings.getReadReceipts() != null) {
-            existingSettings.setReadReceipts(updatedSettings.getReadReceipts());
         }
 
         return userSettingsRepository.save(existingSettings);

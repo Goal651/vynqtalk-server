@@ -53,7 +53,7 @@ public class ChatController {
         savedMessage.setReceiver(message.getReceiver());
         savedMessage.setContent(message.getContent());
         savedMessage.setEdited(false);
-        savedMessage.setType(MessageType.TEXT);
+        savedMessage.setType(message.getType());
         savedMessage.setTimestamp(Instant.now());
         savedMessage.setReactions(List.of());
 
@@ -72,7 +72,7 @@ public class ChatController {
         savedMessage.setContent(message.getContent());
         savedMessage.setReplyTo(message.getReplyTo());
         savedMessage.setEdited(false);
-        savedMessage.setType(MessageType.TEXT);
+        savedMessage.setType(message.getType());
         savedMessage.setTimestamp(Instant.now());
         savedMessage.setReactions(List.of());
         savedMessage = messageService.saveMessage(savedMessage);
@@ -101,7 +101,7 @@ public class ChatController {
         savedMessage.setGroup(message.getGroup());
         savedMessage.setContent(message.getContent());
         savedMessage.setEdited(false);
-        savedMessage.setType(MessageType.TEXT);
+        savedMessage.setType(message.getType());
         savedMessage.setTimestamp(Instant.now());
         savedMessage.setReactions(List.of());
         GroupMessage saved = groupMessageService.saveGroupMessage(savedMessage);
@@ -117,7 +117,7 @@ public class ChatController {
         savedMessage.setContent(message.getContent());
         savedMessage.setReplyTo(message.getReplyTo());
         savedMessage.setEdited(false);
-        savedMessage.setType(MessageType.TEXT);
+        savedMessage.setType(message.getType());
         savedMessage.setTimestamp(Instant.now());
         savedMessage.setReactions(List.of());
         savedMessage = groupMessageService.saveGroupMessage(savedMessage);

@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.vynqtalk.server.dto.group.GroupDTO;
+import com.vynqtalk.server.dto.request.MemberRequest;
 import com.vynqtalk.server.dto.response.ApiResponse;
 import com.vynqtalk.server.dto.user.UserDTO;
 import com.vynqtalk.server.mapper.GroupMapper;
@@ -22,7 +23,7 @@ import com.vynqtalk.server.model.users.User;
 import com.vynqtalk.server.service.GroupService;
 import com.vynqtalk.server.service.UserService;
 import jakarta.validation.Valid;
-import com.vynqtalk.server.dto.group.GroupMemberRequest;
+
 import com.vynqtalk.server.error.UserNotFoundException;
 
 @RestController
@@ -54,7 +55,7 @@ public class GroupMemberController {
 
     // Add member
     @PostMapping
-    public ResponseEntity<ApiResponse<GroupDTO>> addMember(@PathVariable Long groupId, @Valid @RequestBody GroupMemberRequest request) {
+    public ResponseEntity<ApiResponse<GroupDTO>> addMember(@PathVariable Long groupId, @Valid @RequestBody MemberRequest request) {
         User existingUser = userService.getUserById(request.getUserId())
             .orElseThrow(() -> new UserNotFoundException("User not found with id: " + request.getUserId()));
         Group group = groupService.findById(groupId);
@@ -64,7 +65,7 @@ public class GroupMemberController {
 
     // Change user role
     @PutMapping
-    public ResponseEntity<ApiResponse<GroupDTO>> updateMember(@PathVariable Long groupId, @Valid @RequestBody GroupMemberRequest request) {
+    public ResponseEntity<ApiResponse<GroupDTO>> updateMember(@PathVariable Long groupId, @Valid @RequestBody MemberRequest request) {
         User existingUser = userService.getUserById(request.getUserId())
             .orElseThrow(() -> new UserNotFoundException("User not found with id: " + request.getUserId()));
         Group group = groupService.findById(groupId);

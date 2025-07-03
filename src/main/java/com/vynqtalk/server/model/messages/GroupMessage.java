@@ -39,6 +39,7 @@ public class GroupMessage {
     @Column(nullable = false, columnDefinition = "TEXT")
     private String content;
 
+    private String fileName;
 
     @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @JoinColumn(nullable = false, name = "sender_id")
