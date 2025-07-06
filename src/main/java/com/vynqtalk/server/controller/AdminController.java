@@ -22,7 +22,8 @@ import org.springframework.web.bind.annotation.*;
 import jakarta.validation.Valid;
 
 /**
- * Controller for admin-related endpoints, including user, group, alert, and system status management.
+ * Controller for admin-related endpoints, including user, group, alert, and
+ * system status management.
  */
 @RestController
 @RequestMapping("/admin")
@@ -33,12 +34,12 @@ public class AdminController {
     private final SystemMetricsService systemMetricsService;
 
     public AdminController(UserService userService, UserMapper userMapper, AdminService adminService,
-                          SystemMetricsService systemMetricsService, SystemStatusService systemStatusService) {
+            SystemMetricsService systemMetricsService, SystemStatusService systemStatusService) {
         this.userService = userService;
         this.userMapper = userMapper;
         this.adminService = adminService;
         this.systemMetricsService = systemMetricsService;
-        
+
     }
 
     /**
@@ -88,25 +89,14 @@ public class AdminController {
      * Updates a user by ID using a UserUpdateRequest DTO.
      */
     @PutMapping("/users/{id}")
-    public ResponseEntity<ApiResponse<UserDTO>> updateUser(@PathVariable Long id, @Valid @RequestBody UserUpdateRequest userUpdateRequest) {
+    public ResponseEntity<ApiResponse<Void>> updateUser(@PathVariable Long id,
+            @Valid @RequestBody UserUpdateRequest userUpdateRequest) {
         User user = userService.getUserById(id)
-            .orElseThrow(() -> new com.vynqtalk.server.error.UserNotFoundException("User not found with id: " + id));
-        user.setEmail(userUpdateRequest.getEmail());
-        user.setUserRole(userUpdateRequest.getUserRole());
-        user.setName(userUpdateRequest.getName());
+                .orElseThrow(
+                        () -> new com.vynqtalk.server.error.UserNotFoundException("User not found with id: " + id));
         user.setStatus(userUpdateRequest.getStatus());
-        user.setLastActive(userUpdateRequest.getLastActive());
-        User updatedUser = userService.updateUser(id, user);
-        return ResponseEntity.ok(new ApiResponse<>(userMapper.toDTO(updatedUser), "User updated successfully", 200));
-    }
-
-    /**
-     * Deletes a user by ID.
-     */
-    @DeleteMapping("/users/{id}")
-    public ResponseEntity<ApiResponse<Void>> deleteUser(@PathVariable Long id) {
-        userService.deleteUser(id);
-        return ResponseEntity.ok(new ApiResponse<>(null, "User deleted successfully", 200));
+        userService.updateUser(user);
+        return ResponseEntity.ok(new ApiResponse<>(null, "User updated successfully", 200));
     }
 
     /**
@@ -121,7 +111,8 @@ public class AdminController {
         long newGroupsThisWeek = adminService.getNewGroupsThisWeek();
         long messagesToday = adminService.getMessagesToday();
         long messagesYesterday = adminService.getMessagesYesterday();
-        double percentChange = messagesYesterday == 0 ? 100.0 : ((double)(messagesToday - messagesYesterday) / messagesYesterday) * 100.0;
+        double percentChange = messagesYesterday == 0 ? 100.0
+                : ((double) (messagesToday - messagesYesterday) / messagesYesterday) * 100.0;
         stats.put("totalUsers", totalUsers);
         stats.put("newUsersThisMonth", newUsersThisMonth);
         stats.put("totalGroups", totalGroups);
@@ -132,5 +123,4 @@ public class AdminController {
         return ResponseEntity.ok(new ApiResponse<>(stats, "Dashboard stats loaded", 200));
     }
 
-   
 }

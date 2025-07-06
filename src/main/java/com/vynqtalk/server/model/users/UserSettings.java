@@ -31,7 +31,7 @@ public class UserSettings {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "theme", nullable = false)
-    private Theme theme = Theme.BLUE;
+    private Theme theme = Theme.DARK;
 
     @Column(nullable = false)
     private Boolean showOnlineStatus = true;

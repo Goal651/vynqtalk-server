@@ -91,7 +91,7 @@ public class AdminService {
         User user = userService.getUserById(id)
                 .orElseThrow(() -> new UserNotFoundException("User not found with id: " + id));
         user.setId(id);
-        userService.updateUser(id, user);
+        userService.updateUser(user);
         return userMapper.toDTO(user);
     }
 

@@ -26,5 +26,7 @@ public class ChatMessage  {
     private String content;
     @NotBlank
     private MessageType type;
+
+    private String fileName;
 }
 

@@ -25,7 +25,7 @@ public class MessageController {
     }
 
     // Get all messages in a conversation or group
-    @GetMapping("/conv/{senderId}/{receiverId}")
+    @GetMapping("/all/{senderId}/{receiverId}")
     public ResponseEntity<ApiResponse<List<MessageDTO>>> getMessagesByConversation(@PathVariable Long senderId,
             @PathVariable Long receiverId) {
         List<Message> messages = messageService.getMessages(senderId, receiverId);

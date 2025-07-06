@@ -55,6 +55,7 @@ public class ChatController {
         savedMessage.setType(message.getType());
         savedMessage.setTimestamp(Instant.now());
         savedMessage.setReactions(List.of());
+        savedMessage.setFileName(message.getFileName());
 
         Message saved = messageService.saveMessage(savedMessage);
         logger.debug("Saved message to database: {}", saved);
@@ -74,6 +75,7 @@ public class ChatController {
         savedMessage.setType(message.getType());
         savedMessage.setTimestamp(Instant.now());
         savedMessage.setReactions(List.of());
+        savedMessage.setFileName(message.getFileName());
         savedMessage = messageService.saveMessage(savedMessage);
         return messageMapper.toDTO(savedMessage);
     }
@@ -103,6 +105,7 @@ public class ChatController {
         savedMessage.setType(message.getType());
         savedMessage.setTimestamp(Instant.now());
         savedMessage.setReactions(List.of());
+        savedMessage.setFileName(message.getFileName());
         GroupMessage saved = groupMessageService.saveGroupMessage(savedMessage);
         return groupMessageMapper.toDTO(saved);
     }
@@ -119,6 +122,7 @@ public class ChatController {
         savedMessage.setType(message.getType());
         savedMessage.setTimestamp(Instant.now());
         savedMessage.setReactions(List.of());
+        savedMessage.setFileName(message.getFileName());
         savedMessage = groupMessageService.saveGroupMessage(savedMessage);
         return groupMessageMapper.toDTO(savedMessage);
     }

@@ -21,6 +21,7 @@ public class GroupMessageDTO {
     private MessageType type;
     private UserDTO sender;
     private GroupDTO group;
+    private String fileName;
     private Instant timestamp;
     private List<Reaction> reactions;
     private GroupMessageDTO replyTo;

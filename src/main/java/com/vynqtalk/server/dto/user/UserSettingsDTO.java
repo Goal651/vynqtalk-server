@@ -4,7 +4,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import com.vynqtalk.server.model.enums.Theme;
-import com.vynqtalk.server.model.users.User;
 
 import lombok.AllArgsConstructor;
 
@@ -12,8 +11,7 @@ import lombok.AllArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserSettingsDTO {
-    private Long id;
-    private User user;
+    
     private Boolean notificationEnabled;
     private Theme theme;
     private Boolean showOnlineStatus;

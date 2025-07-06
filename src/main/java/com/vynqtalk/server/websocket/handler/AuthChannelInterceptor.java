@@ -42,7 +42,6 @@ public class AuthChannelInterceptor implements HandshakeInterceptor {
         }
 
         String token = httpServletRequest.getParameter("token");
-        System.out.println("This token to be checked ......................" + token);
         if (token == null || token.isEmpty()) {
             logger.warn("Token is missing or empty");
             response.setStatusCode(org.springframework.http.HttpStatus.UNAUTHORIZED);

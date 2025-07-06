@@ -21,6 +21,7 @@ public class MessageDTO {
     private UserDTO sender;
     private UserDTO receiver;
     private Instant timestamp;
+    private String fileName;
     private boolean edited;
     private List<Reaction> reactions;
     private MessageDTO replyTo;

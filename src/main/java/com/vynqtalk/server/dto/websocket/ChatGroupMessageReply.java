@@ -19,7 +19,7 @@ import lombok.Builder;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ChatGroupMessageReply  {
+public class ChatGroupMessageReply {
     @NotNull
     private User sender;
     @NotNull
@@ -30,5 +30,6 @@ public class ChatGroupMessageReply  {
     private MessageType type;
     @NotNull
     private GroupMessage replyTo;
-}
 
+    private String fileName;
+}

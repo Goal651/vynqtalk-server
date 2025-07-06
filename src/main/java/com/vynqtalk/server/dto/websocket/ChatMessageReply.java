@@ -29,5 +29,7 @@ public class ChatMessageReply  {
     private MessageType type;
     @NotNull
     private Message replyTo;
+
+    private String fileName;
 }
 

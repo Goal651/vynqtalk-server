@@ -11,6 +11,8 @@ import lombok.AllArgsConstructor;
 public class MemberRequest {
     @NotNull(message = "User ID is required")
     private Long userId;
+
+    private String action;
 }
 
 // Note: Use this DTO for group member add/update requests only. 

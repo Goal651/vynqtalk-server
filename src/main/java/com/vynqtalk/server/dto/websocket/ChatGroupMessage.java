@@ -27,5 +27,7 @@ public class ChatGroupMessage  {
     private String content;
     @NotBlank
     private MessageType type; 
+
+    private String fileName;
 }
 

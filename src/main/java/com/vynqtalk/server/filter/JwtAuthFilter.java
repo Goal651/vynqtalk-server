@@ -49,13 +49,20 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         String requestURI = request.getRequestURI();   // "/api/v1/auth/login"
         String path = requestURI.substring(contextPath.length()); // "/auth/login"
 
-        System.out.println("This endpoint to be checked ......................"+path);
-        // Skip JWT processing for the auth route
-        if (path.startsWith("/auth/") || path.startsWith("/public/") ||
-                path.startsWith("/ws") || path.startsWith("/actuator/") ||
-                path.startsWith("/system/") || path.startsWith("/swagger-ui.html") ||
-                path.startsWith("/swagger-ui/") || path.startsWith("/v3/api-docs/") ||
-                path.startsWith("/v3/api-docs") ) {
+        logger.debug("Path: {}", path);
+        // Skip JWT processing for public and documentation routes, except /auth/check-token
+        boolean isExcludedPath =
+            path.startsWith("/auth/") ||
+            path.startsWith("/public/") ||
+            path.startsWith("/ws") ||
+            path.startsWith("/actuator/") ||
+            path.startsWith("/system/") ||
+            path.startsWith("/swagger-ui.html") ||
+            path.startsWith("/swagger-ui/") ||
+            path.startsWith("/v3/api-docs/") ||
+            path.startsWith("/v3/api-docs");
+
+        if (isExcludedPath && !path.equals("/auth/check-user")) {
             filterChain.doFilter(request, response);
             return;
         }

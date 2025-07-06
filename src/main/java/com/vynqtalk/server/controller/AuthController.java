@@ -1,5 +1,6 @@
 package com.vynqtalk.server.controller;
 
+import java.security.Principal;
 import java.time.Instant;
 
 import org.springframework.http.HttpStatus;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.vynqtalk.server.dto.request.LoginRequest;
 import com.vynqtalk.server.dto.response.ApiResponse;
 import com.vynqtalk.server.dto.response.AuthData;
+import com.vynqtalk.server.dto.user.UserDTO;
 import com.vynqtalk.server.model.enums.UserRole;
 import com.vynqtalk.server.model.users.User;
 import com.vynqtalk.server.service.JwtService;
@@ -27,9 +29,13 @@ import com.vynqtalk.server.dto.request.ChangePasswordRequest;
 import com.vynqtalk.server.dto.request.VerifyEmailRequest;
 import com.vynqtalk.server.dto.request.ResendVerificationRequest;
 import com.vynqtalk.server.error.UserNotFoundException;
+import com.vynqtalk.server.mapper.UserMapper;
+
+import org.springframework.web.bind.annotation.GetMapping;
 
 /**
- * Controller for authentication-related endpoints, including login, signup, token check, and password management.
+ * Controller for authentication-related endpoints, including login, signup,
+ * token check, and password management.
  */
 @RestController
 @RequestMapping("/auth")
@@ -37,18 +43,22 @@ public class AuthController {
     private final UserService userService;
     private final JwtService jwtService;
     private final UserSettingsService userSettingsService;
+    private final UserMapper userMapper;
 
-    public AuthController(UserService userService, JwtService jwtService, UserSettingsService userSettingsService) {
+    public AuthController(UserService userService, JwtService jwtService, UserSettingsService userSettingsService,
+            UserMapper userMapper) {
         this.userService = userService;
         this.jwtService = jwtService;
         this.userSettingsService = userSettingsService;
+        this.userMapper = userMapper;
     }
 
     /**
      * Authenticates a user and returns a JWT token if successful.
      */
     @PostMapping("/login")
-    public ResponseEntity<ApiResponse<AuthData>> login(@RequestBody LoginRequest loginRequest, HttpServletRequest request) {
+    public ResponseEntity<ApiResponse<AuthData>> login(@RequestBody LoginRequest loginRequest,
+            HttpServletRequest request) {
         String ipAddress = request.getRemoteAddr();
         if (loginRequest.getEmail() == null || loginRequest.getPassword() == null) {
             return ResponseEntity.ok()
@@ -57,7 +67,7 @@ public class AuthController {
 
         boolean authResult = userService.authenticate(loginRequest, ipAddress);
         User user = userService.getUserByEmail(loginRequest.getEmail())
-            .orElseThrow(() -> new UserNotFoundException("User not found with email: " + loginRequest.getEmail()));
+                .orElseThrow(() -> new UserNotFoundException("User not found with email: " + loginRequest.getEmail()));
 
         if (user.getStatus().equals("blocked")) {
             return ResponseEntity.status(HttpStatus.ACCEPTED)
@@ -95,6 +105,13 @@ public class AuthController {
         AuthData authData = new AuthData(user, token);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(new ApiResponse<>(authData, "Signup successful", HttpStatus.CREATED.value()));
+    }
+
+    @GetMapping("/check-user")
+    public ResponseEntity<ApiResponse<UserDTO>> getLoggedUser(Principal principal) {
+        User user = userService.getUserByEmail(principal.getName())
+                .orElseThrow(() -> new UserNotFoundException("User not valid"));
+        return ResponseEntity.ok(new ApiResponse<UserDTO>(userMapper.toDTO(user), "User checked successfully", 200));
     }
 
     /**
@@ -141,7 +158,8 @@ public class AuthController {
      * Handles resend verification email requests.
      */
     @PostMapping("/resend-verification")
-    public ResponseEntity<ApiResponse<String>> resendVerification(@Valid @RequestBody ResendVerificationRequest request) {
+    public ResponseEntity<ApiResponse<String>> resendVerification(
+            @Valid @RequestBody ResendVerificationRequest request) {
         return ResponseEntity.ok(new ApiResponse<>(null, "Verification email resent", HttpStatus.OK.value()));
     }
 
@@ -152,16 +170,17 @@ public class AuthController {
     public ResponseEntity<ApiResponse<User>> checkToken(@RequestHeader("Authorization") String authHeader) {
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                .body(new ApiResponse<>(null, "Missing or invalid Authorization header", HttpStatus.UNAUTHORIZED.value()));
+                    .body(new ApiResponse<>(null, "Missing or invalid Authorization header",
+                            HttpStatus.UNAUTHORIZED.value()));
         }
         String token = authHeader.substring(7);
         String email = jwtService.getUsernameFromToken(token);
         if (email == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                .body(new ApiResponse<>(null, "Invalid or expired token", HttpStatus.UNAUTHORIZED.value()));
+                    .body(new ApiResponse<>(null, "Invalid or expired token", HttpStatus.UNAUTHORIZED.value()));
         }
         User user = userService.getUserByEmail(email)
-            .orElseThrow(() -> new UserNotFoundException("User not found with email: " + email));
+                .orElseThrow(() -> new UserNotFoundException("User not found with email: " + email));
         return ResponseEntity.ok(new ApiResponse<>(user, "Token is valid", HttpStatus.OK.value()));
     }
 }

@@ -102,9 +102,9 @@ public class UserService {
      * Updates a user by ID using a User entity.
      */
     @Transactional
-    public User updateUser(Long id, User user) {
-        User existingUser = userRepository.findById(id)
-                .orElseThrow(() -> new UserNotFoundException("User not found with id: " + id));
+    public User updateUser(User user) {
+        User existingUser = userRepository.findById(user.getId())
+                .orElseThrow(() -> new UserNotFoundException("User not found with id: " + user.getEmail()));
         existingUser.setName(user.getName());
         existingUser.setEmail(user.getEmail());
         existingUser.setPassword(user.getPassword());
@@ -124,6 +124,10 @@ public class UserService {
      * Returns all users.
      */
     public List<User> getAllUsers() {
-        return userRepository.findAll();
+        List<User> response= userRepository.findAll();
+        response.forEach((User user)->{
+            user.setPassword(null);
+        });
+        return response;
     }
 }
