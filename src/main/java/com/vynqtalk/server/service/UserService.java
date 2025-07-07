@@ -7,6 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.vynqtalk.server.dto.request.LoginRequest;
 import com.vynqtalk.server.dto.user.UserDTO;
 import com.vynqtalk.server.repository.UserRepository;
+import com.vynqtalk.server.model.enums.AlertType;
 import com.vynqtalk.server.model.users.User;
 import com.vynqtalk.server.error.UserNotFoundException;
 
@@ -46,7 +47,7 @@ public class UserService {
             failedLoginAttempts.put(key, attempts);
 
             if (attempts >= 3) {
-                alertService.logAlert("warning", "3+ failed login attempts for " + loginRequest.getEmail(), ipAddress);
+                alertService.logAlert(AlertType.WARNING, "3+ failed login attempts for " + loginRequest.getEmail(), ipAddress,loginRequest.getEmail());
                 failedLoginAttempts.remove(key);
             }
         } else {
