@@ -21,6 +21,9 @@ import com.vynqtalk.server.repository.UserRepository;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import com.vynqtalk.server.error.UserNotFoundException;
+import com.vynqtalk.server.dto.response.ChartData;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Service for admin-related operations, including user, group, and alert
@@ -68,8 +71,7 @@ public class AdminService {
      * Returns all users as DTOs.
      */
     public List<UserDTO> getAllUsers() {
-        List<User> users = userService.getAllUsers();
-        return users.stream().map(userMapper::toDTO).toList();
+        return userService.getAllUsersWithLatestMessage();
     }
 
     /**
@@ -169,5 +171,33 @@ public class AdminService {
      */
     public List<Alert> getRecentAlerts(int limit) {
         return alertRepository.findAllByOrderByCreatedAtDesc(PageRequest.of(0, limit));
+    }
+
+    public List<ChartData> getChartData(Instant start, Instant end) {
+        // Get new users per day
+        List<Object[]> newUsersRaw = userRepository.countNewUsersPerDay();
+        // Get active users per day
+        List<Object[]> activeUsersRaw = userRepository.countActiveUsersPerDay(start, end);
+        // Get messages per day
+        List<Object[]> messagesRaw = userRepository.countMessagesPerDay();
+
+        Map<String, ChartData> chartDataMap = new HashMap<>();
+
+        for (Object[] row : newUsersRaw) {
+            String date = row[0].toString();
+            int count = ((Number) row[1]).intValue();
+            chartDataMap.computeIfAbsent(date, d -> new ChartData(d, 0, 0, 0)).setNewUsers(count);
+        }
+        for (Object[] row : activeUsersRaw) {
+            String date = row[0].toString();
+            int count = ((Number) row[1]).intValue();
+            chartDataMap.computeIfAbsent(date, d -> new ChartData(d, 0, 0, 0)).setActiveUsers(count);
+        }
+        for (Object[] row : messagesRaw) {
+            String date = row[0].toString();
+            int count = ((Number) row[1]).intValue();
+            chartDataMap.computeIfAbsent(date, d -> new ChartData(d, 0, 0, 0)).setMessages(count);
+        }
+        return chartDataMap.values().stream().toList();
     }
 }

@@ -12,6 +12,8 @@ import com.vynqtalk.server.service.UserService;
 import com.vynqtalk.server.model.system.Alert;
 import com.vynqtalk.server.model.users.User;
 import com.vynqtalk.server.service.SystemStatusService;
+import com.vynqtalk.server.dto.response.ChartData;
+import java.time.Instant;
 
 import java.util.List;
 import java.util.HashMap;
@@ -121,6 +123,14 @@ public class AdminController {
         stats.put("messagesYesterday", messagesYesterday);
         stats.put("messagesPercentChange", percentChange);
         return ResponseEntity.ok(new ApiResponse<>(stats, "Dashboard stats loaded", 200));
+    }
+
+    @GetMapping("analytics")
+    public ResponseEntity<ApiResponse<List<ChartData>>> getChartData(@RequestParam(required = false) Long start, @RequestParam(required = false) Long end) {
+        Instant startInstant = start != null ? Instant.ofEpochMilli(start) : Instant.EPOCH;
+        Instant endInstant = end != null ? Instant.ofEpochMilli(end) : Instant.now();
+        List<ChartData> chartData = adminService.getChartData(startInstant, endInstant);
+        return ResponseEntity.ok(new ApiResponse<>(chartData, "Chart data loaded", 200));
     }
 
 }

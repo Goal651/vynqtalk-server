@@ -69,7 +69,7 @@ public class UserController {
         ExportUserDTO userDTO = new ExportUserDTO();
         User user = userService.getUserByEmail(principal.getName())
                 .orElseThrow(() -> new UserNotFoundException("User not found with id: " + principal.getName()));
-        userDTO.setUser(userMapper.toDTO(user));
+        userDTO.setUser(userService.getUserWithUnreadMessages(user));
         return ResponseEntity.ok(new ApiResponse<>(userDTO, "Data processed successfully", 200));
     }
 
@@ -81,7 +81,7 @@ public class UserController {
                 .orElseThrow(() -> new UserNotFoundException("User not found with id: " + principal.getName()));
         user.setName(userUpdateRequest.getName());
         user.setBio(userUpdateRequest.getBio());
-        User updatedUser = userService.updateUser(user);
+                User updatedUser = userService.updateUser(user);
         return ResponseEntity.ok(new ApiResponse<>( "User updated successfully", 200));
     }
 
@@ -97,10 +97,7 @@ public class UserController {
     // List all users
     @GetMapping("/all")
     public ResponseEntity<ApiResponse<List<UserDTO>>> getAllUsers(Principal principal) {
-        List<User> users = userService.getAllUsers();
-        List<UserDTO> userDTO = users.stream()
-                .map(userMapper::toDTO)
-                .toList();
+        List<UserDTO> userDTO = userService.getAllUsersWithLatestMessage();
         return ResponseEntity.ok(
                 new ApiResponse<>(userDTO, userDTO.isEmpty() ? "No users found" : "Users retrieved successfully", 200));
     }

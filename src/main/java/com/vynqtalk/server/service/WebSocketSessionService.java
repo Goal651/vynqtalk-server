@@ -29,4 +29,9 @@ public class WebSocketSessionService {
     public String getUserIdBySession(String sessionId) {
         return sessionUsers.get(sessionId);
     }
+    
+    public boolean isUserOnline(Long userId) {
+        String userIdStr = String.valueOf(userId);
+        return sessionUsers.containsValue(userIdStr);
+    }
 }

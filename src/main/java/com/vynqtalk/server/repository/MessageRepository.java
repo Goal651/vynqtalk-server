@@ -24,4 +24,18 @@ public interface MessageRepository extends JpaRepository<Message, Long> {
     List<Message> findChatBetweenUsers(@Param("userA") Long userA, @Param("userB") Long userB);
 
     long countByTimestampBetween(Instant start, Instant end);
+
+    @Query("""
+        SELECT m FROM Message m
+        WHERE m.sender.id = :userId OR m.receiver.id = :userId
+        ORDER BY m.timestamp DESC
+    """)
+    List<Message> findLatestMessageByUserId(@Param("userId") Long userId);
+
+    @Query("""
+        SELECT m FROM Message m
+        WHERE m.receiver.id = :userId AND m.isRead = false
+        ORDER BY m.timestamp DESC
+    """)
+    List<Message> findUnreadMessagesByUserId(@Param("userId") Long userId);
 }

@@ -10,6 +10,7 @@ import com.vynqtalk.server.repository.UserRepository;
 import com.vynqtalk.server.model.enums.AlertType;
 import com.vynqtalk.server.model.users.User;
 import com.vynqtalk.server.error.UserNotFoundException;
+import com.vynqtalk.server.mapper.MessageMapper;
 
 import java.time.Instant;
 import java.util.List;
@@ -25,11 +26,19 @@ import java.util.concurrent.ConcurrentHashMap;
 public class UserService {
     private final UserRepository userRepository;
     private final AlertService alertService;
+    private final MessageService messageService;
+    private final MessageMapper messageMapper;
     private final Map<String, Integer> failedLoginAttempts = new ConcurrentHashMap<>();
+    private final UserSettingsService userSettingsService;
+    private final WebSocketSessionService webSocketSessionService;
 
-    public UserService(UserRepository userRepository, AlertService alertService) {
+    public UserService(UserRepository userRepository, AlertService alertService, MessageService messageService, MessageMapper messageMapper, UserSettingsService userSettingsService, WebSocketSessionService webSocketSessionService) {
         this.userRepository = userRepository;
         this.alertService = alertService;
+        this.messageService = messageService;
+        this.messageMapper = messageMapper;
+        this.userSettingsService = userSettingsService;
+        this.webSocketSessionService = webSocketSessionService;
     }
 
     /**
@@ -122,13 +131,55 @@ public class UserService {
     }
 
     /**
-     * Returns all users.
+     * Returns all users with their latest message.
      */
-    public List<User> getAllUsers() {
-        List<User> response= userRepository.findAll();
-        response.forEach((User user)->{
-            user.setPassword(null);
-        });
-        return response;
+    public List<UserDTO> getAllUsersWithLatestMessage() {
+        List<User> users = userRepository.findAll();
+        return users.stream().map(user -> {
+            UserDTO dto = new UserDTO();
+            dto.setId(user.getId());
+            dto.setName(user.getName());
+            dto.setAvatar(user.getAvatar());
+            dto.setPassword(null);
+            dto.setEmail(user.getEmail());
+            dto.setUserRole(user.getUserRole());
+            dto.setStatus(user.getStatus());
+            dto.setBio(user.getBio());
+            dto.setLastActive(user.getLastActive());
+            dto.setCreatedAt(user.getCreatedAt());
+            messageService.getLatestMessageByUserId(user.getId())
+                .ifPresent(message -> dto.setLatestMessage(messageMapper.toDTO(message)));
+            // Set online status if allowed
+            boolean online = false;
+            try {
+                var settings = userSettingsService.getUserSettings(user);
+                if (settings.getShowOnlineStatus() != null && settings.getShowOnlineStatus()) {
+                    online = webSocketSessionService.isUserOnline(user.getId());
+                    dto.setOnline(online);
+                }
+            } catch (Exception ignored) {}
+            return dto;
+        }).toList();
+    }
+
+    public UserDTO getUserWithUnreadMessages(User user) {
+        UserDTO dto = new UserDTO();
+        dto.setId(user.getId());
+        dto.setName(user.getName());
+        dto.setAvatar(user.getAvatar());
+        dto.setPassword(null);
+        dto.setEmail(user.getEmail());
+        dto.setUserRole(user.getUserRole());
+        dto.setStatus(user.getStatus());
+        dto.setBio(user.getBio());
+        dto.setLastActive(user.getLastActive());
+        dto.setCreatedAt(user.getCreatedAt());
+        // Set unread messages
+        dto.setUnreadMessages(messageService.getUnreadMessagesByUserId(user.getId())
+            .stream().map(messageMapper::toDTO).toList());
+        // Optionally set latest message as well
+        messageService.getLatestMessageByUserId(user.getId())
+            .ifPresent(message -> dto.setLatestMessage(messageMapper.toDTO(message)));
+        return dto;
     }
 }

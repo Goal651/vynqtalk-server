@@ -8,14 +8,19 @@ import java.util.List;
 import java.util.Optional;
 import com.vynqtalk.server.error.NotificationNotFoundException;
 import com.vynqtalk.server.model.system.Notification;
+import com.vynqtalk.server.model.users.DeviceToken;
+import com.vynqtalk.server.model.users.User;
+import com.vynqtalk.server.repository.DeviceTokenRepository;
 
 @Service
 public class NotificationService {
     
     private final NotificationRepository notificationRepository;
+    private final DeviceTokenRepository deviceTokenRepository;
 
-    public NotificationService(NotificationRepository notificationRepository) {
+    public NotificationService(NotificationRepository notificationRepository, DeviceTokenRepository deviceTokenRepository) {
         this.notificationRepository = notificationRepository;
+        this.deviceTokenRepository = deviceTokenRepository;
     }
 
     /**
@@ -66,5 +71,16 @@ public class NotificationService {
      */
     public List<Notification> getNotificationsByType(String type) {
         return notificationRepository.findByType(type);
+    }
+
+    public void registerDeviceToken(User user, String token) {
+        deviceTokenRepository.findByToken(token).ifPresentOrElse(
+            existing -> {},
+            () -> deviceTokenRepository.save(new DeviceToken(user, token))
+        );
+    }
+
+    public void unregisterDeviceToken(String token) {
+        deviceTokenRepository.deleteByToken(token);
     }
 }

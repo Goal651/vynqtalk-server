@@ -58,6 +58,9 @@ public class Message {
     @Column(nullable = false)
     private boolean isEdited;
 
+    @Column(nullable = false)
+    private boolean isRead = false;
+
     @Type(JsonType.class)
     @Column(columnDefinition = "json")
     private List<Reaction> reactions;

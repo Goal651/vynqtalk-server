@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import jakarta.validation.Valid;
 import com.vynqtalk.server.dto.notifications.NotificationCreateRequest;
 import com.vynqtalk.server.error.NotificationNotFoundException;
+import java.security.Principal;
 
 import java.util.List;
 
@@ -37,12 +38,14 @@ public class NotificationController {
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<NotificationDTO>> getNotificationById(@PathVariable Long id) {
         Notification notification = notificationService.getNotificationById(id)
-            .orElseThrow(() -> new NotificationNotFoundException("Notification not found with id: " + id));
-        return ResponseEntity.ok(new ApiResponse<>(notificationMapper.toDTO(notification), "Notification retrieved successfully", 200));
+                .orElseThrow(() -> new NotificationNotFoundException("Notification not found with id: " + id));
+        return ResponseEntity.ok(
+                new ApiResponse<>(notificationMapper.toDTO(notification), "Notification retrieved successfully", 200));
     }
 
     @PostMapping
-    public ResponseEntity<ApiResponse<NotificationDTO>> createNotification(@Valid @RequestBody NotificationCreateRequest notificationRequest) {
+    public ResponseEntity<ApiResponse<NotificationDTO>> createNotification(
+            @Valid @RequestBody NotificationCreateRequest notificationRequest) {
         Notification notification = new Notification();
         notification.setTitle(notificationRequest.getTitle());
         notification.setMessage(notificationRequest.getMessage());
@@ -51,7 +54,8 @@ public class NotificationController {
         notification.setTimestamp(java.time.Instant.now());
         // Set user if needed (userService.getUserById(notificationRequest.getUserId()))
         Notification savedNotification = notificationService.createNotification(notification);
-        return ResponseEntity.status(201).body(new ApiResponse<>(notificationMapper.toDTO(savedNotification), "Notification created successfully", 201));
+        return ResponseEntity.status(201).body(new ApiResponse<>(notificationMapper.toDTO(savedNotification),
+                "Notification created successfully", 201));
     }
 
     @PutMapping("/{id}/read")
@@ -60,7 +64,8 @@ public class NotificationController {
         if (notification == null) {
             throw new NotificationNotFoundException("Notification not found with id: " + id);
         }
-        return ResponseEntity.ok(new ApiResponse<>(notificationMapper.toDTO(notification), "Notification marked as read", 200));
+        return ResponseEntity
+                .ok(new ApiResponse<>(notificationMapper.toDTO(notification), "Notification marked as read", 200));
     }
 
     @DeleteMapping("/{id}")
@@ -78,4 +83,24 @@ public class NotificationController {
         return ResponseEntity.ok(new ApiResponse<>(notificationDTOs, "Notifications retrieved successfully", 200));
     }
 
-} 
+    @PostMapping("/device/register")
+    public ResponseEntity<ApiResponse<Void>> registerDeviceToken(Principal principal, @RequestParam String token) {
+        notificationService.registerDeviceToken(
+                // You may want to use userService.getUserByEmail(principal.getName()).get() in
+                // real code
+                new com.vynqtalk.server.model.users.User() {
+                    {
+                        setEmail(principal.getName());
+                    }
+                },
+                token);
+        return ResponseEntity.ok(new ApiResponse<>(null, "Device token registered", 200));
+    }
+
+    @PostMapping("/device/unregister")
+    public ResponseEntity<ApiResponse<Void>> unregisterDeviceToken(@RequestParam String token) {
+        notificationService.unregisterDeviceToken(token);
+        return ResponseEntity.ok(new ApiResponse<>(null, "Device token unregistered", 200));
+    }
+
+}

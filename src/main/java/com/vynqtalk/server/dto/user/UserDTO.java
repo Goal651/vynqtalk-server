@@ -2,6 +2,7 @@ package com.vynqtalk.server.dto.user;
 
 import java.time.Instant;
 
+import com.vynqtalk.server.dto.messages.MessageDTO;
 import com.vynqtalk.server.model.enums.UserRole;
 
 import lombok.Data;
@@ -22,6 +23,9 @@ public class UserDTO {
     private String bio;
     private Instant lastActive;
     private Instant createdAt;
+    private MessageDTO latestMessage;
+    private java.util.List<com.vynqtalk.server.dto.messages.MessageDTO> unreadMessages;
+    private Boolean online;
 }
 
 // Note: Use this DTO for user profile responses only (never include sensitive

@@ -96,4 +96,19 @@ public class MessageService {
         return savedReply;
     }
 
+    /**
+     * Gets the latest message sent or received by a user.
+     */
+    public Optional<Message> getLatestMessageByUserId(Long userId) {
+        List<Message> messages = messageRepository.findLatestMessageByUserId(userId);
+        return messages.isEmpty() ? Optional.empty() : Optional.of(messages.get(0));
+    }
+
+    /**
+     * Gets unread messages for a user (where receiver is the user and isRead is false).
+     */
+    public List<Message> getUnreadMessagesByUserId(Long userId) {
+        return messageRepository.findUnreadMessagesByUserId(userId);
+    }
+
 }

@@ -11,9 +11,13 @@ import org.springframework.messaging.simp.stomp.StompCommand;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.messaging.support.ChannelInterceptor;
 import org.springframework.stereotype.Component;
+import com.vynqtalk.server.service.UserSettingsService;
+import org.springframework.beans.factory.annotation.Autowired;
+import com.vynqtalk.server.service.UserService;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.Set;
 
 @Component
 public class WebSocketInterceptor implements ChannelInterceptor {
@@ -22,6 +26,12 @@ public class WebSocketInterceptor implements ChannelInterceptor {
     private final Map<String, String> connectedUsers = new ConcurrentHashMap<>();
 
     private final SimpMessagingTemplate messagingTemplate;
+
+    @Autowired
+    private UserSettingsService userSettingsService;
+
+    @Autowired
+    private UserService userService;
 
     public WebSocketInterceptor(@Lazy SimpMessagingTemplate messagingTemplate) {
         this.messagingTemplate = messagingTemplate;
@@ -32,7 +42,21 @@ public class WebSocketInterceptor implements ChannelInterceptor {
     }
 
     private void broadcastUsers() {
-        messagingTemplate.convertAndSend("/topic/onlineUsers", connectedUsers);
+        // Only send user IDs who allow online status
+        Set<Long> visibleUserIds = new java.util.HashSet<>();
+        for (String email : connectedUsers.keySet()) {
+            try {
+                var userOpt = userService.getUserByEmail(email);
+                if (userOpt.isPresent()) {
+                    var user = userOpt.get();
+                    var settings = userSettingsService.getUserSettings(user);
+                    if (settings.getShowOnlineStatus() != null && settings.getShowOnlineStatus()) {
+                        visibleUserIds.add(user.getId());
+                    }
+                }
+            } catch (Exception ignored) {}
+        }
+        messagingTemplate.convertAndSend("/topic/onlineUsers", visibleUserIds);
     }
 
     @Override
