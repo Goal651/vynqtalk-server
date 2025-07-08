@@ -4,6 +4,7 @@ import com.vynqtalk.server.dto.notifications.NotificationDTO;
 import com.vynqtalk.server.dto.response.ApiResponse;
 import com.vynqtalk.server.mapper.NotificationMapper;
 import com.vynqtalk.server.model.system.Notification;
+import com.vynqtalk.server.model.users.User;
 import com.vynqtalk.server.service.NotificationService;
 import com.vynqtalk.server.service.UserService;
 
@@ -11,7 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import jakarta.validation.Valid;
 import com.vynqtalk.server.dto.notifications.NotificationCreateRequest;
-import com.vynqtalk.server.error.NotificationNotFoundException;
+
 import java.security.Principal;
 
 import java.util.List;
@@ -24,27 +25,26 @@ public class NotificationController {
     private final NotificationMapper notificationMapper;
     private final UserService userService;
 
-    public NotificationController(NotificationService notificationService, NotificationMapper notificationMapper,UserService userService) {
+    public NotificationController(NotificationService notificationService, NotificationMapper notificationMapper,
+            UserService userService) {
         this.notificationService = notificationService;
         this.notificationMapper = notificationMapper;
-        this.userService=userService;
+        this.userService = userService;
     }
 
-    @GetMapping("/user/{userId}")
-    public ResponseEntity<ApiResponse<List<NotificationDTO>>> getNotificationsByUserId(@PathVariable Long userId) {
-        List<Notification> results = notificationService.getNotificationsByUserId(userId);
-        List<NotificationDTO> notifications = results.stream()
-                .map(notificationMapper::toDTO)
-                .toList();
-        return ResponseEntity.ok(new ApiResponse<>(notifications, "Notifications retrieved successfully", 200));
+    @GetMapping
+    public ResponseEntity<ApiResponse<List<NotificationDTO>>> getNotificationsByUserId(Principal principal) {
+        User user = userService.getUserByEmail(principal.getName());
+        List<Notification> results = notificationService.getNotificationsByUserId(user.getId());
+        List<NotificationDTO> notifications = notificationMapper.toDTOs(results);
+        return ResponseEntity.ok(new ApiResponse<>(true, notifications, "Notifications retrieved successfully"));
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<NotificationDTO>> getNotificationById(@PathVariable Long id) {
-        Notification notification = notificationService.getNotificationById(id)
-                .orElseThrow(() -> new NotificationNotFoundException("Notification not found with id: " + id));
+        Notification notification = notificationService.getNotificationById(id);
         return ResponseEntity.ok(
-                new ApiResponse<>(notificationMapper.toDTO(notification), "Notification retrieved successfully", 200));
+                new ApiResponse<>(true, notificationMapper.toDTO(notification), "Notification retrieved successfully"));
     }
 
     @PostMapping
@@ -58,48 +58,41 @@ public class NotificationController {
         notification.setTimestamp(java.time.Instant.now());
         // Set user if needed (userService.getUserById(notificationRequest.getUserId()))
         Notification savedNotification = notificationService.createNotification(notification);
-        return ResponseEntity.status(201).body(new ApiResponse<>(notificationMapper.toDTO(savedNotification),
-                "Notification created successfully", 201));
+        return ResponseEntity.ok(new ApiResponse<>(true, notificationMapper.toDTO(savedNotification),
+                "Notification created successfully"));
     }
 
-    @PutMapping("/{id}/read")
+    @PutMapping("/read/{id}")
     public ResponseEntity<ApiResponse<NotificationDTO>> markAsRead(@PathVariable Long id) {
         Notification notification = notificationService.markAsRead(id);
-        if (notification == null) {
-            throw new NotificationNotFoundException("Notification not found with id: " + id);
-        }
         return ResponseEntity
-                .ok(new ApiResponse<>(notificationMapper.toDTO(notification), "Notification marked as read", 200));
+                .ok(new ApiResponse<>(true, notificationMapper.toDTO(notification), "Notification marked as read"));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<ApiResponse<Void>> deleteNotification(@PathVariable Long id) {
         notificationService.deleteNotification(id);
-        return ResponseEntity.ok(new ApiResponse<>(null, "Notification deleted successfully", 200));
+        return ResponseEntity.ok(new ApiResponse<>(true, null, "Notification deleted successfully"));
     }
 
     @GetMapping("/type/{type}")
     public ResponseEntity<ApiResponse<List<NotificationDTO>>> getNotificationsByType(@PathVariable String type) {
-        List<Notification> notifications = notificationService.getNotificationsByType(type);
-        List<NotificationDTO> notificationDTOs = notifications.stream()
-                .map(notificationMapper::toDTO)
-                .toList();
-        return ResponseEntity.ok(new ApiResponse<>(notificationDTOs, "Notifications retrieved successfully", 200));
+        List<Notification> result = notificationService.getNotificationsByType(type);
+        List<NotificationDTO> notifications = notificationMapper.toDTOs(result);
+        return ResponseEntity.ok(new ApiResponse<>(true, notifications, "Notifications retrieved successfully"));
     }
 
     @PostMapping("/device/register")
     public ResponseEntity<ApiResponse<Void>> registerDeviceToken(Principal principal, @RequestBody String token) {
         notificationService.registerDeviceToken(
-                userService.getUserByEmail(principal.getName()).get() ,
-                
+                userService.getUserByEmail(principal.getName()),
                 token);
-        return ResponseEntity.ok(new ApiResponse<>(null, "Device token registered", 200));
+        return ResponseEntity.ok(new ApiResponse<>(true, null, "Device token registered"));
     }
 
     @PostMapping("/device/unregister")
     public ResponseEntity<ApiResponse<Void>> unregisterDeviceToken(@RequestParam String token) {
         notificationService.unregisterDeviceToken(token);
-        return ResponseEntity.ok(new ApiResponse<>(null, "Device token unregistered", 200));
+        return ResponseEntity.ok(new ApiResponse<>(true, null, "Device token unregistered"));
     }
-
 }

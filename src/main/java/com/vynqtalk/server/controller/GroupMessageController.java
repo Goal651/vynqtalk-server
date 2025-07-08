@@ -6,7 +6,6 @@ import com.vynqtalk.server.mapper.GroupMessageMapper;
 import com.vynqtalk.server.model.messages.GroupMessage;
 import com.vynqtalk.server.model.messages.Reaction;
 import com.vynqtalk.server.service.GroupMessageService;
-import com.vynqtalk.server.error.GroupMessageNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,17 +35,14 @@ public class GroupMessageController {
         List<GroupMessageDTO> messageDTO = messages.stream()
                 .map(groupMessageMapper::toDTO)
                 .toList();
-        return ResponseEntity.ok(new ApiResponse<>(messageDTO, messageDTO.isEmpty() ? "No messages found for this group" : "Messages retrieved successfully", 200));
+        return ResponseEntity.ok(new ApiResponse<>(true,messageDTO, messageDTO.isEmpty() ? "No messages found for this group" : "Messages retrieved successfully"));
     }
 
     // Get message by ID
     @GetMapping("/{conversationId}")
     public ResponseEntity<ApiResponse<GroupMessageDTO>> getMessages(@PathVariable Long conversationId) {
         GroupMessage message = groupMessageService.getGroupMessageById(conversationId);
-        if (message == null) {
-            throw new GroupMessageNotFoundException("Group message not found with id: " + conversationId);
-        }
-        return ResponseEntity.ok(new ApiResponse<>(groupMessageMapper.toDTO(message), "Message retrieved successfully", 200));
+        return ResponseEntity.ok(new ApiResponse<>(true,groupMessageMapper.toDTO(message), "Message retrieved successfully"));
     }
 
     // Delete a message
@@ -54,7 +50,7 @@ public class GroupMessageController {
     public ResponseEntity<ApiResponse<Void>> deleteMessage(@PathVariable Long messageId) {
         logger.info("Deleting group message with id: {}", messageId);
         groupMessageService.deleteGroupMessage(messageId);
-        return ResponseEntity.ok(new ApiResponse<>(null, "Message deleted successfully", 200));
+        return ResponseEntity.ok(new ApiResponse<>(true,null, "Message deleted successfully"));
     }
 
     // Update (edit) a message
@@ -62,13 +58,13 @@ public class GroupMessageController {
     public ResponseEntity<ApiResponse<GroupMessageDTO>> updateMessage(@PathVariable Long messageId,
             @RequestBody GroupMessage updated) {
         GroupMessage result = groupMessageService.updateGroupMessage(messageId, updated);
-        return ResponseEntity.ok(new ApiResponse<>(groupMessageMapper.toDTO(result), "Message updated successfully", 200));
+        return ResponseEntity.ok(new ApiResponse<>(true,groupMessageMapper.toDTO(result), "Message updated successfully"));
     }
 
     @PutMapping("/react/{messageId}")
     public ResponseEntity<ApiResponse<GroupMessageDTO>> reactMessage(@PathVariable Long messageId,
             @RequestBody List<Reaction> reactions) {
         GroupMessage result = groupMessageService.reactToMessage(messageId, reactions);
-        return ResponseEntity.ok(new ApiResponse<>(groupMessageMapper.toDTO(result), "Message reactions updated successfully", 200));
+        return ResponseEntity.ok(new ApiResponse<>(true,groupMessageMapper.toDTO(result), "Message reactions updated successfully"));
     }
 }

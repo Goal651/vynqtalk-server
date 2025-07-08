@@ -7,8 +7,6 @@ import com.vynqtalk.server.model.users.User;
 import com.vynqtalk.server.repository.AlertRepository;
 import com.vynqtalk.server.repository.UserRepository;
 
-import java.util.Optional;
-
 import org.springframework.stereotype.Service;
 
 /**
@@ -29,11 +27,9 @@ public class AlertService {
      * Logs an alert with the given type, message, and IP address.
      */
     public void logAlert(AlertType type, String message, String ipAddress, String email) {
-        Optional<User> user = userService.findByEmail(email);
-        if (!user.isPresent()) {
-            throw new UserNotFoundException("User " + email + " not found");
-        }
-        Alert alert = new Alert(type, message, ipAddress,user.get());
+        User user = userService.findByEmail(email).orElseThrow(
+                () -> new UserNotFoundException());
+        Alert alert = new Alert(type, message, ipAddress, user);
         alertRepository.save(alert);
     }
-} 
+}

@@ -13,6 +13,9 @@ import org.springframework.messaging.support.ChannelInterceptor;
 import org.springframework.stereotype.Component;
 import com.vynqtalk.server.service.UserSettingsService;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import com.vynqtalk.server.model.users.User;
+import com.vynqtalk.server.model.users.UserSettings;
 import com.vynqtalk.server.service.UserService;
 
 import java.util.Map;
@@ -46,10 +49,9 @@ public class WebSocketInterceptor implements ChannelInterceptor {
         Set<Long> visibleUserIds = new java.util.HashSet<>();
         for (String email : connectedUsers.keySet()) {
             try {
-                var userOpt = userService.getUserByEmail(email);
-                if (userOpt.isPresent()) {
-                    var user = userOpt.get();
-                    var settings = userSettingsService.getUserSettings(user);
+                User user = userService.getUserByEmail(email);
+                if (user!=null) {
+                    UserSettings settings = userSettingsService.getUserSettings(user);
                     if (settings.getShowOnlineStatus() != null && settings.getShowOnlineStatus()) {
                         visibleUserIds.add(user.getId());
                     }

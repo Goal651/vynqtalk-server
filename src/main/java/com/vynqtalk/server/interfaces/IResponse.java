@@ -6,5 +6,4 @@ public interface IResponse<T> {
     boolean isSuccess();
     @Nullable T getData();
     @Nullable String getMessage();
-    int getStatus();
 }

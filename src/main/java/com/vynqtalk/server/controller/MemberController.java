@@ -24,18 +24,17 @@ import com.vynqtalk.server.service.GroupService;
 import com.vynqtalk.server.service.UserService;
 import jakarta.validation.Valid;
 
-import com.vynqtalk.server.error.UserNotFoundException;
-
 @RestController
-@RequestMapping("/group_member/{groupId}")
-public class GroupMemberController {
+@RequestMapping("/member/{groupId}")
+public class MemberController {
 
     private final UserService userService;
     private final GroupService groupService;
     private final GroupMapper groupMapper;
     private final UserMapper userMapper;
 
-    public GroupMemberController(UserService userService, GroupService groupService, GroupMapper groupMapper, UserMapper userMapper) {
+    public MemberController(UserService userService, GroupService groupService, GroupMapper groupMapper,
+            UserMapper userMapper) {
         this.userService = userService;
         this.groupService = groupService;
         this.groupMapper = groupMapper;
@@ -47,41 +46,39 @@ public class GroupMemberController {
     public ResponseEntity<ApiResponse<List<UserDTO>>> getMembers(@PathVariable Long groupId) {
         Group group = groupService.findById(groupId);
         List<User> members = group.getMembers();
-        List<UserDTO> userDTO = members.stream()
-                .map(userMapper::toDTO)
-                .toList();
-        return ResponseEntity.ok(new ApiResponse<>(userDTO, "Members retrieved successfully", 200));
+        List<UserDTO> userDTO = userMapper.toDTOs(members);
+        return ResponseEntity.ok(new ApiResponse<>(true, userDTO, "Members retrieved successfully"));
     }
 
     // Add member
-    @PostMapping
-    public ResponseEntity<ApiResponse<GroupDTO>> addMember(@PathVariable Long groupId, @Valid @RequestBody MemberRequest request) {
-        User existingUser = userService.getUserById(request.getUserId())
-            .orElseThrow(() -> new UserNotFoundException("User not found with id: " + request.getUserId()));
+    @PostMapping("/{userId}")
+    public ResponseEntity<ApiResponse<GroupDTO>> addMember(@PathVariable Long groupId,
+            @PathVariable Long userId) {
+        User existingUser = userService.getUserById(userId);
         Group group = groupService.findById(groupId);
         Group updatedGroup = groupService.addMember(group, existingUser);
-        return ResponseEntity.ok(new ApiResponse<>(groupMapper.toDTO(updatedGroup), "Member added successfully", 200));
+        return ResponseEntity.ok(new ApiResponse<>(true, groupMapper.toDTO(updatedGroup), "Member added successfully"));
     }
 
     // Change user role
     @PutMapping
-    public ResponseEntity<ApiResponse<GroupDTO>> updateMember(@PathVariable Long groupId, @Valid @RequestBody MemberRequest request) {
-        User existingUser = userService.getUserById(request.getUserId())
-            .orElseThrow(() -> new UserNotFoundException("User not found with id: " + request.getUserId()));
+    public ResponseEntity<ApiResponse<GroupDTO>> updateMember(@PathVariable Long groupId,
+            @Valid @RequestBody MemberRequest request) {
+        User existingUser = userService.getUserById(request.getUserId());
         Group group = groupService.findById(groupId);
         Group updatedGroup = groupService.addMember(group, existingUser);
-        return ResponseEntity.ok(new ApiResponse<>(groupMapper.toDTO(updatedGroup), "Member added successfully", 200));
+        return ResponseEntity.ok(new ApiResponse<>(true, groupMapper.toDTO(updatedGroup), "Member added successfully"));
     }
 
     // delete member
-    @DeleteMapping("/{userId}")
-    public ResponseEntity<ApiResponse<GroupDTO>> removeMember(@PathVariable Long groupId, @PathVariable Long userId) {
+    @DeleteMapping("/{memberId}")
+    public ResponseEntity<ApiResponse<GroupDTO>> removeMember(@PathVariable Long groupId,
+            @PathVariable Long memberId) {
         Group group = groupService.findById(groupId);
-        User user = userService.getUserById(userId)
-            .orElseThrow(() -> new UserNotFoundException("User not found with id: " + userId));
+        User user = userService.getUserById(memberId);
         Group updatedGroup = groupService.removeMember(group, user);
         return ResponseEntity
-                .ok(new ApiResponse<>(groupMapper.toDTO(updatedGroup), "Member removed successfully", 200));
+                .ok(new ApiResponse<>(true, groupMapper.toDTO(updatedGroup), "Member removed successfully"));
     }
 
 }

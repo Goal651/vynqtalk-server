@@ -8,7 +8,7 @@ import com.vynqtalk.server.error.MessageNotFoundException;
 
 import java.time.Instant;
 import java.util.List;
-import java.util.Optional;
+
 
 @Service
 public class MessageService {
@@ -31,8 +31,10 @@ public class MessageService {
     /**
      * Gets a message by ID.
      */
-    public Optional<Message> getMessageById(Long id) {
-        return messageRepository.findById(id);
+    public Message getMessageById(Long id) {
+        return messageRepository.findById(id).orElseThrow(
+            ()-> new MessageNotFoundException()
+        );
     }
 
     /**
@@ -49,7 +51,7 @@ public class MessageService {
     
     public void deleteMessage(Long messageId) {
          messageRepository.findById(messageId)
-            .orElseThrow(() -> new MessageNotFoundException("Message not found with ID: " + messageId));
+            .orElseThrow(() -> new MessageNotFoundException());
         // createMessageDeletedNotification(message);
         messageRepository.deleteById(messageId);
     }
@@ -61,7 +63,7 @@ public class MessageService {
     
     public Message updateMessage(Long messageId, Message updatedMessage) {
         messageRepository.findById(messageId)
-            .orElseThrow(() -> new MessageNotFoundException("Message not found with ID: " + messageId));
+            .orElseThrow(() -> new MessageNotFoundException());
         Message savedMessage = messageRepository.save(updatedMessage);
         // createMessageEditedNotification(savedMessage);
         return savedMessage;
@@ -74,7 +76,7 @@ public class MessageService {
     
     public Message reactToMessage(Long messageId, List<Reaction> reactions) {
         Message message = messageRepository.findById(messageId)
-            .orElseThrow(() -> new MessageNotFoundException("Message not found with ID: " + messageId));
+            .orElseThrow(() -> new MessageNotFoundException());
         message.setReactions(reactions);
         Message savedMessage = messageRepository.save(message);
         // createMessageReactionNotification(savedMessage);
@@ -88,7 +90,7 @@ public class MessageService {
     
     public Message replyMessage(Long messageId, Message reply) {
         Message message = messageRepository.findById(messageId)
-            .orElseThrow(() -> new MessageNotFoundException("Message not found with ID: " + messageId));
+            .orElseThrow(() -> new MessageNotFoundException());
         reply.setReplyTo(message);
         reply.setTimestamp(Instant.now());
         Message savedReply = messageRepository.save(reply);
@@ -99,9 +101,9 @@ public class MessageService {
     /**
      * Gets the latest message sent or received by a user.
      */
-    public Optional<Message> getLatestMessageByUserId(Long userId) {
+    public Message getLatestMessageByUserId(Long userId) {
         List<Message> messages = messageRepository.findLatestMessageByUserId(userId);
-        return messages.isEmpty() ? Optional.empty() : Optional.of(messages.get(0));
+        return messages.isEmpty() ? null : messages.get(0);
     }
 
     /**

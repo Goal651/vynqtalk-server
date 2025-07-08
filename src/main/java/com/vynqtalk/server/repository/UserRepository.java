@@ -23,4 +23,5 @@ public interface UserRepository extends JpaRepository<User, Long> {
     List<Object[]> countMessagesPerDay();
 
     long countByCreatedAtAfter(Instant instant);
+    boolean existsByEmail(String email);
 }

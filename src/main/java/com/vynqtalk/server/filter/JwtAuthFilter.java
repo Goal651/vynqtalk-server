@@ -15,18 +15,16 @@ import com.vynqtalk.server.service.JwtService;
 import com.vynqtalk.server.service.UserService;
 
 import java.io.IOException;
+import java.nio.file.AccessDeniedException;
+
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import java.util.Optional;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
 
 @Component
 public class JwtAuthFilter extends OncePerRequestFilter {
-
-    private static final Logger logger = LoggerFactory.getLogger(JwtAuthFilter.class);
 
     private final JwtService jwtService;
     private final UserService userService;
@@ -46,21 +44,18 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         String authHeader = request.getHeader("Authorization");
 
         String contextPath = request.getContextPath(); // "/api/v1"
-        String requestURI = request.getRequestURI();   // "/api/v1/auth/login"
+        String requestURI = request.getRequestURI(); // "/api/v1/auth/login"
         String path = requestURI.substring(contextPath.length()); // "/auth/login"
 
-        logger.debug("Path: {}", path);
-        // Skip JWT processing for public and documentation routes, except /auth/check-token
-        boolean isExcludedPath =
-            path.startsWith("/auth/") ||
-            path.startsWith("/public/") ||
-            path.startsWith("/ws") ||
-            path.startsWith("/actuator/") ||
-            path.startsWith("/system/") ||
-            path.startsWith("/swagger-ui.html") ||
-            path.startsWith("/swagger-ui/") ||
-            path.startsWith("/v3/api-docs/") ||
-            path.startsWith("/v3/api-docs");
+        boolean isExcludedPath = path.startsWith("/auth/") ||
+                path.startsWith("/public/") ||
+                path.startsWith("/ws") ||
+                path.startsWith("/actuator/") ||
+                path.startsWith("/system/") ||
+                path.startsWith("/swagger-ui.html") ||
+                path.startsWith("/swagger-ui/") ||
+                path.startsWith("/v3/api-docs/") ||
+                path.startsWith("/v3/api-docs");
 
         if (isExcludedPath && !path.equals("/auth/check-user")) {
             filterChain.doFilter(request, response);
@@ -68,37 +63,18 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         }
 
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            response.setContentType("application/json");
-            response.getWriter().write("{\"error\": \"Authorization header missing or invalid.\"}");
-            return;
+            throw new AccessDeniedException("Token not found");
         }
 
         String token = authHeader.substring(7);
         JwtValidation result = jwtService.validateToken(token);
 
         if (!result.isValid()) {
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            response.setContentType("application/json");
-            String jsonError = String.format("{\"error\": \"Invalid JWT\", \"details\": \"%s\"}",
-                    result.getErrorMessage());
-            response.getWriter().write(jsonError);
-            return;
+            throw new AccessDeniedException("Verification failed.");
         }
-        Optional<User> userOpt = userService.getUserByEmail(result.getUsername());
-        if (userOpt.isEmpty()) {
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            response.setContentType("application/json");
-            response.getWriter().write("{\"error\": \"User not found.\"}");
-            return;
-        }
-        User user = userOpt.get();
-        logger.debug("User status: {}", user.getStatus());
+        User user = userService.getUserByEmail(result.getUsername());
         if (user.getStatus().equals("blocked")) {
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            response.setContentType("application/json");
-            response.getWriter().write("{\"error\": \"User is blocked.\"}");
-            return;
+            throw new AccessDeniedException("You are blocked.\nPlease contact you admin");
         }
 
         String username = result.getUsername();

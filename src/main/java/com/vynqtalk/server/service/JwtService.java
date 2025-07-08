@@ -6,14 +6,19 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.security.Keys;
 import javax.crypto.SecretKey;
+
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import java.util.Date;
 
 @Service
 public class JwtService implements IJwtService {
-    private final String SECRET = "your-256-bit-secret-your-256-bit-secret";
-    private final SecretKey SECRET_KEY = Keys.hmacShaKeyFor(SECRET.getBytes());
+    private final SecretKey SECRET_KEY;
     private final long EXPIRATION_TIME = 86400000; // 1 day in milliseconds
+
+    public JwtService(@Value("${jwt.secret}") String secret) {
+        this.SECRET_KEY = Keys.hmacShaKeyFor(secret.getBytes());
+    }
 
     @Override
     public String generateToken(String email) {
@@ -60,8 +65,7 @@ public class JwtService implements IJwtService {
             return new JwtValidation(false, null, "Unsupported token: " + e.getMessage());
         } catch (io.jsonwebtoken.JwtException e) {
             return new JwtValidation(false, null, "JWT error: " + e.getMessage());
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             return new JwtValidation(false, null, "Unexpected error: " + e.getMessage());
         }
     }

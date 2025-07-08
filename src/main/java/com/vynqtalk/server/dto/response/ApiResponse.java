@@ -13,23 +13,14 @@ public class ApiResponse<T> implements IResponse<T> {
     private boolean success;
     private T data;
     private String message;
-    private int status;
 
     // Success response constructor
-    public ApiResponse(T data, String message, int status) {
-        this.success = true;
+    public ApiResponse(T data, String message,boolean success) {
+        this.success = success;
         this.data = data;
         this.message = message;
-        this.status = status;
     }
 
-    // Error response constructor
-    public ApiResponse(String message, int status) {
-        this.success = false;
-        this.data = null;
-        this.message = message;
-        this.status = status;
-    }
 
     @Override
     public boolean isSuccess() {
@@ -46,11 +37,6 @@ public class ApiResponse<T> implements IResponse<T> {
     @Nullable
     public String getMessage() {
         return message;
-    }
-
-    @Override
-    public int getStatus() {
-        return status;
     }
 }
 

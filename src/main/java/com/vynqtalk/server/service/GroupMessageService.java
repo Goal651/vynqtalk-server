@@ -34,7 +34,7 @@ public class GroupMessageService {
      */
     public GroupMessage getGroupMessageById(Long id) {
         return groupMessageRepository.findById(id)
-                .orElseThrow(() -> new GroupMessageNotFoundException("Group message not found with id: " + id));
+                .orElseThrow(() -> new GroupMessageNotFoundException());
     }
 
     /**
@@ -52,7 +52,7 @@ public class GroupMessageService {
     @Transactional
     public void deleteGroupMessage(Long id) {
         groupMessageRepository.findById(id)
-                .orElseThrow(() -> new GroupMessageNotFoundException("Group message not found with id: " + id));
+                .orElseThrow(() -> new GroupMessageNotFoundException());
         groupMessageRepository.deleteById(id);
     }
 
@@ -64,7 +64,7 @@ public class GroupMessageService {
     @Transactional
     public GroupMessage updateGroupMessage(Long id, GroupMessage updatedGroupMessage) {
         GroupMessage groupMessage = groupMessageRepository.findById(id)
-                .orElseThrow(() -> new GroupMessageNotFoundException("Group message not found with id: " + id));
+                .orElseThrow(() -> new GroupMessageNotFoundException());
         groupMessage.setContent(updatedGroupMessage.getContent());
         groupMessage.setSender(updatedGroupMessage.getSender());
         groupMessage.setTimestamp(updatedGroupMessage.getTimestamp());
@@ -79,7 +79,7 @@ public class GroupMessageService {
     @Transactional
     public GroupMessage reactToMessage(Long messageId, List<Reaction> reactions) {
         GroupMessage message = groupMessageRepository.findById(messageId)
-                .orElseThrow(() -> new GroupMessageNotFoundException("Group message not found with id: " + messageId));
+                .orElseThrow(() -> new GroupMessageNotFoundException());
         message.setReactions(reactions);
         return groupMessageRepository.save(message);
     }

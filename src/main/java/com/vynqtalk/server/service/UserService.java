@@ -1,5 +1,6 @@
 package com.vynqtalk.server.service;
 
+import com.vynqtalk.server.repository.UserSettingsRepository;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -8,7 +9,9 @@ import com.vynqtalk.server.dto.request.LoginRequest;
 import com.vynqtalk.server.dto.user.UserDTO;
 import com.vynqtalk.server.repository.UserRepository;
 import com.vynqtalk.server.model.enums.AlertType;
+import com.vynqtalk.server.model.messages.Message;
 import com.vynqtalk.server.model.users.User;
+import com.vynqtalk.server.model.users.UserSettings;
 import com.vynqtalk.server.error.UserNotFoundException;
 import com.vynqtalk.server.mapper.MessageMapper;
 
@@ -24,6 +27,8 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 @Service
 public class UserService {
+
+    private final UserSettingsRepository userSettingsRepository;
     private final UserRepository userRepository;
     private final AlertService alertService;
     private final MessageService messageService;
@@ -32,13 +37,16 @@ public class UserService {
     private final UserSettingsService userSettingsService;
     private final WebSocketSessionService webSocketSessionService;
 
-    public UserService(UserRepository userRepository, AlertService alertService, MessageService messageService, MessageMapper messageMapper, UserSettingsService userSettingsService, WebSocketSessionService webSocketSessionService) {
+    public UserService(UserRepository userRepository, AlertService alertService, MessageService messageService,
+            MessageMapper messageMapper, UserSettingsService userSettingsService,
+            WebSocketSessionService webSocketSessionService, UserSettingsRepository userSettingsRepository) {
         this.userRepository = userRepository;
         this.alertService = alertService;
         this.messageService = messageService;
         this.messageMapper = messageMapper;
         this.userSettingsService = userSettingsService;
         this.webSocketSessionService = webSocketSessionService;
+        this.userSettingsRepository = userSettingsRepository;
     }
 
     /**
@@ -46,7 +54,7 @@ public class UserService {
      */
     public boolean authenticate(LoginRequest loginRequest, String ipAddress) {
         User dbUser = userRepository.findByEmail(loginRequest.getEmail())
-                .orElseThrow(() -> new UserNotFoundException("User not found with email: " + loginRequest.getEmail()));
+                .orElseThrow(() -> new UserNotFoundException());
         BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
         boolean success = dbUser != null && passwordEncoder.matches(loginRequest.getPassword(), dbUser.getPassword());
 
@@ -56,7 +64,8 @@ public class UserService {
             failedLoginAttempts.put(key, attempts);
 
             if (attempts >= 3) {
-                alertService.logAlert(AlertType.WARNING, "3+ failed login attempts for " + loginRequest.getEmail(), ipAddress,loginRequest.getEmail());
+                alertService.logAlert(AlertType.WARNING, "3+ failed login attempts for " + loginRequest.getEmail(),
+                        ipAddress, loginRequest.getEmail());
                 failedLoginAttempts.remove(key);
             }
         } else {
@@ -75,7 +84,8 @@ public class UserService {
         user.setStatus("active");
         user.setLastActive(Instant.now());
         user.setBio("No bio yet");
-        user.setUserRole(user.getUserRole());;
+        user.setUserRole(user.getUserRole());
+        ;
         return userRepository.save(user);
     }
 
@@ -84,8 +94,7 @@ public class UserService {
      */
     @Transactional
     public User updateUser(UserDTO userDTO) {
-        User user = this.getUserById(userDTO.getId())
-                .orElseThrow(() -> new UserNotFoundException("User not found with id: " + userDTO.getId()));
+        User user = this.getUserById(userDTO.getId());
         user.setEmail(userDTO.getEmail());
         user.setUserRole(userDTO.getUserRole());
         user.setName(userDTO.getName());
@@ -97,15 +106,21 @@ public class UserService {
     /**
      * Gets a user by ID.
      */
-    public Optional<User> getUserById(Long id) {
-        return userRepository.findById(id);
+    public User getUserById(Long id) {
+        return userRepository.findById(id).orElseThrow(
+                () -> new UserNotFoundException());
     }
 
     /**
      * Gets a user by email.
      */
-    public Optional<User> getUserByEmail(String email) {
-        return userRepository.findByEmail(email);
+    public User getUserByEmail(String email) {
+        return userRepository.findByEmail(email).orElseThrow(
+                () -> new UserNotFoundException());
+    }
+
+    public boolean checkUserByEmail(String email) {
+        return userRepository.existsByEmail(email);
     }
 
     /**
@@ -114,7 +129,7 @@ public class UserService {
     @Transactional
     public User updateUser(User user) {
         User existingUser = userRepository.findById(user.getId())
-                .orElseThrow(() -> new UserNotFoundException("User not found with id: " + user.getEmail()));
+                .orElseThrow(() -> new UserNotFoundException());
         existingUser.setName(user.getName());
         existingUser.setEmail(user.getEmail());
         existingUser.setPassword(user.getPassword());
@@ -147,17 +162,18 @@ public class UserService {
             dto.setBio(user.getBio());
             dto.setLastActive(user.getLastActive());
             dto.setCreatedAt(user.getCreatedAt());
-            messageService.getLatestMessageByUserId(user.getId())
-                .ifPresent(message -> dto.setLatestMessage(messageMapper.toDTO(message)));
+            Message latestMessage = messageService.getLatestMessageByUserId(user.getId());
+            dto.setLatestMessage(messageMapper.toDTO(latestMessage));
             // Set online status if allowed
             boolean online = false;
             try {
-                var settings = userSettingsService.getUserSettings(user);
+                UserSettings settings = userSettingsService.getUserSettings(user);
                 if (settings.getShowOnlineStatus() != null && settings.getShowOnlineStatus()) {
                     online = webSocketSessionService.isUserOnline(user.getId());
                     dto.setOnline(online);
                 }
-            } catch (Exception ignored) {}
+            } catch (Exception ignored) {
+            }
             return dto;
         }).toList();
     }
@@ -176,10 +192,10 @@ public class UserService {
         dto.setCreatedAt(user.getCreatedAt());
         // Set unread messages
         dto.setUnreadMessages(messageService.getUnreadMessagesByUserId(user.getId())
-            .stream().map(messageMapper::toDTO).toList());
+                .stream().map(messageMapper::toDTO).toList());
         // Optionally set latest message as well
-        messageService.getLatestMessageByUserId(user.getId())
-            .ifPresent(message -> dto.setLatestMessage(messageMapper.toDTO(message)));
+        Message latestMessage = messageService.getLatestMessageByUserId(user.getId());
+        dto.setLatestMessage(messageMapper.toDTO(latestMessage));
         return dto;
     }
 }

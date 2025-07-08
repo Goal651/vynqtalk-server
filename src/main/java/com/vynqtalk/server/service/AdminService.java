@@ -2,6 +2,11 @@ package com.vynqtalk.server.service;
 
 import java.time.Instant;
 import java.util.List;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.springframework.stereotype.Service;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,12 +23,8 @@ import com.vynqtalk.server.repository.AlertRepository;
 import com.vynqtalk.server.repository.MessageRepository;
 import com.vynqtalk.server.repository.GroupRepository;
 import com.vynqtalk.server.repository.UserRepository;
-import java.time.LocalDate;
-import java.time.ZoneId;
 import com.vynqtalk.server.error.UserNotFoundException;
 import com.vynqtalk.server.dto.response.ChartData;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Service for admin-related operations, including user, group, and alert
@@ -62,7 +63,7 @@ public class AdminService {
         user.setUserRole(UserRole.USER);
         user.setStatus("active");
         user.setLastActive(Instant.now());
-        user.setBio("No bio yet");
+        user.setBio("The owner");
         userService.saveUser(user);
         return userMapper.toDTO(user);
     }
@@ -90,8 +91,7 @@ public class AdminService {
      */
     @Transactional
     public UserDTO updateUser(Long id, UserDTO userDTO) {
-        User user = userService.getUserById(id)
-                .orElseThrow(() -> new UserNotFoundException("User not found with id: " + id));
+        User user = userService.getUserById(id);
         user.setId(id);
         userService.updateUser(user);
         return userMapper.toDTO(user);

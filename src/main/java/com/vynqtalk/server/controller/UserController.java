@@ -16,10 +16,6 @@ import com.vynqtalk.server.service.UserService;
 import com.vynqtalk.server.service.UserSettingsService;
 
 import jakarta.validation.Valid;
-
-import com.vynqtalk.server.error.UserNotFoundException;
-import com.vynqtalk.server.error.UserSettingsNotFoundException;
-
 import java.security.Principal;
 import java.util.List;
 
@@ -52,53 +48,47 @@ public class UserController {
         user.setPassword(userRequest.getPassword());
         user.setUserRole(UserRole.USER);
         User result = userService.saveUser(user);
-        return ResponseEntity.status(201)
-                .body(new ApiResponse<>(userMapper.toDTO(result), "User created successfully", 201));
+        return ResponseEntity.ok(new ApiResponse<>(true,userMapper.toDTO(result), "User created successfully"));
     }
 
     // Get user by ID
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<UserDTO>> getUserById(@PathVariable Long id) {
-        User user = userService.getUserById(id)
-                .orElseThrow(() -> new UserNotFoundException("User not found with id: " + id));
-        return ResponseEntity.ok(new ApiResponse<>(userMapper.toDTO(user), "User retrieved successfully", 200));
+        User user = userService.getUserById(id);
+        return ResponseEntity.ok(new ApiResponse<>(true,userMapper.toDTO(user), "User retrieved successfully"));
     }
 
     @GetMapping("/export")
     public ResponseEntity<ApiResponse<ExportUserDTO>> getUserData(Principal principal) {
         ExportUserDTO userDTO = new ExportUserDTO();
-        User user = userService.getUserByEmail(principal.getName())
-                .orElseThrow(() -> new UserNotFoundException("User not found with id: " + principal.getName()));
+        User user = userService.getUserByEmail(principal.getName());
         userDTO.setUser(userService.getUserWithUnreadMessages(user));
-        return ResponseEntity.ok(new ApiResponse<>(userDTO, "Data processed successfully", 200));
+        return ResponseEntity.ok(new ApiResponse<>(true,userDTO, "Data processed successfully"));
     }
 
     @GetMapping
     public ResponseEntity<ApiResponse<UserDTO>> getUser(Principal principal) {
-        User user = userService.getUserByEmail(principal.getName())
-                .orElseThrow(() -> new UserNotFoundException("User not found with id: " + principal.getName()));
-        return ResponseEntity.ok(new ApiResponse<>(userMapper.toDTO(user), "Data processed successfully", 200));
+        User user = userService.getUserByEmail(principal.getName());
+        return ResponseEntity.ok(new ApiResponse<>(true,userMapper.toDTO(user), "Data processed successfully"));
     }
 
     // Update user profile
     @PutMapping
     public ResponseEntity<ApiResponse<Void>> updateUser(Principal principal,
             @Valid @RequestBody UserUpdateRequest userUpdateRequest) {
-        User user = userService.getUserByEmail(principal.getName())
-                .orElseThrow(() -> new UserNotFoundException("User not found with id: " + principal.getName()));
+        User user = userService.getUserByEmail(principal.getName());
         user.setName(userUpdateRequest.getName());
         user.setBio(userUpdateRequest.getBio());
-                 userService.updateUser(user);
-        return ResponseEntity.ok(new ApiResponse<>( "User updated successfully", 200));
+        userService.updateUser(user);
+        return ResponseEntity.ok(new ApiResponse<>(true,null,"User updated successfully"));
     }
 
     // Delete user account
     @DeleteMapping
     public ResponseEntity<ApiResponse<Void>> deleteUser(Principal principal) {
-        User user = userService.getUserByEmail(principal.getName())
-                .orElseThrow(() -> new UserNotFoundException("User not found with id: " + principal.getName()));
+        User user = userService.getUserByEmail(principal.getName());
         userService.deleteUser(user.getId());
-        return ResponseEntity.ok(new ApiResponse<>(null, "User deleted successfully", 200));
+        return ResponseEntity.ok(new ApiResponse<>(true,null, "User deleted successfully"));
     }
 
     // List all users
@@ -106,34 +96,26 @@ public class UserController {
     public ResponseEntity<ApiResponse<List<UserDTO>>> getAllUsers(Principal principal) {
         List<UserDTO> userDTO = userService.getAllUsersWithLatestMessage();
         return ResponseEntity.ok(
-                new ApiResponse<>(userDTO, userDTO.isEmpty() ? "No users found" : "Users retrieved successfully", 200));
+                new ApiResponse<>(true,userDTO, userDTO.isEmpty() ? "No users found" : "Users retrieved successfully"));
     }
 
     // Get user settings
     @GetMapping("/settings")
     public ResponseEntity<ApiResponse<UserSettingsDTO>> getUserSettings(Principal principal) {
-        User user = userService.getUserByEmail(principal.getName())
-                .orElseThrow(() -> new UserNotFoundException("User not found with id: " + principal.getName()));
+        User user = userService.getUserByEmail(principal.getName());
         UserSettings settings = userSettingsService.getUserSettings(user);
-        if (settings == null) {
-            throw new UserSettingsNotFoundException("User settings not found for user id: " + principal.getName());
-        }
         UserSettingsDTO dto = userSettingsMapper.toDTO(settings);
-        return ResponseEntity.ok(new ApiResponse<>(dto, "User settings retrieved successfully", 200));
+        return ResponseEntity.ok(new ApiResponse<>(true,dto, "User settings retrieved successfully"));
     }
 
     // Update user settings
     @PutMapping("/settings")
     public ResponseEntity<ApiResponse<UserSettingsDTO>> updateUserSettings(Principal principal,
             @RequestBody UserSettingsUpdateRequest updatedSettings) {
-        User user = userService.getUserByEmail(principal.getName())
-                .orElseThrow(() -> new UserNotFoundException("User not found with id: " + principal.getName()));
+        User user = userService.getUserByEmail(principal.getName());
         UserSettings settings = userSettingsService.updateUserSettings(user, updatedSettings);
-        if (settings == null) {
-            throw new UserSettingsNotFoundException("User settings not found for user id: " + principal.getName());
-        }
         UserSettingsDTO dto = userSettingsMapper.toDTO(settings);
-        return ResponseEntity.ok(new ApiResponse<>(dto, "User settings updated successfully", 200));
+        return ResponseEntity.ok(new ApiResponse<>(true,dto, "User settings updated successfully"));
     }
 
 }

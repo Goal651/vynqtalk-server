@@ -17,9 +17,6 @@ import com.vynqtalk.server.service.GroupMessageService;
 import com.vynqtalk.server.service.GroupService;
 import com.vynqtalk.server.service.MessageService;
 import com.vynqtalk.server.service.UserService;
-import com.vynqtalk.server.error.MessageNotFoundException;
-import com.vynqtalk.server.error.UserNotFoundException;
-import com.vynqtalk.server.error.GroupMessageNotFoundException;
 
 import java.time.Instant;
 import java.util.List;
@@ -31,7 +28,6 @@ import org.springframework.stereotype.Controller;
 
 @Controller
 public class ChatController {
-
 
     private final MessageService messageService;
     private final GroupMessageService groupMessageService;
@@ -55,10 +51,8 @@ public class ChatController {
     @SendTo("/topic/messages")
     public MessageDTO receiveMessage(@Payload ChatMessage message) {
         Message savedMessage = new Message();
-        User sender = userService.getUserById(message.getSenderId())
-                .orElseThrow(() -> new UserNotFoundException("Sender not found"));
-        User receiver = userService.getUserById(message.getReceiverId())
-                .orElseThrow(() -> new UserNotFoundException("Sender not found"));
+        User sender = userService.getUserById(message.getSenderId());
+        User receiver = userService.getUserById(message.getReceiverId());
 
         savedMessage.setSender(sender);
         savedMessage.setReceiver(receiver);
@@ -77,12 +71,9 @@ public class ChatController {
     @SendTo("/topic/messages")
     public MessageDTO replyMessage(@Payload ChatMessageReply message) {
         Message savedMessage = new Message();
-        User sender = userService.getUserById(message.getSenderId())
-                .orElseThrow(() -> new UserNotFoundException("Sender not found"));
-        User receiver = userService.getUserById(message.getSenderId())
-                .orElseThrow(() -> new UserNotFoundException("Sender not found"));
-        Message replyTo = messageService.getMessageById(message.getReplyToId())
-                .orElseThrow(() -> new MessageNotFoundException("Message being replayed not found"));
+        User sender = userService.getUserById(message.getSenderId());
+        User receiver = userService.getUserById(message.getSenderId());
+        Message replyTo = messageService.getMessageById(message.getReplyToId());
         savedMessage.setSender(sender);
         savedMessage.setReceiver(receiver);
         savedMessage.setContent(message.getContent());
@@ -99,10 +90,7 @@ public class ChatController {
     @MessageMapping("/chat.sendMessageReaction")
     @SendTo("/topic/reactions")
     public MessageDTO reactToMessage(@Payload ReactMessage message) {
-        System.out.println("Chcek this out "+message);
-        Message exist = messageService.getMessageById(message.getMessageId())
-                .orElseThrow(
-                        () -> new MessageNotFoundException("Message not found with id: " + message.getMessageId()));
+        Message exist = messageService.getMessageById(message.getMessageId());
         exist.setReactions(message.getReactions());
         Message savedMessage = messageService.saveMessage(exist);
         return messageMapper.toDTO(savedMessage);
@@ -113,8 +101,7 @@ public class ChatController {
     @MessageMapping("/group.sendMessage")
     @SendTo("/topic/groupMessages")
     public GroupMessageDTO receiveGroupMessage(@Payload ChatGroupMessage message) {
-        User sender = userService.getUserById(message.getSenderId())
-                .orElseThrow(() -> new UserNotFoundException("Sender not found"));
+        User sender = userService.getUserById(message.getSenderId());
         Group group = groupService.findById(message.getSenderId());
         GroupMessage savedMessage = new GroupMessage();
         savedMessage.setSender(sender);
@@ -132,8 +119,7 @@ public class ChatController {
     @MessageMapping("/group.sendMessageReply")
     public GroupMessageDTO replyGroupMessage(@Payload ChatGroupMessageReply message) {
         GroupMessage savedMessage = new GroupMessage();
-        User sender = userService.getUserById(message.getSenderId())
-                .orElseThrow(() -> new UserNotFoundException("Sender not found"));
+        User sender = userService.getUserById(message.getSenderId());
         Group group = groupService.findById(message.getSenderId());
         GroupMessage replyTo = groupMessageService.getGroupMessageById(message.getReplyToId());
         savedMessage.setSender(sender);
@@ -153,9 +139,6 @@ public class ChatController {
     @SendTo("/topic/groupReactions")
     public GroupMessageDTO reactToGroupMessage(@Payload ReactMessage message) {
         GroupMessage groupMessage = groupMessageService.getGroupMessageById(message.getMessageId());
-        if (groupMessage == null) {
-            throw new GroupMessageNotFoundException("Group message not found with id: " + message.getMessageId());
-        }
         groupMessage.setReactions(message.getReactions());
         GroupMessage saved = groupMessageService.saveGroupMessage(groupMessage);
         return groupMessageMapper.toDTO(saved);

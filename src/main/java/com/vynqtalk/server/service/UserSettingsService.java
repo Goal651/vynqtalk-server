@@ -24,7 +24,6 @@ public class UserSettingsService {
     public UserSettings getUserSettings(User user) {
         UserSettings settings = userSettingsRepository.findByUserId(user.getId());
         if (settings == null) {
-            // Create default settings if none exist
             settings = createDefaultSettings(user);
         }
         return settings;

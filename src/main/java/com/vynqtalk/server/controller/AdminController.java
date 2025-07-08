@@ -50,7 +50,7 @@ public class AdminController {
     @GetMapping("/metrics")
     public ResponseEntity<ApiResponse<List<SystemMetric>>> getSystemData() {
         List<SystemMetric> systemMetric = systemMetricsService.getSystemMetrics();
-        return ResponseEntity.ok(new ApiResponse<>(systemMetric, "System data loaded", 200));
+        return ResponseEntity.ok(new ApiResponse<>(true,systemMetric, "System data loaded"));
     }
 
     /**
@@ -58,7 +58,7 @@ public class AdminController {
      */
     @GetMapping("/users")
     public ResponseEntity<ApiResponse<List<UserDTO>>> getAllUsers() {
-        return ResponseEntity.ok(new ApiResponse<>(adminService.getAllUsers(), "Users fetched successfully", 200));
+        return ResponseEntity.ok(new ApiResponse<>(true,adminService.getAllUsers(), "Users fetched successfully"));
     }
 
     /**
@@ -66,7 +66,7 @@ public class AdminController {
      */
     @GetMapping("/groups")
     public ResponseEntity<ApiResponse<List<GroupDTO>>> getAllGroups() {
-        return ResponseEntity.ok(new ApiResponse<>(adminService.getAllGroups(), "Groups fetched successfully", 200));
+        return ResponseEntity.ok(new ApiResponse<>(true,adminService.getAllGroups(), "Groups fetched successfully"));
     }
 
     /**
@@ -75,7 +75,7 @@ public class AdminController {
     @GetMapping("/alerts")
     public ResponseEntity<ApiResponse<List<Alert>>> getAllAlerts() {
         List<Alert> alerts = adminService.getAllAlerts();
-        return ResponseEntity.ok(new ApiResponse<>(alerts, "Alerts fetched successfully", 200));
+        return ResponseEntity.ok(new ApiResponse<>(true,alerts, "Alerts fetched successfully"));
     }
 
     /**
@@ -84,7 +84,7 @@ public class AdminController {
     @GetMapping("/alerts/recent")
     public ResponseEntity<ApiResponse<List<Alert>>> getRecentAlerts(@RequestParam(defaultValue = "10") int limit) {
         List<Alert> alerts = adminService.getRecentAlerts(limit);
-        return ResponseEntity.ok(new ApiResponse<>(alerts, "Recent alerts fetched", 200));
+        return ResponseEntity.ok(new ApiResponse<>(true,alerts, "Recent alerts fetched"));
     }
 
     /**
@@ -93,12 +93,10 @@ public class AdminController {
     @PutMapping("/users/{id}")
     public ResponseEntity<ApiResponse<Void>> updateUser(@PathVariable Long id,
             @Valid @RequestBody UserUpdateRequest userUpdateRequest) {
-        User user = userService.getUserById(id)
-                .orElseThrow(
-                        () -> new com.vynqtalk.server.error.UserNotFoundException("User not found with id: " + id));
+        User user = userService.getUserById(id);
         user.setStatus(userUpdateRequest.getStatus());
         userService.updateUser(user);
-        return ResponseEntity.ok(new ApiResponse<>(null, "User updated successfully", 200));
+        return ResponseEntity.ok(new ApiResponse<>(true,null, "User updated successfully"));
     }
 
     /**
@@ -122,7 +120,7 @@ public class AdminController {
         stats.put("messagesToday", messagesToday);
         stats.put("messagesYesterday", messagesYesterday);
         stats.put("messagesPercentChange", percentChange);
-        return ResponseEntity.ok(new ApiResponse<>(stats, "Dashboard stats loaded", 200));
+        return ResponseEntity.ok(new ApiResponse<>(true,stats, "Dashboard stats loaded"));
     }
 
     @GetMapping("analytics")
@@ -130,7 +128,7 @@ public class AdminController {
         Instant startInstant = start != null ? Instant.ofEpochMilli(start) : Instant.EPOCH;
         Instant endInstant = end != null ? Instant.ofEpochMilli(end) : Instant.now();
         List<ChartData> chartData = adminService.getChartData(startInstant, endInstant);
-        return ResponseEntity.ok(new ApiResponse<>(chartData, "Chart data loaded", 200));
+        return ResponseEntity.ok(new ApiResponse<>(true,chartData, "Chart data loaded"));
     }
 
 }

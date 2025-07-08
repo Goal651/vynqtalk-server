@@ -27,7 +27,7 @@ public class SystemController {
     @GetMapping("/status")
     public ResponseEntity<ApiResponse<SystemStatus>> getSystemStatus() {
         SystemStatus status = systemStatusService.getStatus();
-        return ResponseEntity.ok(new ApiResponse<>(status, "System status fetched", 200));
+        return ResponseEntity.ok(new ApiResponse<>(true,status, "System status fetched"));
     }
 
     /**
@@ -37,6 +37,6 @@ public class SystemController {
     public ResponseEntity<ApiResponse<SystemStatus>> updateSystemStatus(@RequestParam boolean inMaintenance,
             @RequestParam String message) {
         SystemStatus status = systemStatusService.updateStatus(inMaintenance, message);
-        return ResponseEntity.ok(new ApiResponse<>(status, "System status updated", 200));
+        return ResponseEntity.ok(new ApiResponse<>(true,status, "System status updated"));
     }
 }

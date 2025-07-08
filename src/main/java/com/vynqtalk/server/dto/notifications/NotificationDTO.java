@@ -16,7 +16,7 @@ public class NotificationDTO {
     private Long id;
     private String title;
     private User user;
-    private String details;
+    private String message;
     private Instant timestamp;
     private Boolean isRead;
     private NotificationType type;

@@ -13,7 +13,6 @@ import org.springframework.web.multipart.MultipartFile;
 import com.vynqtalk.server.dto.response.ApiResponse;
 import com.vynqtalk.server.service.UploadService;
 import com.vynqtalk.server.service.UserService;
-import com.vynqtalk.server.error.UserNotFoundException;
 import com.vynqtalk.server.model.users.User;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -34,16 +33,15 @@ public class UploaderController {
         public ResponseEntity<ApiResponse<String>> uploadUserProfileImage(Principal principal,
                         @RequestParam("file") MultipartFile file,
                         HttpServletRequest request) {
-                User user = userService.getUserByEmail(principal.getName())
-                                .orElseThrow(() -> new UserNotFoundException("User not found with id: " + principal.getName()));
+                User user = userService.getUserByEmail(principal.getName());
                 String fileName = imageUploadService.uploadImage(file);
                 String baseUrl = request.getScheme() + "://" + request.getServerName() +
                                 ((request.getServerPort() == 80 || request.getServerPort() == 443) ? ""
                                                 : ":" + request.getServerPort());
-                String response = baseUrl + "/api/v1/public/profile/" + fileName;
+                String response = baseUrl + "/api/v2/public/profile/" + fileName;
                 user.setAvatar(response);
                 userService.updateUser(user);
-                return ResponseEntity.ok(new ApiResponse<>(response, "Image uploaded successfully", 200));
+                return ResponseEntity.ok(new ApiResponse<>(true,response, "Image uploaded successfully"));
         }
 
         @PostMapping("/message")
@@ -53,8 +51,8 @@ public class UploaderController {
                 String baseUrl = request.getScheme() + "://" + request.getServerName() +
                                 ((request.getServerPort() == 80 || request.getServerPort() == 443) ? ""
                                                 : ":" + request.getServerPort());
-                String response = baseUrl + "/api/v1/public/message/" + fileName;
-                return ResponseEntity.ok(new ApiResponse<>(response, "Image uploaded successfully", 200));
+                String response = baseUrl + "/api/v2/public/message/" + fileName;
+                return ResponseEntity.ok(new ApiResponse<>(true,response, "Image uploaded successfully"));
         }
 
         @PostMapping("/group/{id}")

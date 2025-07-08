@@ -31,8 +31,7 @@ public class AdminInitializer {
     @EventListener(ApplicationReadyEvent.class)
     public void createAdminIfNotExists() {
         System.out.println("[AdminInitializer] Checking for admin user...");
-        System.out.println(userService.getUserByEmail(adminEmail));
-        if (!userService.getUserByEmail(adminEmail).isPresent()) {
+        if (!userService.checkUserByEmail(adminEmail)) {
             User admin = new User();
             admin.setEmail(adminEmail);
             admin.setPassword(adminPassword);
