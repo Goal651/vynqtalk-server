@@ -10,10 +10,8 @@ import lombok.AllArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserSettingsDTO {
-    
+public class UserSettingsDTO {  
     private Boolean notificationEnabled;
     private Theme theme;
     private Boolean showOnlineStatus;
 }
-// Note: Use this DTO for user settings responses only. 

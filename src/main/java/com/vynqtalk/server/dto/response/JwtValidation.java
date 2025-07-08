@@ -13,4 +13,3 @@ public class JwtValidation {
     private String errorMessage;
 }
 
-// Note: Use this DTO for JWT validation results only.

@@ -15,5 +15,3 @@ public class AuthData {
     private User user;
     private String accessToken;
 }
-
-// Note: Use this DTO for authentication responses only.

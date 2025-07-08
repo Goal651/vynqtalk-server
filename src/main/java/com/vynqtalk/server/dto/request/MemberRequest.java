@@ -15,4 +15,3 @@ public class MemberRequest {
     private String action;
 }
 
-// Note: Use this DTO for group member add/update requests only. 

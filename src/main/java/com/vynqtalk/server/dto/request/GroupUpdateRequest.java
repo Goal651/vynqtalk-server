@@ -14,8 +14,5 @@ public class GroupUpdateRequest {
 
     @NotBlank(message = "Description is required")
     private String description;
-
     private Boolean isPrivate;
 }
-
-// Note: Use this DTO for group update requests only. 

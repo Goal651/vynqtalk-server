@@ -17,5 +17,3 @@ public class ResetPasswordRequest {
     @NotBlank(message = "Password is required")
     private String password;
 }
-
-// Note: Use this DTO for password reset requests only. 

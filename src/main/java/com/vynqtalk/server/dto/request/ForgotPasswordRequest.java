@@ -14,5 +14,3 @@ public class ForgotPasswordRequest {
     @Email(message = "Invalid email format")
     private String email;
 }
-
-// Note: Use this DTO for forgot password requests only. 

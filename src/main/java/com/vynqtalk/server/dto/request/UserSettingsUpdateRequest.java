@@ -14,5 +14,3 @@ public class UserSettingsUpdateRequest {
     private Theme theme;
     private Boolean showOnlineStatus;
 }
-
-// Note: Use this DTO for user settings update requests only. 

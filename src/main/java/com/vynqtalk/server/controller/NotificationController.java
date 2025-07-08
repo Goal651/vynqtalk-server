@@ -5,6 +5,8 @@ import com.vynqtalk.server.dto.response.ApiResponse;
 import com.vynqtalk.server.mapper.NotificationMapper;
 import com.vynqtalk.server.model.system.Notification;
 import com.vynqtalk.server.service.NotificationService;
+import com.vynqtalk.server.service.UserService;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import jakarta.validation.Valid;
@@ -20,10 +22,12 @@ public class NotificationController {
 
     private final NotificationService notificationService;
     private final NotificationMapper notificationMapper;
+    private final UserService userService;
 
-    public NotificationController(NotificationService notificationService, NotificationMapper notificationMapper) {
+    public NotificationController(NotificationService notificationService, NotificationMapper notificationMapper,UserService userService) {
         this.notificationService = notificationService;
         this.notificationMapper = notificationMapper;
+        this.userService=userService;
     }
 
     @GetMapping("/user/{userId}")
@@ -84,15 +88,10 @@ public class NotificationController {
     }
 
     @PostMapping("/device/register")
-    public ResponseEntity<ApiResponse<Void>> registerDeviceToken(Principal principal, @RequestParam String token) {
+    public ResponseEntity<ApiResponse<Void>> registerDeviceToken(Principal principal, @RequestBody String token) {
         notificationService.registerDeviceToken(
-                // You may want to use userService.getUserByEmail(principal.getName()).get() in
-                // real code
-                new com.vynqtalk.server.model.users.User() {
-                    {
-                        setEmail(principal.getName());
-                    }
-                },
+                userService.getUserByEmail(principal.getName()).get() ,
+                
                 token);
         return ResponseEntity.ok(new ApiResponse<>(null, "Device token registered", 200));
     }

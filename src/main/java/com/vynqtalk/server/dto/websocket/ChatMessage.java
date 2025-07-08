@@ -1,7 +1,6 @@
 package com.vynqtalk.server.dto.websocket;
 
 import com.vynqtalk.server.model.enums.MessageType;
-import com.vynqtalk.server.model.users.User;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -19,9 +18,9 @@ import lombok.Builder;
 @Builder
 public class ChatMessage  {
     @NotNull
-    private User sender;
+    private Long senderId;
     @NotNull
-    private User receiver;
+    private Long receiverId;
     @NotBlank
     private String content;
     @NotBlank

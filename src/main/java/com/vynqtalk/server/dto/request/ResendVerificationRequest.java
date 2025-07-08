@@ -15,4 +15,3 @@ public class ResendVerificationRequest {
     private String email;
 }
 
-// Note: Use this DTO for resend verification requests only. 

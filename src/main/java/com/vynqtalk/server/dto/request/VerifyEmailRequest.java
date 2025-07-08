@@ -14,5 +14,3 @@ public class VerifyEmailRequest {
     @Email(message = "Invalid email format")
     private String email;
 }
-
-// Note: Use this DTO for email verification requests only. 

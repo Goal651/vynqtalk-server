@@ -15,5 +15,3 @@ public class LoginRequest {
     private String email;
     private String password;
 }
-
-// Note: Use this DTO for login requests only.

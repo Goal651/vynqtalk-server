@@ -20,5 +20,3 @@ public class UserCreateRequest {
     @NotBlank(message = "Password is required")
     private String password;
 }
-
-// Note: Use this DTO for user creation requests only (never for responses). 

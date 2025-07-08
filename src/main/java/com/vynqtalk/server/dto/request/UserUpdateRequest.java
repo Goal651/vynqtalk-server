@@ -12,4 +12,3 @@ public class UserUpdateRequest {
     private String bio;
     private String status;
 }
-// Note: Use this DTO for user profile update requests only.

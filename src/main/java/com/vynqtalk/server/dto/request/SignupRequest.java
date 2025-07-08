@@ -20,5 +20,3 @@ public class SignupRequest {
     @NotBlank(message = "Name is required")
     private String name;
 }
-
-// Note: Use this DTO for signup requests only. 

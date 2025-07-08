@@ -73,6 +73,13 @@ public class UserController {
         return ResponseEntity.ok(new ApiResponse<>(userDTO, "Data processed successfully", 200));
     }
 
+    @GetMapping
+    public ResponseEntity<ApiResponse<UserDTO>> getUser(Principal principal) {
+        User user = userService.getUserByEmail(principal.getName())
+                .orElseThrow(() -> new UserNotFoundException("User not found with id: " + principal.getName()));
+        return ResponseEntity.ok(new ApiResponse<>(userMapper.toDTO(user), "Data processed successfully", 200));
+    }
+
     // Update user profile
     @PutMapping
     public ResponseEntity<ApiResponse<Void>> updateUser(Principal principal,
@@ -81,7 +88,7 @@ public class UserController {
                 .orElseThrow(() -> new UserNotFoundException("User not found with id: " + principal.getName()));
         user.setName(userUpdateRequest.getName());
         user.setBio(userUpdateRequest.getBio());
-                User updatedUser = userService.updateUser(user);
+                 userService.updateUser(user);
         return ResponseEntity.ok(new ApiResponse<>( "User updated successfully", 200));
     }
 

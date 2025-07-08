@@ -11,10 +11,6 @@ import lombok.AllArgsConstructor;
 public class GroupCreateRequest {
     @NotBlank(message = "Group name is required")
     private String name;
-
     private String description;
-
     private Boolean isPrivate;
 }
-
-// Note: Use this DTO for group creation requests only. 

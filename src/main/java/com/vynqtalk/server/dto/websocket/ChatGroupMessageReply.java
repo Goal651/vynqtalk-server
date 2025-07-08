@@ -1,9 +1,7 @@
 package com.vynqtalk.server.dto.websocket;
 
 import com.vynqtalk.server.model.enums.MessageType;
-import com.vynqtalk.server.model.groups.Group;
-import com.vynqtalk.server.model.messages.GroupMessage;
-import com.vynqtalk.server.model.users.User;
+
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -21,15 +19,15 @@ import lombok.Builder;
 @Builder
 public class ChatGroupMessageReply {
     @NotNull
-    private User sender;
+    private Long senderId;
     @NotNull
-    private Group group;
+    private Long groupId;
     @NotBlank
     private String content;
     @NotBlank
     private MessageType type;
     @NotNull
-    private GroupMessage replyTo;
+    private Long replyToId;
 
     private String fileName;
 }

@@ -17,5 +17,3 @@ public class ChangePasswordRequest {
     @NotBlank(message = "Password is required")
     private String password;
 }
-
-// Note: Use this DTO for password change requests only. 
