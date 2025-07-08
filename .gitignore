@@ -3,3 +3,5 @@ target
 wigo.json
 .env
 uploads
+*.sh
+*.dump
