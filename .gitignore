@@ -1,7 +1,6 @@
 .env
-target
+/target
+/dist
+/backups
 .vscode
-wigo.json
-uploads
-*.sh
-*.dump
+/scripts

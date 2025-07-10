@@ -62,6 +62,14 @@ The server will start at: [http://localhost:8080](http://localhost:8080)
 
 ---
 
+## 📚 Documentation
+
+- [Getting Started](docs/getting-started.md)
+- [API Reference](docs/api-reference.md)
+- [Architecture Overview](docs/architecture.md)
+
+---
+
 ## 📖 API Documentation
 
 - **Swagger UI:** [http://localhost:8080/swagger-ui.html](http://localhost:8080/swagger-ui.html)
