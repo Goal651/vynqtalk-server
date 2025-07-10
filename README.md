@@ -1,8 +1,14 @@
-# VynqTalk Server 🚀
+# vynqtalk-server
 
-**VynqTalk Server** is the powerful back-end for VynqTalk, a modern chat application built with Spring Boot and Java. It provides robust RESTful APIs, real-time messaging, secure authentication, and seamless data management.
+![Build](https://img.shields.io/github/actions/workflow/status/goal651/vynqtalk-server/ci.yml)
+![License](https://img.shields.io/github/license/goal651/vynqtalk-server)
+![Stars](https://img.shields.io/github/stars/goal651/vynqtalk-server?style=social)
+
+A scalable chat server backend for real-time messaging, built with Java and Spring Boot.
 
 ---
+
+> **If you like this project, please give it a ⭐️ on GitHub!**
 
 ## ✨ Features
 
@@ -77,6 +83,7 @@ The server will start at: [http://localhost:8080](http://localhost:8080)
 - Ensure PostgreSQL is running and accessible
 - Verify credentials in `.env` and `application.properties`
 - Check Java & Maven versions:
+
   ```bash
   java -version
   mvn -version
@@ -86,13 +93,18 @@ The server will start at: [http://localhost:8080](http://localhost:8080)
 
 ## 🤝 Contributing
 
-Contributions are welcome!  
-Fork the repo, submit pull requests, or report issues.
+We welcome contributions! Please see [CONTRIBUTING.md](./CONTRIBUTING.md) for guidelines.
 
 ---
 
 ## 💬 Support
 
 If you like this project, please give it a ⭐ on GitHub!
+
+---
+
+## License
+
+This project is licensed under the MIT License. See the [LICENSE](./LICENSE) file for details.
 
 ---

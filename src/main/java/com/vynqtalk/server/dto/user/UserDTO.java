@@ -17,7 +17,7 @@ public class UserDTO {
     private Long id;
     private String name;
     private String avatar;
-    private  String password = null;
+    private String password ;
     private String email;
     private UserRole userRole;
     private String status;

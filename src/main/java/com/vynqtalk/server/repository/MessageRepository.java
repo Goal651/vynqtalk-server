@@ -38,4 +38,7 @@ public interface MessageRepository extends JpaRepository<Message, Long> {
         ORDER BY m.timestamp DESC
     """)
     List<Message> findUnreadMessagesByUserId(@Param("userId") Long userId);
+
+    java.util.List<Message> findAllBySenderId(Long senderId);
+    java.util.List<Message> findAllByReceiverId(Long receiverId);
 }

@@ -20,7 +20,6 @@ public class AlertService {
     public AlertService(AlertRepository alertRepository, UserRepository userService) {
         this.alertRepository = alertRepository;
         this.userService = userService;
-
     }
 
     /**

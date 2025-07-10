@@ -174,11 +174,8 @@ public class AdminService {
     }
 
     public List<ChartData> getChartData(Instant start, Instant end) {
-        // Get new users per day
         List<Object[]> newUsersRaw = userRepository.countNewUsersPerDay();
-        // Get active users per day
         List<Object[]> activeUsersRaw = userRepository.countActiveUsersPerDay(start, end);
-        // Get messages per day
         List<Object[]> messagesRaw = userRepository.countMessagesPerDay();
 
         Map<String, ChartData> chartDataMap = new HashMap<>();

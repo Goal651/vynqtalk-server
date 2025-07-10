@@ -10,4 +10,5 @@ import com.vynqtalk.server.model.messages.GroupMessage;
 public interface GroupMessageRepository extends JpaRepository<GroupMessage, Long> {
     // Additional query methods can be defined here if needed
     List<GroupMessage> findByGroupId(@Param("groupId") Long groupId);
+    void deleteBySenderId(Long senderId);
 }

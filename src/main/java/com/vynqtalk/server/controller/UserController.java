@@ -69,6 +69,7 @@ public class UserController {
     @GetMapping
     public ResponseEntity<ApiResponse<UserDTO>> getUser(Principal principal) {
         User user = userService.getUserByEmail(principal.getName());
+        user.setPassword(null);
         return ResponseEntity.ok(new ApiResponse<>(true,userMapper.toDTO(user), "Data processed successfully"));
     }
 

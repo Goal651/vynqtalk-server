@@ -14,6 +14,12 @@ import com.vynqtalk.server.model.users.User;
 import com.vynqtalk.server.model.users.UserSettings;
 import com.vynqtalk.server.error.UserNotFoundException;
 import com.vynqtalk.server.mapper.MessageMapper;
+import com.vynqtalk.server.repository.GroupRepository;
+import com.vynqtalk.server.repository.GroupMessageRepository;
+import com.vynqtalk.server.repository.NotificationRepository;
+import com.vynqtalk.server.repository.DeviceTokenRepository;
+import com.vynqtalk.server.repository.UserLogRepository;
+import com.vynqtalk.server.service.GroupMessageService;
 
 import java.time.Instant;
 import java.util.List;
@@ -36,10 +42,19 @@ public class UserService {
     private final Map<String, Integer> failedLoginAttempts = new ConcurrentHashMap<>();
     private final UserSettingsService userSettingsService;
     private final WebSocketSessionService webSocketSessionService;
+    private final GroupRepository groupRepository;
+    private final GroupMessageRepository groupMessageRepository;
+    private final GroupMessageService groupMessageService;
+    private final NotificationRepository notificationRepository;
+    private final DeviceTokenRepository deviceTokenRepository;
+    private final UserLogRepository userLogRepository;
 
     public UserService(UserRepository userRepository, AlertService alertService, MessageService messageService,
             MessageMapper messageMapper, UserSettingsService userSettingsService,
-            WebSocketSessionService webSocketSessionService, UserSettingsRepository userSettingsRepository) {
+            WebSocketSessionService webSocketSessionService, UserSettingsRepository userSettingsRepository,
+            GroupRepository groupRepository, GroupMessageRepository groupMessageRepository,
+            GroupMessageService groupMessageService, NotificationRepository notificationRepository,
+            DeviceTokenRepository deviceTokenRepository, UserLogRepository userLogRepository) {
         this.userRepository = userRepository;
         this.alertService = alertService;
         this.messageService = messageService;
@@ -47,6 +62,12 @@ public class UserService {
         this.userSettingsService = userSettingsService;
         this.webSocketSessionService = webSocketSessionService;
         this.userSettingsRepository = userSettingsRepository;
+        this.groupRepository = groupRepository;
+        this.groupMessageRepository = groupMessageRepository;
+        this.groupMessageService = groupMessageService;
+        this.notificationRepository = notificationRepository;
+        this.deviceTokenRepository = deviceTokenRepository;
+        this.userLogRepository = userLogRepository;
     }
 
     /**
@@ -138,10 +159,38 @@ public class UserService {
     }
 
     /**
-     * Deletes a user by ID.
+     * Deletes a user by ID, handling all related data and constraints.
      */
     @Transactional
     public void deleteUser(Long id) {
+        User user = getUserById(id);
+        // 1. Check group admin status
+        List<com.vynqtalk.server.model.groups.Group> adminGroups = groupRepository.findByAdmins_Id(id);
+        for (com.vynqtalk.server.model.groups.Group group : adminGroups) {
+            if (group.getAdmins().size() == 1) {
+                throw new RuntimeException("Cannot delete user: user is the only admin in group '" + group.getName() + "'. Assign a new admin first.");
+            }
+        }
+        // 2. Delete all direct messages (sent or received)
+        messageService.deleteAllMessagesByUserId(id);
+        // 3. Delete all group messages sent by user
+        groupMessageRepository.deleteBySenderId(id);
+        // 4. Delete user settings
+        userSettingsService.deleteUserSettings(user);
+        // 5. Delete notifications
+        notificationRepository.deleteByUserId(id);
+        // 6. Delete device tokens
+        deviceTokenRepository.deleteByUser(user);
+        // 7. Remove user from all group members/admins
+        List<com.vynqtalk.server.model.groups.Group> memberGroups = groupRepository.findByMembers_Id(id);
+        for (com.vynqtalk.server.model.groups.Group group : memberGroups) {
+            group.getMembers().removeIf(u -> u.getId().equals(id));
+            group.getAdmins().removeIf(u -> u.getId().equals(id));
+            groupRepository.save(group);
+        }
+        // 8. Log the deletion
+        userLogRepository.save(new com.vynqtalk.server.model.users.UserLog(user.getEmail(), user.getName(), "DELETED ACCOUNT", java.time.Instant.now()));
+        // 9. Delete the user
         userRepository.deleteById(id);
     }
 

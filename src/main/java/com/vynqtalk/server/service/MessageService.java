@@ -113,4 +113,11 @@ public class MessageService {
         return messageRepository.findUnreadMessagesByUserId(userId);
     }
 
+    @org.springframework.transaction.annotation.Transactional
+    public void deleteAllMessagesByUserId(Long userId) {
+        java.util.List<Message> sent = messageRepository.findAllBySenderId(userId);
+        java.util.List<Message> received = messageRepository.findAllByReceiverId(userId);
+        sent.forEach(m -> messageRepository.deleteById(m.getId()));
+        received.forEach(m -> messageRepository.deleteById(m.getId()));
+    }
 }
