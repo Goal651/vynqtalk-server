@@ -1,7 +1,7 @@
+.env
 target
 .vscode
 wigo.json
-.env
 uploads
 *.sh
 *.dump
