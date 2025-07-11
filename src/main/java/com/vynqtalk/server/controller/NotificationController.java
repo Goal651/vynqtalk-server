@@ -12,10 +12,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import jakarta.validation.Valid;
 import com.vynqtalk.server.dto.notifications.NotificationCreateRequest;
+import com.vynqtalk.server.dto.notifications.PushSubscriptionDTO;
 
 import java.security.Principal;
 
 import java.util.List;
+
+
 
 @RestController
 @RequestMapping("/notifications")
@@ -82,17 +85,22 @@ public class NotificationController {
         return ResponseEntity.ok(new ApiResponse<>(true, notifications, "Notifications retrieved successfully"));
     }
 
+
+
     @PostMapping("/device/register")
-    public ResponseEntity<ApiResponse<Void>> registerDeviceToken(Principal principal, @RequestBody String token) {
+    public ResponseEntity<ApiResponse<Void>> registerDeviceToken(Principal principal, @RequestBody PushSubscriptionDTO subscription) {
+        System.out.println("Subscription logging"+subscription);
         notificationService.registerDeviceToken(
                 userService.getUserByEmail(principal.getName()),
-                token);
+                subscription.getEndpoint(),
+                subscription.getKeys().getP256dh(),
+                subscription.getKeys().getAuth());
         return ResponseEntity.ok(new ApiResponse<>(true, null, "Device token registered"));
     }
 
     @PostMapping("/device/unregister")
-    public ResponseEntity<ApiResponse<Void>> unregisterDeviceToken(@RequestParam String token) {
-        notificationService.unregisterDeviceToken(token);
+    public ResponseEntity<ApiResponse<Void>> unregisterDeviceToken(@RequestParam String endpoint) {
+        notificationService.unregisterDeviceToken(endpoint);
         return ResponseEntity.ok(new ApiResponse<>(true, null, "Device token unregistered"));
     }
 }

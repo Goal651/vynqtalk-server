@@ -5,10 +5,10 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.vynqtalk.server.exceptions.GroupMessageNotFoundException;
 import com.vynqtalk.server.model.messages.GroupMessage;
 import com.vynqtalk.server.model.messages.Reaction;
 import com.vynqtalk.server.repository.GroupMessageRepository;
-import com.vynqtalk.server.error.GroupMessageNotFoundException;
 
 @Service
 public class GroupMessageService {
@@ -79,7 +79,7 @@ public class GroupMessageService {
     @Transactional
     public GroupMessage reactToMessage(Long messageId, List<Reaction> reactions) {
         GroupMessage message = groupMessageRepository.findById(messageId)
-                .orElseThrow(() -> new GroupMessageNotFoundException());
+                .orElseThrow(()->new GroupMessageNotFoundException());
         message.setReactions(reactions);
         return groupMessageRepository.save(message);
     }

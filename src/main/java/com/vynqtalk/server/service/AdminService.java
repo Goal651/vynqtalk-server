@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.vynqtalk.server.mapper.GroupMapper;
 import com.vynqtalk.server.dto.group.GroupDTO;
 import com.vynqtalk.server.dto.user.UserDTO;
+import com.vynqtalk.server.exceptions.UserNotFoundException;
 import com.vynqtalk.server.model.enums.UserRole;
 import com.vynqtalk.server.model.groups.Group;
 import com.vynqtalk.server.model.system.Alert;
@@ -23,7 +24,6 @@ import com.vynqtalk.server.repository.AlertRepository;
 import com.vynqtalk.server.repository.MessageRepository;
 import com.vynqtalk.server.repository.GroupRepository;
 import com.vynqtalk.server.repository.UserRepository;
-import com.vynqtalk.server.error.UserNotFoundException;
 import com.vynqtalk.server.dto.response.ChartData;
 
 /**

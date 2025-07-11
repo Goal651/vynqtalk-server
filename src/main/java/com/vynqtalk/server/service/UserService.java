@@ -7,24 +7,24 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.vynqtalk.server.dto.request.LoginRequest;
 import com.vynqtalk.server.dto.user.UserDTO;
+import com.vynqtalk.server.exceptions.SystemException;
+import com.vynqtalk.server.exceptions.UserNotFoundException;
 import com.vynqtalk.server.repository.UserRepository;
 import com.vynqtalk.server.model.enums.AlertType;
+import com.vynqtalk.server.model.groups.Group;
 import com.vynqtalk.server.model.messages.Message;
 import com.vynqtalk.server.model.users.User;
 import com.vynqtalk.server.model.users.UserSettings;
-import com.vynqtalk.server.error.UserNotFoundException;
 import com.vynqtalk.server.mapper.MessageMapper;
 import com.vynqtalk.server.repository.GroupRepository;
 import com.vynqtalk.server.repository.GroupMessageRepository;
 import com.vynqtalk.server.repository.NotificationRepository;
 import com.vynqtalk.server.repository.DeviceTokenRepository;
 import com.vynqtalk.server.repository.UserLogRepository;
-import com.vynqtalk.server.service.GroupMessageService;
 
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -164,11 +164,12 @@ public class UserService {
     @Transactional
     public void deleteUser(Long id) {
         User user = getUserById(id);
+        System.out.println("this is loggin level" +user);
         // 1. Check group admin status
-        List<com.vynqtalk.server.model.groups.Group> adminGroups = groupRepository.findByAdmins_Id(id);
-        for (com.vynqtalk.server.model.groups.Group group : adminGroups) {
+        List<Group> adminGroups = groupRepository.findByAdmins_Id(id);
+        for (Group group : adminGroups) {
             if (group.getAdmins().size() == 1) {
-                throw new RuntimeException("Cannot delete user: user is the only admin in group '" + group.getName() + "'. Assign a new admin first.");
+                throw new SystemException("Cannot delete user: user is the only admin in group '" + group.getName() + "'. Assign a new admin first.");
             }
         }
         // 2. Delete all direct messages (sent or received)

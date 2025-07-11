@@ -1,10 +1,10 @@
 package com.vynqtalk.server.service;
 
+import com.vynqtalk.server.exceptions.MessageNotFoundException;
 import com.vynqtalk.server.model.messages.Message;
 import com.vynqtalk.server.model.messages.Reaction;
 import com.vynqtalk.server.repository.MessageRepository;
 import org.springframework.stereotype.Service;
-import com.vynqtalk.server.error.MessageNotFoundException;
 
 import java.time.Instant;
 import java.util.List;
@@ -97,7 +97,7 @@ public class MessageService {
         // createMessageReplyNotification(savedReply, message);
         return savedReply;
     }
-
+ 
     /**
      * Gets the latest message sent or received by a user.
      */

@@ -17,6 +17,8 @@ import com.vynqtalk.server.service.GroupMessageService;
 import com.vynqtalk.server.service.GroupService;
 import com.vynqtalk.server.service.MessageService;
 import com.vynqtalk.server.service.UserService;
+import com.vynqtalk.server.config.WebSocketInterceptor;
+import com.vynqtalk.server.service.NotificationService;
 
 import java.time.Instant;
 import java.util.List;
@@ -35,16 +37,20 @@ public class ChatController {
     private final GroupMessageMapper groupMessageMapper;
     private final UserService userService;
     private final GroupService groupService;
+    private final NotificationService notificationService;
+    private final WebSocketInterceptor webSocketInterceptor;
 
     public ChatController(MessageService messageService, GroupMessageService groupMessageService,
             MessageMapper messageMapper, GroupMessageMapper groupMessageMapper, UserService userService,
-            GroupService groupService) {
+            GroupService groupService, NotificationService notificationService, WebSocketInterceptor webSocketInterceptor) {
         this.messageService = messageService;
         this.groupMessageService = groupMessageService;
         this.messageMapper = messageMapper;
         this.groupMessageMapper = groupMessageMapper;
         this.userService = userService;
         this.groupService = groupService;
+        this.notificationService = notificationService;
+        this.webSocketInterceptor = webSocketInterceptor;
     }
 
     @MessageMapping("/chat.sendMessage")
@@ -64,6 +70,14 @@ public class ChatController {
         savedMessage.setFileName(message.getFileName());
 
         Message saved = messageService.saveMessage(savedMessage);
+
+        // Check if receiver is online using WebSocketInterceptor
+        String receiverSessionId = webSocketInterceptor.getSessionIdByEmail(receiver.getEmail());
+        if (receiverSessionId == null) {
+            // User is offline, send push notification
+            notificationService.sendPushNotificationToUser(receiver, "New message from " + sender.getName(), message.getContent());
+        }
+
         return messageMapper.toDTO(saved);
     }
 

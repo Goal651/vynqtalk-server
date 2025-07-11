@@ -1,4 +1,4 @@
-package com.vynqtalk.server.error;
+package com.vynqtalk.server.exceptions;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -67,5 +67,10 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(UserSettingsNotFoundException.class)
     public ResponseEntity<ApiResponse<?>> handleUserSettingsNotFoundException(UserSettingsNotFoundException ex) {
         return ResponseEntity.ok(new ApiResponse<>(false, null,"User settings not found"));
+    }
+
+    @ExceptionHandler(SystemException.class)
+    public ResponseEntity<ApiResponse<?>> handleSystemExceptions(SystemException ex){
+        return ResponseEntity.ok(new ApiResponse<>(false,null,ex.getMessage()));
     }
 }

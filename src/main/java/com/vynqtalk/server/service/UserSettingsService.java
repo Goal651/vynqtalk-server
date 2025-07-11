@@ -7,7 +7,7 @@ import com.vynqtalk.server.model.users.User;
 import com.vynqtalk.server.model.users.UserSettings;
 import com.vynqtalk.server.repository.UserSettingsRepository;
 import com.vynqtalk.server.dto.request.UserSettingsUpdateRequest;
-import com.vynqtalk.server.error.UserSettingsNotFoundException;
+import com.vynqtalk.server.exceptions.UserSettingsNotFoundException;
 
 @Service
 public class UserSettingsService {

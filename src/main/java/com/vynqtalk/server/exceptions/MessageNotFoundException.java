@@ -1,4 +1,4 @@
-package com.vynqtalk.server.error;
+package com.vynqtalk.server.exceptions;
 
 public class MessageNotFoundException extends RuntimeException {
 

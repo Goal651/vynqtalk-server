@@ -6,12 +6,12 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.vynqtalk.server.exceptions.GroupNotFoundException;
 import com.vynqtalk.server.model.enums.NotificationType;
 import com.vynqtalk.server.model.groups.Group;
 import com.vynqtalk.server.model.system.Notification;
 import com.vynqtalk.server.model.users.User;
 import com.vynqtalk.server.repository.GroupRepository;
-import com.vynqtalk.server.error.GroupNotFoundException;
 
 @Service
 public class GroupService {

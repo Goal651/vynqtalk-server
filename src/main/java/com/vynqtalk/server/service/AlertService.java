@@ -1,6 +1,6 @@
 package com.vynqtalk.server.service;
 
-import com.vynqtalk.server.error.UserNotFoundException;
+import com.vynqtalk.server.exceptions.UserNotFoundException;
 import com.vynqtalk.server.model.enums.AlertType;
 import com.vynqtalk.server.model.system.Alert;
 import com.vynqtalk.server.model.users.User;
@@ -24,11 +24,11 @@ public class AlertService {
 
     /**
      * Logs an alert with the given type, message, and IP address.
-     */
+     */ 
     public void logAlert(AlertType type, String message, String ipAddress, String email) {
         User user = userService.findByEmail(email).orElseThrow(
                 () -> new UserNotFoundException());
-        Alert alert = new Alert(type, message, ipAddress, user);
+        Alert alert = new Alert(type, message, ipAddress, user.getEmail());
         alertRepository.save(alert);
     }
 }
