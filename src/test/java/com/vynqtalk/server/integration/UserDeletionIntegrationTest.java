@@ -2,7 +2,8 @@ package com.vynqtalk.server.integration;
 
 import com.vynqtalk.server.model.users.User;
 import com.vynqtalk.server.repository.UserRepository;
-import com.vynqtalk.server.service.UserService;
+import com.vynqtalk.server.service.user.UserService;
+
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;

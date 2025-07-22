@@ -1,6 +1,7 @@
 package com.vynqtalk.server.service;
 
 import com.vynqtalk.server.repository.UserRepository;
+import com.vynqtalk.server.service.user.UserService;
 import com.vynqtalk.server.model.users.User;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
