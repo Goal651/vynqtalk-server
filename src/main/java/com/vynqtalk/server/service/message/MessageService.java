@@ -101,8 +101,8 @@ public class MessageService {
     /**
      * Gets the latest message sent or received by a user.
      */
-    public Message getLatestMessageByUserId(Long userId) {
-        List<Message> messages = messageRepository.findLatestMessageByUserId(userId);
+    public Message getLatestMessageByUserId(Long userId,Long currentUser) {
+        List<Message> messages = messageRepository.findLatestMessageByUserId(userId,currentUser);
         return messages.isEmpty() ? null : messages.get(0);
     }
 

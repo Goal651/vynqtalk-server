@@ -74,7 +74,7 @@ public class AdminService {
      * Returns all users as DTOs.
      */
     public List<UserDTO> getAllUsers() {
-        return userService.getAllUsersWithLatestMessage();
+        return userMapper.toDTOs( userService.getAllUsers());
     }
 
     /**

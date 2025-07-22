@@ -26,11 +26,17 @@ public interface MessageRepository extends JpaRepository<Message, Long> {
     long countByTimestampBetween(Instant start, Instant end);
 
     @Query("""
-        SELECT m FROM Message m
-        WHERE m.sender.id = :userId OR m.receiver.id = :userId
+       SELECT m FROM Message m
+                LEFT JOIN FETCH m.sender
+                LEFT JOIN FETCH m.receiver
+                LEFT JOIN FETCH m.replyTo r
+                LEFT JOIN FETCH r.sender
+                LEFT JOIN FETCH r.receiver
+                WHERE (m.sender.id = :userA AND m.receiver.id = :userB)
+                   OR (m.sender.id = :userB AND m.receiver.id = :userA)
         ORDER BY m.timestamp DESC
     """)
-    List<Message> findLatestMessageByUserId(@Param("userId") Long userId);
+    List<Message> findLatestMessageByUserId(@Param("userA") Long userA, @Param("userB") Long userB);
 
     @Query("""
         SELECT m FROM Message m

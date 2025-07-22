@@ -26,6 +26,7 @@ import com.vynqtalk.server.repository.UserLogRepository;
 
 import java.time.Instant;
 import java.util.List;
+
 /**
  * Service for user-related operations, including authentication, user
  * management, and login attempt tracking.
@@ -46,7 +47,7 @@ public class UserService {
     private final DeviceTokenRepository deviceTokenRepository;
     private final UserLogRepository userLogRepository;
 
-    public UserService(UserRepository userRepository,  MessageService messageService,
+    public UserService(UserRepository userRepository, MessageService messageService,
             MessageMapper messageMapper, UserSettingsService userSettingsService,
             WebSocketSessionService webSocketSessionService, UserSettingsRepository userSettingsRepository,
             GroupRepository groupRepository, GroupMessageRepository groupMessageRepository,
@@ -65,8 +66,6 @@ public class UserService {
         this.deviceTokenRepository = deviceTokenRepository;
         this.userLogRepository = userLogRepository;
     }
-
-
 
     /**
      * Saves a new user, encoding the password and setting default fields.
@@ -137,12 +136,13 @@ public class UserService {
     @Transactional
     public void deleteUser(Long id) {
         User user = getUserById(id);
-        System.out.println("this is loggin level" +user);
+        System.out.println("this is loggin level" + user);
         // 1. Check group admin status
         List<Group> adminGroups = groupRepository.findByAdmins_Id(id);
         for (Group group : adminGroups) {
             if (group.getAdmins().size() == 1) {
-                throw new SystemException("Cannot delete user: user is the only admin in group '" + group.getName() + "'. Assign a new admin first.");
+                throw new SystemException("Cannot delete user: user is the only admin in group '" + group.getName()
+                        + "'. Assign a new admin first.");
             }
         }
         // 2. Delete all direct messages (sent or received)
@@ -163,7 +163,8 @@ public class UserService {
             groupRepository.save(group);
         }
         // 8. Log the deletion
-        userLogRepository.save(new com.vynqtalk.server.model.users.UserLog(user.getEmail(), user.getName(), "DELETED ACCOUNT", java.time.Instant.now()));
+        userLogRepository.save(new com.vynqtalk.server.model.users.UserLog(user.getEmail(), user.getName(),
+                "DELETED ACCOUNT", java.time.Instant.now()));
         // 9. Delete the user
         userRepository.deleteById(id);
     }
@@ -171,7 +172,9 @@ public class UserService {
     /**
      * Returns all users with their latest message.
      */
-    public List<UserDTO> getAllUsersWithLatestMessage() {
+    public List<UserDTO> getAllUsersWithLatestMessage(String email) {
+        User currentUser = userRepository.findByEmail(email).orElseThrow(
+                () -> new UserNotFoundException());
         List<User> users = userRepository.findAll();
         return users.stream().map(user -> {
             UserDTO dto = new UserDTO();
@@ -185,7 +188,7 @@ public class UserService {
             dto.setBio(user.getBio());
             dto.setLastActive(user.getLastActive());
             dto.setCreatedAt(user.getCreatedAt());
-            Message latestMessage = messageService.getLatestMessageByUserId(user.getId());
+            Message latestMessage = messageService.getLatestMessageByUserId(user.getId(), currentUser.getId());
             dto.setLatestMessage(messageMapper.toDTO(latestMessage));
             // Set online status if allowed
             boolean online = false;
@@ -199,6 +202,10 @@ public class UserService {
             }
             return dto;
         }).toList();
+    }
+
+    public List<User> getAllUsers() {
+        return userRepository.findAll();
     }
 
     public UserDTO getUserWithUnreadMessages(User user) {
@@ -216,9 +223,7 @@ public class UserService {
         // Set unread messages
         dto.setUnreadMessages(messageService.getUnreadMessagesByUserId(user.getId())
                 .stream().map(messageMapper::toDTO).toList());
-        // Optionally set latest message as well
-        Message latestMessage = messageService.getLatestMessageByUserId(user.getId());
-        dto.setLatestMessage(messageMapper.toDTO(latestMessage));
+
         return dto;
     }
 }

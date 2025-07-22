@@ -95,7 +95,7 @@ public class UserController {
     // List all users
     @GetMapping("/all")
     public ResponseEntity<ApiResponse<List<UserDTO>>> getAllUsers(Principal principal) {
-        List<UserDTO> userDTO = userService.getAllUsersWithLatestMessage();
+        List<UserDTO> userDTO = userService.getAllUsersWithLatestMessage(principal.getName());
         return ResponseEntity.ok(
                 new ApiResponse<>(true,userDTO, userDTO.isEmpty() ? "No users found" : "Users retrieved successfully"));
     }
