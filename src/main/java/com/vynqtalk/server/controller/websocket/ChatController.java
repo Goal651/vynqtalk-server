@@ -134,7 +134,7 @@ public class ChatController {
         oldMessage.setContent(newMessage.getNewMessage());
         oldMessage.setEdited(true);
         messageService.saveMessage(oldMessage);
-        return new WsResponse<>(true, messageMapper.toDTO(oldMessage), "Message Deleted successfully");
+        return new WsResponse<>(true, messageMapper.toDTO(oldMessage), "Message edited successfully");
     }
 
     // Group socket controller
@@ -143,10 +143,10 @@ public class ChatController {
     @SendTo("/topic/groupMessages")
     public WsResponse<GroupMessageDTO> receiveGroupMessage(@Payload ChatGroupMessage message) {
         User sender = userService.getUserById(message.getSenderId());
-        Group group = groupService.findById(message.getSenderId());
+        Group group = groupService.findById(message.getGroupId());
         GroupMessage savedMessage = new GroupMessage();
         savedMessage.setSender(sender);
-        savedMessage.setGroup(group);
+        savedMessage.setGroup(group); 
         savedMessage.setContent(message.getContent());
         savedMessage.setEdited(false);
         savedMessage.setType(message.getType());
@@ -158,10 +158,11 @@ public class ChatController {
     }
 
     @MessageMapping("/group.sendMessageReply")
+    @SendTo("/topic/groupMessages")
     public WsResponse<GroupMessageDTO> replyGroupMessage(@Payload ChatGroupMessageReply message) {
         GroupMessage savedMessage = new GroupMessage();
         User sender = userService.getUserById(message.getSenderId());
-        Group group = groupService.findById(message.getSenderId());
+        Group group = groupService.findById(message.getGroupId());
         GroupMessage replyTo = groupMessageService.getGroupMessageById(message.getReplyToId());
         savedMessage.setSender(sender);
         savedMessage.setGroup(group);
@@ -182,6 +183,23 @@ public class ChatController {
         GroupMessage groupMessage = groupMessageService.getGroupMessageById(message.getMessageId());
         groupMessage.setReactions(message.getReactions());
         GroupMessage saved = groupMessageService.saveGroupMessage(groupMessage);
-        return new WsResponse<>(true, groupMessageMapper.toDTO(saved), "");
+        return new WsResponse<>(true, groupMessageMapper.toDTO(saved), "Reacted successfully");
+    }
+
+    @MessageMapping("/group.deleteMessage")
+    @SendTo("/topic/groupMessageDeletion")
+    public WsResponse<Long> deleteGroupMessage(@Payload Long id) {
+        groupMessageService.deleteGroupMessage(id);
+        return new WsResponse<>(true, id, "Group message deleted successfully");
+    }
+
+    @MessageMapping("/group.editMessage")
+    @SendTo("/topic/groupMessageEdition")
+    public WsResponse<GroupMessageDTO> editGroupMessage(@Payload ChatMessageEdit newMessage) {
+        GroupMessage oldMessage = groupMessageService.getGroupMessageById(newMessage.getId());
+        oldMessage.setContent(newMessage.getNewMessage());
+        oldMessage.setEdited(true);
+        GroupMessage saved = groupMessageService.saveGroupMessage(oldMessage);
+        return new WsResponse<>(true, groupMessageMapper.toDTO(saved), "Group message edited successfully");
     }
 }
