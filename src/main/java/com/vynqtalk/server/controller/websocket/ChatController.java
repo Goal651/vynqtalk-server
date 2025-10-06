@@ -3,9 +3,11 @@ package com.vynqtalk.server.controller.websocket;
 import com.vynqtalk.server.config.websocket.WebSocketInterceptor;
 import com.vynqtalk.server.dto.messages.GroupMessageDTO;
 import com.vynqtalk.server.dto.messages.MessageDTO;
+import com.vynqtalk.server.dto.response.WsResponse;
 import com.vynqtalk.server.dto.websocket.ChatGroupMessage;
 import com.vynqtalk.server.dto.websocket.ChatGroupMessageReply;
 import com.vynqtalk.server.dto.websocket.ChatMessage;
+import com.vynqtalk.server.dto.websocket.ChatMessageEdit;
 import com.vynqtalk.server.dto.websocket.ChatMessageReply;
 import com.vynqtalk.server.dto.websocket.ReactMessage;
 import com.vynqtalk.server.mapper.GroupMessageMapper;
@@ -42,7 +44,8 @@ public class ChatController {
 
     public ChatController(MessageService messageService, GroupMessageService groupMessageService,
             MessageMapper messageMapper, GroupMessageMapper groupMessageMapper, UserService userService,
-            GroupService groupService, NotificationService notificationService, WebSocketInterceptor webSocketInterceptor) {
+            GroupService groupService, NotificationService notificationService,
+            WebSocketInterceptor webSocketInterceptor) {
         this.messageService = messageService;
         this.groupMessageService = groupMessageService;
         this.messageMapper = messageMapper;
@@ -55,35 +58,42 @@ public class ChatController {
 
     @MessageMapping("/chat.sendMessage")
     @SendTo("/topic/messages")
-    public MessageDTO receiveMessage(@Payload ChatMessage message) {
-        Message savedMessage = new Message();
-        User sender = userService.getUserById(message.getSenderId());
-        User receiver = userService.getUserById(message.getReceiverId());
+    public WsResponse<MessageDTO> receiveMessage(@Payload ChatMessage message) {
+        try {
+            System.out.println(message + "For testing       \n\n\n\n");
+            Message savedMessage = new Message();
+            User sender = userService.getUserById(message.getSenderId());
+            User receiver = userService.getUserById(message.getReceiverId());
 
-        savedMessage.setSender(sender);
-        savedMessage.setReceiver(receiver);
-        savedMessage.setContent(message.getContent());
-        savedMessage.setEdited(false);
-        savedMessage.setType(message.getType());
-        savedMessage.setTimestamp(Instant.now());
-        savedMessage.setReactions(List.of());
-        savedMessage.setFileName(message.getFileName());
+            savedMessage.setSender(sender);
+            savedMessage.setReceiver(receiver);
+            savedMessage.setContent(message.getContent());
+            savedMessage.setEdited(false);
+            savedMessage.setType(message.getType());
+            savedMessage.setTimestamp(Instant.now());
+            savedMessage.setReactions(List.of());
+            savedMessage.setFileName(message.getFileName());
 
-        Message saved = messageService.saveMessage(savedMessage);
+            Message saved = messageService.saveMessage(savedMessage);
 
-        // Check if receiver is online using WebSocketInterceptor
-        String receiverSessionId = webSocketInterceptor.getSessionIdByEmail(receiver.getEmail());
-        if (receiverSessionId == null) {
-            // User is offline, send push notification
-            notificationService.sendPushNotificationToUser(receiver, "New message from " + sender.getName(), message.getContent());
+            // Check if receiver is online using WebSocketInterceptor
+            String receiverSessionId = webSocketInterceptor.getSessionIdByEmail(receiver.getEmail());
+            if (receiverSessionId == null) {
+                // User is offline, send push notification
+                notificationService.sendPushNotificationToUser(receiver, "New message from " + sender.getName(),
+                        message.getContent());
+            }
+
+            return new WsResponse<>(true, messageMapper.toDTO(saved), "Message Sent Successfully");
+        } catch (Error e) {
+            System.out.println("This is error handling " + e.getLocalizedMessage());
+            return new WsResponse<>(false, null, "There have been error" + e.getMessage());
         }
-
-        return messageMapper.toDTO(saved);
     }
 
     @MessageMapping("/chat.sendMessageReply")
     @SendTo("/topic/messages")
-    public MessageDTO replyMessage(@Payload ChatMessageReply message) {
+    public WsResponse<MessageDTO> replyMessage(@Payload ChatMessageReply message) {
         Message savedMessage = new Message();
         User sender = userService.getUserById(message.getSenderId());
         User receiver = userService.getUserById(message.getSenderId());
@@ -98,23 +108,40 @@ public class ChatController {
         savedMessage.setReactions(List.of());
         savedMessage.setFileName(message.getFileName());
         savedMessage = messageService.saveMessage(savedMessage);
-        return messageMapper.toDTO(savedMessage);
+        return new WsResponse<>(true, messageMapper.toDTO(savedMessage), "Replied successfully");
     }
 
     @MessageMapping("/chat.sendMessageReaction")
     @SendTo("/topic/reactions")
-    public MessageDTO reactToMessage(@Payload ReactMessage message) {
+    public WsResponse<MessageDTO> reactToMessage(@Payload ReactMessage message) {
         Message exist = messageService.getMessageById(message.getMessageId());
         exist.setReactions(message.getReactions());
         Message savedMessage = messageService.saveMessage(exist);
-        return messageMapper.toDTO(savedMessage);
+        return new WsResponse<>(true, messageMapper.toDTO(savedMessage), "Reacted successfully");
+    }
+
+    @MessageMapping("/chat.deleteMessage")
+    @SendTo("/topic/messageDeletion")
+    public WsResponse<Long> deleteMessage(@Payload Long id) {
+        messageService.deleteMessage(id);
+        return new WsResponse<>(true, id, "Message Deleted successfully");
+    }
+
+    @MessageMapping("/chat.editMessage")
+    @SendTo("/topic/messageEdition")
+    public WsResponse<MessageDTO> editMessage(@Payload ChatMessageEdit newMessage) {
+        Message oldMessage = messageService.getMessageById(newMessage.getId());
+        oldMessage.setContent(newMessage.getNewMessage());
+        oldMessage.setEdited(true);
+        messageService.saveMessage(oldMessage);
+        return new WsResponse<>(true, messageMapper.toDTO(oldMessage), "Message Deleted successfully");
     }
 
     // Group socket controller
 
     @MessageMapping("/group.sendMessage")
     @SendTo("/topic/groupMessages")
-    public GroupMessageDTO receiveGroupMessage(@Payload ChatGroupMessage message) {
+    public WsResponse<GroupMessageDTO> receiveGroupMessage(@Payload ChatGroupMessage message) {
         User sender = userService.getUserById(message.getSenderId());
         Group group = groupService.findById(message.getSenderId());
         GroupMessage savedMessage = new GroupMessage();
@@ -127,11 +154,11 @@ public class ChatController {
         savedMessage.setReactions(List.of());
         savedMessage.setFileName(message.getFileName());
         GroupMessage saved = groupMessageService.saveGroupMessage(savedMessage);
-        return groupMessageMapper.toDTO(saved);
+        return new WsResponse<>(true, groupMessageMapper.toDTO(saved), "Sent message");
     }
 
     @MessageMapping("/group.sendMessageReply")
-    public GroupMessageDTO replyGroupMessage(@Payload ChatGroupMessageReply message) {
+    public WsResponse<GroupMessageDTO> replyGroupMessage(@Payload ChatGroupMessageReply message) {
         GroupMessage savedMessage = new GroupMessage();
         User sender = userService.getUserById(message.getSenderId());
         Group group = groupService.findById(message.getSenderId());
@@ -146,15 +173,15 @@ public class ChatController {
         savedMessage.setReactions(List.of());
         savedMessage.setFileName(message.getFileName());
         savedMessage = groupMessageService.saveGroupMessage(savedMessage);
-        return groupMessageMapper.toDTO(savedMessage);
+        return new WsResponse<>(true, groupMessageMapper.toDTO(savedMessage), "Replied successfully");
     }
 
     @MessageMapping("/group.sendMessageReaction")
     @SendTo("/topic/groupReactions")
-    public GroupMessageDTO reactToGroupMessage(@Payload ReactMessage message) {
+    public WsResponse<GroupMessageDTO> reactToGroupMessage(@Payload ReactMessage message) {
         GroupMessage groupMessage = groupMessageService.getGroupMessageById(message.getMessageId());
         groupMessage.setReactions(message.getReactions());
         GroupMessage saved = groupMessageService.saveGroupMessage(groupMessage);
-        return groupMessageMapper.toDTO(saved);
+        return new WsResponse<>(true, groupMessageMapper.toDTO(saved), "");
     }
 }

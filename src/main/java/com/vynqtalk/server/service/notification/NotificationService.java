@@ -95,7 +95,8 @@ public class NotificationService {
 
     public void registerDeviceToken(User user, String endpoint, String p256dh, String auth) {
         deviceTokenRepository.findByEndpoint(endpoint).ifPresentOrElse(
-                existing -> {},
+                existing -> {
+                },
                 () -> deviceTokenRepository.save(new DeviceToken(user, endpoint, p256dh, auth)));
     }
 
@@ -105,49 +106,53 @@ public class NotificationService {
 
     /**
      * Sends a push notification to all device tokens of the user.
-     * @param user The user to notify
+     * 
+     * @param user  The user to notify
      * @param title The notification title
-     * @param body The notification body
+     * @param body  The notification body
      */
     public void sendPushNotificationToUser(User user, String title, String body) {
-        List<DeviceToken> tokens = deviceTokenRepository.findByUser(user);
-
-        PushService pushService;
         try {
-            pushService = new PushService()
-                .setPublicKey(vapidPublicKey)
-                .setPrivateKey(vapidPrivateKey)
-                .setSubject(vapidSubject);
-        } catch (NoSuchAlgorithmException | NoSuchProviderException | InvalidKeySpecException e) {
-            logger.severe("Failed to initialize PushService: " + e.getMessage());
-            return;
-        }
+            List<DeviceToken> tokens = deviceTokenRepository.findByUser(user);
 
-        String payloadJson = String.format(
-            "{ \"title\": \"%s\", \"body\": \"%s\", \"icon\": \"/logo.svg\", \"badge\": \"/logo.svg\", \"data\": { \"url\": \"/some-path\" } }",
-            title, body
-        );
-
-        for (DeviceToken deviceToken : tokens) {
+            PushService pushService;
             try {
-                nl.martijndwars.webpush.Notification notification = new nl.martijndwars.webpush.Notification(
-                    deviceToken.getEndpoint(),
-                    deviceToken.getP256dh(),
-                    deviceToken.getAuth(),
-                    payloadJson.getBytes()
-                );
-                HttpResponse response = pushService.send(notification);
-                int statusCode = response.getStatusLine().getStatusCode();
-                logger.info("Push sent to " + deviceToken.getEndpoint() + " with response: " + response.getStatusLine());
-
-                // Remove expired/invalid subscriptions
-                if (statusCode == 410 || statusCode == 404) {
-                    logger.info("Removing expired push subscription: " + deviceToken.getEndpoint());
-                    deviceTokenRepository.deleteByEndpoint(deviceToken.getEndpoint());
-                }
-            } catch (Exception e) {
-                logger.warning("Failed to send push: " + e.getMessage());
+                pushService = new PushService()
+                        .setPublicKey(vapidPublicKey)
+                        .setPrivateKey(vapidPrivateKey)
+                        .setSubject(vapidSubject);
+            } catch (NoSuchAlgorithmException | NoSuchProviderException | InvalidKeySpecException e) {
+                logger.severe("Failed to initialize PushService: " + e.getMessage());
+                return;
             }
+
+            String payloadJson = String.format(
+                    "{ \"title\": \"%s\", \"body\": \"%s\", \"icon\": \"/logo.svg\", \"badge\": \"/logo.svg\", \"data\": { \"url\": \"/some-path\" } }",
+                    title, body);
+
+            for (DeviceToken deviceToken : tokens) {
+                try {
+                    nl.martijndwars.webpush.Notification notification = new nl.martijndwars.webpush.Notification(
+                            deviceToken.getEndpoint(),
+                            deviceToken.getP256dh(),
+                            deviceToken.getAuth(),
+                            payloadJson.getBytes());
+                    HttpResponse response = pushService.send(notification);
+                    int statusCode = response.getStatusLine().getStatusCode();
+                    logger.info("Push sent to " + deviceToken.getEndpoint() + " with response: "
+                            + response.getStatusLine());
+
+                    // Remove expired/invalid subscriptions
+                    if (statusCode == 410 || statusCode == 404) {
+                        logger.info("Removing expired push subscription: " + deviceToken.getEndpoint());
+                        deviceTokenRepository.deleteByEndpoint(deviceToken.getEndpoint());
+                    }
+                } catch (Exception e) {
+                    logger.warning("Failed to send push: " + e.getMessage());
+                }
+            }
+        } catch (Error e) {
+           System.out.println("This is the source\n");
         }
     }
 }
