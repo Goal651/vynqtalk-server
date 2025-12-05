@@ -1,0 +1,53 @@
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: vynqtalk-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: vynqtalk
+      POSTGRES_USER: vynqtalk
+      POSTGRES_PASSWORD: vynqtalk_password
+    ports:
+      - "5422:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U vynqtalk"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - vynqtalk-network
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: vynqtalk-server
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      PORT: 8080
+      DATABASE_URL: jdbc:postgresql://db:5432/vynqtalk
+      DATABASE_USERNAME: vynqtalk
+      DATABASE_PASSWORD: vynqtalk_password
+      ADMIN_EMAIL: ${ADMIN_EMAIL:-admin@vynqtalk.com}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-admin123}
+      ADMIN_NAME: ${ADMIN_NAME:-Admin}
+      JWT_SECRET: ${JWT_SECRET:-your-secret-key-change-this-in-production}
+      VAPID_PUBLIC: ${VAPID_PUBLIC:-}
+      VAPID_PRIVATE: ${VAPID_PRIVATE:-}
+    ports:
+      - "8080:8080"
+    networks:
+      - vynqtalk-network
+
+volumes:
+  postgres_data:
+    driver: local
+
+networks:
+  vynqtalk-network:
+    driver: bridge

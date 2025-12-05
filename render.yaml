@@ -1,0 +1,48 @@
+
+services:
+  # Web Service (Spring Boot Application)
+  - type: web
+    name: vynqtalk-server
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    plan: free
+    region: oregon # Free tier available in oregon
+    healthCheckPath: /api/v2/actuator/health
+    envVars:
+      - key: PORT
+        value: 8080
+      - key: DATABASE_URL
+        fromDatabase:
+          name: vynqtalk-db
+          property: connectionString
+      - key: DATABASE_USERNAME
+        fromDatabase:
+          name: vynqtalk-db
+          property: user
+      - key: DATABASE_PASSWORD
+        fromDatabase:
+          name: vynqtalk-db
+          property: password
+      - key: ADMIN_EMAIL
+        sync: false # Set manually in Render dashboard
+      - key: ADMIN_PASSWORD
+        sync: false
+      - key: ADMIN_NAME
+        value: Admin
+      - key: JWT_SECRET
+        generateValue: true # Render auto-generates a secure value
+      - key: VAPID_PUBLIC
+        sync: false
+      - key: VAPID_PRIVATE
+        sync: false
+      - key: JAVA_TOOL_OPTIONS
+        value: "-Xmx256m -Xms128m" # Memory optimization for free tier
+
+databases:
+  # PostgreSQL Database
+  - name: vynqtalk-db
+    plan: free
+    region: oregon
+    databaseName: vynqtalk
+    user: vynqtalk
+    postgresMajorVersion: "16"

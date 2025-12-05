@@ -20,7 +20,4 @@ COPY --from=build /app/target/*.jar app.jar
 # Railway sets PORT env var automatically
 EXPOSE 8080
 
-# Use the PORT env var if set, otherwise default to 8080
-ENV JAVA_OPTS="-Xmx192m -Xms96m"
-
-ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS -jar app.jar --server.port=${PORT:-8080}"] 
+ENTRYPOINT ["java","-jar","/app/app.jar"]
