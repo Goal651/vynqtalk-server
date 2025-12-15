@@ -15,11 +15,12 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ApiResponse<?>> handleValidationException(MethodArgumentNotValidException ex) {
+        System.out.println(ex.getBindingResult().getFieldErrors());
         String errorMessage = ex.getBindingResult().getFieldErrors().stream()
                 .findFirst()
                 .map(error -> error.getDefaultMessage())
                 .orElse("Invalid data");
-        return ResponseEntity.ok(new ApiResponse<>(false, errorMessage, "Invalid Data"));
+        return ResponseEntity.ok(new ApiResponse<>(false, null, errorMessage));
     }
 
     @ExceptionHandler(AccessDeniedException.class)
