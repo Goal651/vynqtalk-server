@@ -32,29 +32,35 @@ public class AuthChannelInterceptor implements HandshakeInterceptor {
     public boolean beforeHandshake(@NonNull ServerHttpRequest request, @NonNull ServerHttpResponse response,
             @NonNull WebSocketHandler wsHandler, @NonNull Map<String, Object> attributes) throws Exception {
         if (!(request instanceof ServletServerHttpRequest servletRequest)) {
+            logger.error("WebSocket connection failed: request is not a ServletServerHttpRequest");
             return false; 
         }
 
         HttpServletRequest httpServletRequest = servletRequest.getServletRequest();
         String path = request.getURI().getPath();
         if (!path.contains("/ws")) {
+            logger.info("WebSocket connection accepted: path={}", path);
             return true;
         }
 
         String token = httpServletRequest.getParameter("token");
         if (token == null || token.isEmpty()) {
             response.setStatusCode(HttpStatus.UNAUTHORIZED);
+            logger.error("WebSocket connection failed: token is null or empty");
             return false;
         }
 
         String userEmail = jwtService.getUsernameFromToken(token);
+        logger.info("WebSocket connection accepted: userEmail={}", userEmail);
         if (userEmail == null) {
             response.setStatusCode(HttpStatus.UNAUTHORIZED);
+            logger.error("WebSocket connection failed: userEmail is null");
             return false;
         }
 
         attributes.put("userEmail", userEmail);
         attributes.put("stompUser", userEmail);
+        logger.info("WebSocket connection accepted: attributes={}", attributes);
         return true;
     }
 
