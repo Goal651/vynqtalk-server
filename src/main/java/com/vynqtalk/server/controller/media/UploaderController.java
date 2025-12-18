@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.vynqtalk.server.dto.response.ApiResponse;
+import com.vynqtalk.server.dto.user.UserDTO;
 import com.vynqtalk.server.service.media.UploadService;
 import com.vynqtalk.server.service.user.UserService;
 import com.vynqtalk.server.model.users.User;
@@ -33,7 +34,7 @@ public class UploaderController {
         public ResponseEntity<ApiResponse<String>> uploadUserProfileImage(Principal principal,
                         @RequestParam("file") MultipartFile file,
                         HttpServletRequest request) {
-                User user = userService.getUserByEmail(principal.getName());
+                UserDTO user = userService.getUserByEmail(principal.getName());
                 String fileName = imageUploadService.uploadImage(file);
                 String baseUrl = request.getScheme() + "://" + request.getServerName() +
                                 ((request.getServerPort() == 80 || request.getServerPort() == 443) ? ""

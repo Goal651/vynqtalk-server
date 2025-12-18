@@ -16,6 +16,8 @@ import com.vynqtalk.server.service.user.UserService;
 import com.vynqtalk.server.service.user.UserSettingsService;
 
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+
 import java.security.Principal;
 import java.util.List;
 
@@ -24,20 +26,13 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/user")
+@RequiredArgsConstructor
 public class UserController {
 
     private final UserService userService;
     private final UserMapper userMapper;
     private final UserSettingsService userSettingsService;
     private final UserSettingsMapper userSettingsMapper;
-
-    public UserController(UserService userService, UserMapper userMapper, UserSettingsService userSettingsService,
-            UserSettingsMapper userSettingsMapper) {
-        this.userService = userService;
-        this.userMapper = userMapper;
-        this.userSettingsService = userSettingsService;
-        this.userSettingsMapper = userSettingsMapper;
-    }
 
     // Create a new user
     @PostMapping
@@ -47,8 +42,8 @@ public class UserController {
         user.setName(userRequest.getName());
         user.setPassword(userRequest.getPassword());
         user.setUserRole(UserRole.USER);
-        User result = userService.saveUser(user);
-        return ResponseEntity.ok(new ApiResponse<>(true,userMapper.toDTO(result), "User created successfully"));
+        UserDTO result = userService.saveUser(user);
+        return ResponseEntity.ok(new ApiResponse<>(true,result, "User created successfully"));
     }
 
     // Get user by ID
@@ -61,34 +56,34 @@ public class UserController {
     @GetMapping("/export")
     public ResponseEntity<ApiResponse<ExportUserDTO>> getUserData(Principal principal) {
         ExportUserDTO userDTO = new ExportUserDTO();
-        User user = userService.getUserByEmail(principal.getName());
-        userDTO.setUser(userService.getUserWithUnreadMessages(user));
+        UserDTO user = userService.getUserByEmail(principal.getName());
+        userDTO.setUser(userService.getUserWithUnreadMessages(userMapper.toEntity(user)));
         return ResponseEntity.ok(new ApiResponse<>(true,userDTO, "Data processed successfully"));
     }
 
     @GetMapping
     public ResponseEntity<ApiResponse<UserDTO>> getUser(Principal principal) {
-        User user = userService.getUserByEmail(principal.getName());
+        UserDTO user = userService.getUserByEmail(principal.getName());
         user.setPassword(null);
-        return ResponseEntity.ok(new ApiResponse<>(true,userMapper.toDTO(user), "Data processed successfully"));
+        return ResponseEntity.ok(new ApiResponse<>(true,user, "Data processed successfully"));
     }
 
     // Update user profile
     @PutMapping
     public ResponseEntity<ApiResponse<Void>> updateUser(Principal principal,
             @Valid @RequestBody UserUpdateRequest userUpdateRequest) {
-        User user = userService.getUserByEmail(principal.getName());
+        UserDTO user = userService.getUserByEmail(principal.getName());
         user.setName(userUpdateRequest.getName());
         user.setBio(userUpdateRequest.getBio());
-        userService.updateUser(user);
+        userService.updateUser(userMapper.toEntity(user));
         return ResponseEntity.ok(new ApiResponse<>(true,null,"User updated successfully"));
     }
 
     // Delete user account
     @DeleteMapping
     public ResponseEntity<ApiResponse<Void>> deleteUser(Principal principal) {
-        User user = userService.getUserByEmail(principal.getName());
-        userService.deleteUser(user.getId());
+        UserDTO user = userService.getUserByEmail(principal.getName());
+        userService.deleteUser(userMapper.toEntity(user).getId());
         return ResponseEntity.ok(new ApiResponse<>(true,null, "User deleted successfully"));
     }
 
@@ -103,8 +98,8 @@ public class UserController {
     // Get user settings
     @GetMapping("/settings")
     public ResponseEntity<ApiResponse<UserSettingsDTO>> getUserSettings(Principal principal) {
-        User user = userService.getUserByEmail(principal.getName());
-        UserSettings settings = userSettingsService.getUserSettings(user);
+        UserDTO user = userService.getUserByEmail(principal.getName());
+        UserSettings settings = userSettingsService.getUserSettings(userMapper.toEntity(user));
         UserSettingsDTO dto = userSettingsMapper.toDTO(settings);
         return ResponseEntity.ok(new ApiResponse<>(true,dto, "User settings retrieved successfully"));
     }
@@ -113,8 +108,8 @@ public class UserController {
     @PutMapping("/settings")
     public ResponseEntity<ApiResponse<UserSettingsDTO>> updateUserSettings(Principal principal,
             @RequestBody UserSettingsUpdateRequest updatedSettings) {
-        User user = userService.getUserByEmail(principal.getName());
-        UserSettings settings = userSettingsService.updateUserSettings(user, updatedSettings);
+        UserDTO user = userService.getUserByEmail(principal.getName());
+        UserSettings settings = userSettingsService.updateUserSettings(userMapper.toEntity(user), updatedSettings);
         UserSettingsDTO dto = userSettingsMapper.toDTO(settings);
         return ResponseEntity.ok(new ApiResponse<>(true,dto, "User settings updated successfully"));
     }

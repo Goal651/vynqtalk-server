@@ -1,6 +1,6 @@
 package com.vynqtalk.server.dto.response;
 
-import com.vynqtalk.server.model.users.User;
+import com.vynqtalk.server.dto.user.UserDTO;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -12,6 +12,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class AuthData {
-    private User user;
+    private UserDTO user;
     private String accessToken;
 }

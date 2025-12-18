@@ -2,7 +2,9 @@ package com.vynqtalk.server.controller.notification;
 
 import com.vynqtalk.server.dto.notifications.NotificationDTO;
 import com.vynqtalk.server.dto.response.ApiResponse;
+import com.vynqtalk.server.dto.user.UserDTO;
 import com.vynqtalk.server.mapper.NotificationMapper;
+import com.vynqtalk.server.mapper.UserMapper;
 import com.vynqtalk.server.model.system.Notification;
 import com.vynqtalk.server.model.users.User;
 import com.vynqtalk.server.service.notification.NotificationService;
@@ -11,6 +13,8 @@ import com.vynqtalk.server.service.user.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+
 import com.vynqtalk.server.dto.notifications.NotificationCreateRequest;
 import com.vynqtalk.server.dto.notifications.PushSubscriptionDTO;
 
@@ -18,26 +22,19 @@ import java.security.Principal;
 
 import java.util.List;
 
-
-
 @RestController
 @RequestMapping("/notifications")
+@RequiredArgsConstructor
 public class NotificationController {
 
     private final NotificationService notificationService;
     private final NotificationMapper notificationMapper;
     private final UserService userService;
-
-    public NotificationController(NotificationService notificationService, NotificationMapper notificationMapper,
-            UserService userService) {
-        this.notificationService = notificationService;
-        this.notificationMapper = notificationMapper;
-        this.userService = userService;
-    }
+    private final UserMapper userMapper;
 
     @GetMapping
     public ResponseEntity<ApiResponse<List<NotificationDTO>>> getNotificationsByUserId(Principal principal) {
-        User user = userService.getUserByEmail(principal.getName());
+        UserDTO user = userService.getUserByEmail(principal.getName());
         List<Notification> results = notificationService.getNotificationsByUserId(user.getId());
         List<NotificationDTO> notifications = notificationMapper.toDTOs(results);
         return ResponseEntity.ok(new ApiResponse<>(true, notifications, "Notifications retrieved successfully"));
@@ -85,13 +82,12 @@ public class NotificationController {
         return ResponseEntity.ok(new ApiResponse<>(true, notifications, "Notifications retrieved successfully"));
     }
 
-
-
     @PostMapping("/device/register")
-    public ResponseEntity<ApiResponse<Void>> registerDeviceToken(Principal principal, @RequestBody PushSubscriptionDTO subscription) {
-        System.out.println("Subscription logging"+subscription);
+    public ResponseEntity<ApiResponse<Void>> registerDeviceToken(Principal principal,
+            @RequestBody PushSubscriptionDTO subscription) {
+        System.out.println("Subscription logging" + subscription);
         notificationService.registerDeviceToken(
-                userService.getUserByEmail(principal.getName()),
+                userMapper.toEntity(userService.getUserByEmail(principal.getName())),
                 subscription.getEndpoint(),
                 subscription.getKeys().getP256dh(),
                 subscription.getKeys().getAuth());

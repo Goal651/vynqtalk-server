@@ -5,6 +5,8 @@ import com.vynqtalk.server.service.message.GroupMessageService;
 import com.vynqtalk.server.service.message.MessageService;
 import com.vynqtalk.server.service.websocket.WebSocketSessionService;
 
+import lombok.RequiredArgsConstructor;
+
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,6 +20,7 @@ import com.vynqtalk.server.model.messages.Message;
 import com.vynqtalk.server.model.users.User;
 import com.vynqtalk.server.model.users.UserSettings;
 import com.vynqtalk.server.mapper.MessageMapper;
+import com.vynqtalk.server.mapper.UserMapper;
 import com.vynqtalk.server.repository.GroupRepository;
 import com.vynqtalk.server.repository.GroupMessageRepository;
 import com.vynqtalk.server.repository.NotificationRepository;
@@ -32,6 +35,7 @@ import java.util.List;
  * management, and login attempt tracking.
  */
 @Service
+@RequiredArgsConstructor
 public class UserService {
 
     private final UserSettingsRepository userSettingsRepository;
@@ -46,40 +50,21 @@ public class UserService {
     private final NotificationRepository notificationRepository;
     private final DeviceTokenRepository deviceTokenRepository;
     private final UserLogRepository userLogRepository;
-
-    public UserService(UserRepository userRepository, MessageService messageService,
-            MessageMapper messageMapper, UserSettingsService userSettingsService,
-            WebSocketSessionService webSocketSessionService, UserSettingsRepository userSettingsRepository,
-            GroupRepository groupRepository, GroupMessageRepository groupMessageRepository,
-            GroupMessageService groupMessageService, NotificationRepository notificationRepository,
-            DeviceTokenRepository deviceTokenRepository, UserLogRepository userLogRepository) {
-        this.userRepository = userRepository;
-        this.messageService = messageService;
-        this.messageMapper = messageMapper;
-        this.userSettingsService = userSettingsService;
-        this.webSocketSessionService = webSocketSessionService;
-        this.userSettingsRepository = userSettingsRepository;
-        this.groupRepository = groupRepository;
-        this.groupMessageRepository = groupMessageRepository;
-        this.groupMessageService = groupMessageService;
-        this.notificationRepository = notificationRepository;
-        this.deviceTokenRepository = deviceTokenRepository;
-        this.userLogRepository = userLogRepository;
-    }
+    private final UserMapper userMapper;
 
     /**
      * Saves a new user, encoding the password and setting default fields.
      */
     @Transactional
-    public User saveUser(User user) {
+    public UserDTO saveUser(User user) {
         BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         user.setStatus("active");
         user.setLastActive(Instant.now());
         user.setBio("No bio yet");
         user.setUserRole(user.getUserRole());
-        ;
-        return userRepository.save(user);
+        
+        return userMapper.toDTO(userRepository.save(user));
     }
 
     /**
@@ -107,9 +92,10 @@ public class UserService {
     /**
      * Gets a user by email.
      */
-    public User getUserByEmail(String email) {
-        return userRepository.findByEmail(email).orElseThrow(
+    public UserDTO getUserByEmail(String email) {
+        User user= userRepository.findByEmail(email).orElseThrow(
                 () -> new UserNotFoundException());
+        return userMapper.toDTO(user);
     }
 
     public boolean checkUserByEmail(String email) {

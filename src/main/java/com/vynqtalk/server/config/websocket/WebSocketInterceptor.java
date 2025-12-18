@@ -15,8 +15,11 @@ import org.springframework.stereotype.Component;
 import com.vynqtalk.server.service.user.UserService;
 import com.vynqtalk.server.service.user.UserSettingsService;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import com.vynqtalk.server.dto.user.UserDTO;
+import com.vynqtalk.server.mapper.UserMapper;
 import com.vynqtalk.server.model.users.User;
 import com.vynqtalk.server.model.users.UserSettings;
 
@@ -30,14 +33,10 @@ public class WebSocketInterceptor implements ChannelInterceptor {
     private static final Logger logger = LoggerFactory.getLogger(WebSocketInterceptor.class);
 
     private final Map<String, String> connectedUsers = new ConcurrentHashMap<>();
-
     private final SimpMessagingTemplate messagingTemplate;
-
-    @Autowired
     private UserSettingsService userSettingsService;
-
-    @Autowired
     private UserService userService;
+    private UserMapper userMapper;
 
     public WebSocketInterceptor(@Lazy SimpMessagingTemplate messagingTemplate) {
         this.messagingTemplate = messagingTemplate;
@@ -52,9 +51,9 @@ public class WebSocketInterceptor implements ChannelInterceptor {
         Set<Long> visibleUserIds = new HashSet<>();
         for (String email : connectedUsers.keySet()) {
             try {
-                User user = userService.getUserByEmail(email);
-                if (user!=null) {
-                    UserSettings settings = userSettingsService.getUserSettings(user);
+                UserDTO user = userService.getUserByEmail(email);
+                if (user != null) {
+                    UserSettings settings = userSettingsService.getUserSettings(userMapper.toEntity(user));
                     if (settings.getShowOnlineStatus() != null && settings.getShowOnlineStatus()) {
                         visibleUserIds.add(user.getId());
                     }

@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.vynqtalk.server.dto.response.JwtValidation;
+import com.vynqtalk.server.dto.user.UserDTO;
 import com.vynqtalk.server.model.users.User;
 import com.vynqtalk.server.service.auth.JwtService;
 import com.vynqtalk.server.service.user.UserService;
@@ -72,7 +73,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         if (!result.isValid()) {
             throw new AccessDeniedException("Verification failed.");
         }
-        User user = userService.getUserByEmail(result.getUsername());
+        UserDTO user = userService.getUserByEmail(result.getUsername());
         if (user.getStatus().equals("blocked")) {
             throw new AccessDeniedException("You are blocked.\nPlease contact you admin");
         }

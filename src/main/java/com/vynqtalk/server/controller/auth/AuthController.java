@@ -23,6 +23,7 @@ import com.vynqtalk.server.service.user.UserSettingsService;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 
 import com.vynqtalk.server.dto.auth.ChangePasswordRequest;
 import com.vynqtalk.server.dto.auth.ForgotPasswordRequest;
@@ -41,21 +42,13 @@ import org.springframework.web.bind.annotation.GetMapping;
  */
 @RestController
 @RequestMapping("/auth")
+@RequiredArgsConstructor
 public class AuthController {
     private final UserService userService;
     private final JwtService jwtService;
     private final UserSettingsService userSettingsService;
     private final UserMapper userMapper;
     private final AuthService authService;
-
-    public AuthController(UserService userService, JwtService jwtService, UserSettingsService userSettingsService,
-            UserMapper userMapper,AuthService authService) {
-        this.userService = userService;
-        this.jwtService = jwtService;
-        this.userSettingsService = userSettingsService;
-        this.userMapper = userMapper;
-        this.authService=authService;
-    }
 
     /**
      * Authenticates a user and returns a JWT token if successful.
@@ -69,7 +62,7 @@ public class AuthController {
         }
 
         boolean authResult = authService.authenticate(loginRequest, ipAddress);
-        User user = userService.getUserByEmail(loginRequest.getEmail());
+        UserDTO user = userService.getUserByEmail(loginRequest.getEmail());
 
         if (user.getStatus().equals("blocked")) {
             return ResponseEntity
@@ -99,17 +92,17 @@ public class AuthController {
         if (userService.checkUserByEmail(signupRequest.getEmail())) {
             return ResponseEntity.ok(new ApiResponse<>(false, null, "User already exists"));
         }
-        userService.saveUser(user);
+        UserDTO savedUser = userService.saveUser(user);
         userSettingsService.getUserSettings(user);
         String token = jwtService.generateToken(user.getEmail());
-        AuthData authData = new AuthData(user, token);
+        AuthData authData = new AuthData(savedUser, token);
         return ResponseEntity.ok(new ApiResponse<AuthData>(true, authData, "Signup successful"));
     }
 
     @GetMapping("/check-user")
     public ResponseEntity<ApiResponse<UserDTO>> getLoggedUser(Principal principal) {
-        User user = userService.getUserByEmail(principal.getName());
-        return ResponseEntity.ok(new ApiResponse<UserDTO>(true, userMapper.toDTO(user), "User checked successfully"));
+        UserDTO user = userService.getUserByEmail(principal.getName());
+        return ResponseEntity.ok(new ApiResponse<UserDTO>(true, user, "User checked successfully"));
     }
 
     /**
@@ -166,7 +159,7 @@ public class AuthController {
      * Checks the validity of a JWT token and returns the user if valid.
      */
     @PostMapping("/check-token")
-    public ResponseEntity<ApiResponse<User>> checkToken(@RequestHeader("Authorization") String authHeader) {
+    public ResponseEntity<ApiResponse<UserDTO>> checkToken(@RequestHeader("Authorization") String authHeader) {
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             return ResponseEntity.ok(new ApiResponse<>(false, null, "Missing or invalid Authorization header"));
         }
@@ -176,7 +169,7 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(new ApiResponse<>(false, null, "Invalid or expired token"));
         }
-        User user = userService.getUserByEmail(email);
+        UserDTO user = userService.getUserByEmail(email);
         return ResponseEntity.ok(new ApiResponse<>(true, user, "Token is valid"));
     }
 }

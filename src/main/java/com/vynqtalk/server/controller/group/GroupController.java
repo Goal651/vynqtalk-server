@@ -18,34 +18,33 @@ import com.vynqtalk.server.dto.group.GroupCreateRequest;
 import com.vynqtalk.server.dto.group.GroupDTO;
 import com.vynqtalk.server.dto.group.GroupUpdateRequest;
 import com.vynqtalk.server.dto.response.ApiResponse;
+import com.vynqtalk.server.dto.user.UserDTO;
 import com.vynqtalk.server.mapper.GroupMapper;
+import com.vynqtalk.server.mapper.UserMapper;
 import com.vynqtalk.server.model.groups.Group;
 import com.vynqtalk.server.model.users.User;
 import com.vynqtalk.server.service.group.GroupService;
 import com.vynqtalk.server.service.user.UserService;
 
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("/group")
+@RequiredArgsConstructor
 public class GroupController {
 
     private final GroupService groupService;
     private final UserService userService;
     private final GroupMapper groupMapper;
-
-    public GroupController(GroupService groupService, UserService userService, GroupMapper groupMapper) {
-        this.groupService = groupService;
-        this.userService = userService;
-        this.groupMapper = groupMapper;
-    }
+    private final UserMapper userMapper;
 
     // Get all groups
     @GetMapping("/all")
     public ResponseEntity<ApiResponse<List<GroupDTO>>> getAllGroups(Principal principal) {
         List<Group> groups = groupService.findAll();
         if (principal != null) {
-            User currentUser = userService.getUserByEmail(principal.getName());
+            UserDTO currentUser = userService.getUserByEmail(principal.getName());
 
             groups = groups.stream()
                     .filter(g -> g.getMembers().stream().anyMatch(m -> m.getId().equals(currentUser.getId())))
@@ -68,13 +67,13 @@ public class GroupController {
     @PostMapping
     public ResponseEntity<ApiResponse<GroupDTO>> createGroup(Principal principal,
             @Valid @RequestBody GroupCreateRequest groupRequest) {
-        User createdBy = userService.getUserByEmail(principal.getName());
+        UserDTO createdBy = userService.getUserByEmail(principal.getName());
         Group group = new Group();
         group.setName(groupRequest.getName());
         group.setDescription(groupRequest.getDescription());
-        group.setAdmins(List.of(createdBy));
-        group.setMembers(List.of(createdBy));
-        group.setCreatedBy(createdBy);
+        group.setAdmins(List.of(userMapper.toEntity(createdBy)));
+        group.setMembers(List.of(userMapper.toEntity(createdBy)));
+        group.setCreatedBy(userMapper.toEntity(createdBy));
         group.setCreatedAt(Instant.now());
         group.setIsPrivate(groupRequest.getIsPrivate() != null ? groupRequest.getIsPrivate() : false);
         group.setStatus("active");
