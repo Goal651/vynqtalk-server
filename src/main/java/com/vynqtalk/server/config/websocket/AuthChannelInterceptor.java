@@ -33,11 +33,15 @@ public class AuthChannelInterceptor implements HandshakeInterceptor {
             @NonNull WebSocketHandler wsHandler, @NonNull Map<String, Object> attributes) throws Exception {
         if (!(request instanceof ServletServerHttpRequest servletRequest)) {
             logger.error("WebSocket connection failed: request is not a ServletServerHttpRequest");
-            return false; 
+            return false;
         }
 
         HttpServletRequest httpServletRequest = servletRequest.getServletRequest();
         String path = request.getURI().getPath();
+
+        System.out.println(
+                "Path:wigowigowigowigowigowigowigogiwogwigowigowigogwigowigowigowigowigogigowigogiwogwigowigowigowiglwigowigowigowigowigowigowigowigowigowigowigowigowigowigowigowigowigowigowiwgowigo "
+                        + path);
         if (!path.contains("/ws")) {
             logger.info("WebSocket connection accepted: path={}", path);
             return true;

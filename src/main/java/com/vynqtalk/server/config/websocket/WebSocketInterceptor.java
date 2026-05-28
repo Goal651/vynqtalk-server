@@ -15,12 +15,8 @@ import org.springframework.stereotype.Component;
 import com.vynqtalk.server.service.user.UserService;
 import com.vynqtalk.server.service.user.UserSettingsService;
 
-import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
-
 import com.vynqtalk.server.dto.user.UserDTO;
 import com.vynqtalk.server.mapper.UserMapper;
-import com.vynqtalk.server.model.users.User;
 import com.vynqtalk.server.model.users.UserSettings;
 
 import java.util.HashSet;

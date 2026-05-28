@@ -11,7 +11,6 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.vynqtalk.server.dto.response.JwtValidation;
 import com.vynqtalk.server.dto.user.UserDTO;
-import com.vynqtalk.server.model.users.User;
 import com.vynqtalk.server.service.auth.JwtService;
 import com.vynqtalk.server.service.user.UserService;
 
@@ -22,7 +21,6 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-
 
 @Component
 public class JwtAuthFilter extends OncePerRequestFilter {
@@ -41,10 +39,10 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     protected void doFilterInternal(@NonNull HttpServletRequest request,
             @NonNull HttpServletResponse response,
             @NonNull FilterChain filterChain)
-            throws ServletException, IOException,AccessDeniedException {
+            throws ServletException, IOException, AccessDeniedException {
         String authHeader = request.getHeader("Authorization");
 
-        String contextPath = request.getContextPath(); 
+        String contextPath = request.getContextPath();
         String requestURI = request.getRequestURI();
         String path = requestURI.substring(contextPath.length());
 
